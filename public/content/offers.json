@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "name": "Brand A", "rating": 4.6, "license": "MGA", "payout": "0–24 ч", "methods": "Карты, USDT",  "link": "/out/a", "enabled": true, "position": 1 },
+    { "name": "Brand B", "rating": 4.4, "license": "Curacao", "payout": "1–48 ч", "methods": "Карты, E-wallet", "link": "/out/b", "enabled": true, "position": 2 },
+    { "name": "Brand C", "rating": 4.2, "license": "Curacao", "payout": "1–72 ч", "methods": "Карты, Крипто", "link": "/out/c", "enabled": true, "position": 3 }
+  ]
+}
