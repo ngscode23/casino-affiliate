@@ -1,22 +1,36 @@
 backend:
   name: git-gateway
-  branch: main
+  branch: main # или master, в зависимости от твоей ветки
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
 collections:
+  - name: "home"
+    label: "Главная страница"
+    files:
+      - file: "public/content/home.json"
+        label: "Тексты главной"
+        fields:
+          - { name: "badge", label: "Бейдж", widget: "string" }
+          - { name: "title", label: "Заголовок", widget: "string" }
+          - { name: "subtitle", label: "Подзаголовок", widget: "string" }
+
   - name: "offers"
-    label: "Офферы"
-    folder: "public/content"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - {label: "Название", name: "name", widget: "string"}
-      - {label: "Рейтинг", name: "rating", widget: "number"}
-      - {label: "Лицензия", name: "license", widget: "string"}
-      - {label: "Выплаты", name: "payout", widget: "string"}
-      - {label: "Методы", name: "methods", widget: "string"}
-      - {label: "Ссылка", name: "link", widget: "string"}
-      - {label: "Включено", name: "enabled", widget: "boolean"}
-      - {label: "Позиция", name: "position", widget: "number"}
+    label: "Казино"
+    files:
+      - file: "public/content/offers.json"
+        label: "Список казино"
+        fields:
+          - label: "Казино"
+            name: "items"
+            widget: "list"
+            fields:
+              - { name: "name", label: "Название", widget: "string" }
+              - { name: "rating", label: "Рейтинг", widget: "number", step: 0.1 }
+              - { name: "license", label: "Лицензия", widget: "string" }
+              - { name: "payout", label: "Время выплат", widget: "string" }
+              - { name: "methods", label: "Методы пополнения", widget: "string" }
+              - { name: "link", label: "Партнёрская ссылка", widget: "string" }
+              - { name: "enabled", label: "Вкл/Выкл", widget: "boolean", default: true }
+              - { name: "position", label: "Позиция", widget: "number" }
