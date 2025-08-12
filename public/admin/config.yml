@@ -5,39 +5,18 @@ backend:
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-publish_mode: editorial_workflow   # черновик → ревью → публикация
-
 collections:
   - name: "offers"
     label: "Офферы"
-    format: "json"
-    delete: false
-    editor: { preview: false }
-    files:
-      - name: "offers_list"
-        label: "Список офферов"
-        file: "public/content/offers.json"
-        fields:
-          - { name: "items", label: "Элементы", widget: "list", fields: [
-              { name: "name", label: "Название", widget: "string" },
-              { name: "rating", label: "Рейтинг", widget: "number", valueType: "float", min: 0, max: 5, step: 0.1 },
-              { name: "license", label: "Лицензия", widget: "string" },
-              { name: "payout", label: "Выплаты", widget: "string" },
-              { name: "methods", label: "Методы", widget: "string" },
-              { name: "link", label: "Партнёрская ссылка", widget: "string" },
-              { name: "enabled", label: "Активен", widget: "boolean", default: true },
-              { name: "position", label: "Позиция", widget: "number", default: 1, min: 1 }
-            ] }
-
-  - name: "home"
-    label: "Главная"
-    format: "json"
-    delete: false
-    files:
-      - name: "home_texts"
-        label: "Тексты"
-        file: "public/content/home.json"
-        fields:
-          - { name: "badge", label: "Бейдж", widget: "string" }
-          - { name: "title", label: "Заголовок", widget: "string" }
-          - { name: "subtitle", label: "Подзаголовок", widget: "text" }
+    folder: "public/content"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Название", name: "name", widget: "string"}
+      - {label: "Рейтинг", name: "rating", widget: "number"}
+      - {label: "Лицензия", name: "license", widget: "string"}
+      - {label: "Выплаты", name: "payout", widget: "string"}
+      - {label: "Методы", name: "methods", widget: "string"}
+      - {label: "Ссылка", name: "link", widget: "string"}
+      - {label: "Включено", name: "enabled", widget: "boolean"}
+      - {label: "Позиция", name: "position", widget: "number"}
