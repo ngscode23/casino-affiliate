@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Admin</title>
 
-    <!-- Decap CMS -->
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <!-- Netlify Identity (внешний скрипт) -->
+    <script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-    <!-- Netlify Identity widget -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"
-            onload="window.dispatchEvent(new Event('NetlifyIdentityLoaded'))"></script>
+    <!-- Твой внешний файл с логикой редиректов/открытия модалок -->
+    <script defer src="/admin/identity.js"></script>
 
-    <!-- наш локальный скрипт (источник self) -->
-    <script src="/admin/identity.js"></script>
+    <!-- Decap CMS (внешний скрипт с unpkg) -->
+    <script defer src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   </head>
   <body>
-    <div id="cms"></div>
+    <div id="nc-root"></div>
   </body>
 </html>
