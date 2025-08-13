@@ -33,7 +33,7 @@ collections:
             widget: list
             fields:
               - { name: name,     label: Название, widget: string }
-              - { name: rating,   label: Рейтинг,  widget: number, value_type: float, min: 0, max: 5, step: 0.1 }
+              - { name: rating, label: Рейтинг, widget: number, value_type: float, min: 0, max: 5, step: 0.1 }
               - { name: license,  label: Лицензия, widget: string }
               - { name: payout,   label: Выплаты,  widget: string }
               - { name: methods,  label: Методы,   widget: string }
