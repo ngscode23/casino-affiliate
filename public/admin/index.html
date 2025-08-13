@@ -14,26 +14,39 @@
   <!-- Netlify Identity widget -->
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>
-  if (window.location.hash && window.location.hash.includes('invite_token')) {
-    localStorage.setItem('netlify-cms-invite', window.location.hash);
-    window.location.href = '/admin/';
-  }
-</script>
-<script>
-  // если пришли по invite_token — открыть форму регистрации
-  if (window.location.hash && window.location.hash.includes('invite_token') && window.netlifyIdentity) {
-    window.netlifyIdentity.open('signup');
-  }
+  // Редирект, если пришли по invite_token или recovery_token
+  (function () {
+    const hash = location.hash || '';
+    if (hash.startsWith('#invite_token=') || hash.startsWith('#recovery_token=')) {
+      // Сохраняем токен в localStorage, чтобы Netlify Identity мог его прочитать
+      localStorage.setItem('netlify-cms-token', hash);
+      // Если мы не на /admin/, перебрасываем туда с тем же хэшем
+      if (!location.pathname.startsWith('/admin/')) {
+        location.replace('/admin/' + hash);
+      }
+    }
+  })();
 
-  // после логина перекидываем в админку
+  // Инициализация Netlify Identity
   if (window.netlifyIdentity) {
     window.netlifyIdentity.on('init', (user) => {
-      if (!user) {
-        window.netlifyIdentity.on('login', () => {
-          document.location.href = '/admin/';
-        });
+      // Если нет пользователя и есть invite_token — открываем регистрацию
+      if (!user && location.hash.includes('invite_token')) {
+        window.netlifyIdentity.open('signup');
+      }
+      // Если нет пользователя и есть recovery_token — открываем форму сброса пароля
+      if (!user && location.hash.includes('recovery_token')) {
+        window.netlifyIdentity.open('recovery');
       }
     });
+
+    // После логина перегружаем страницу
+    window.netlifyIdentity.on('login', () => {
+      location.hash = '';
+      location.reload();
+    });
+
+    window.netlifyIdentity.init();
   }
 </script>
   <body>
