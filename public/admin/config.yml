@@ -5,38 +5,38 @@ backend:
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-publish_mode: editorial_workflow
-
 collections:
-  - name: home
-    label: Главная
-    format: json
+  - label: "Главная"
+    name: "home"
     files:
-      - name: home_texts         # ← ЭТО обязателен
-        label: Тексты
-        file: content/home.json  # URL-путь без "public/"
+      - label: "Тексты"
+        name: "texts"
+        file: "public/content/home.json"
+        editor:
+          preview: false
         fields:
-          - { name: badge, label: Бейдж, widget: string }
-          - { name: title, label: Заголовок, widget: string }
-          - { name: subtitle, label: Подзаголовок, widget: text }
+          - { label: "Бейдж", name: "badge", widget: "string", required: true }
+          - { label: "Заголовок", name: "title", widget: "string", required: true }
+          - { label: "Подзаголовок", name: "subtitle", widget: "text", required: true }
 
-  - name: offers
-    label: Офферы
-    format: json
+  - label: "Офферы"
+    name: "offers"
     files:
-      - name: offers_list        # ← ЭТО обязателен
-        label: Список офферов
-        file: content/offers.json
+      - label: "Список офферов"
+        name: "items"
+        file: "public/content/offers.json"
+        editor:
+          preview: false
         fields:
-          - name: items
-            label: Элементы
-            widget: list
+          - label: "Офферы"
+            name: "items"
+            widget: "list"
             fields:
-              - { name: name,     label: Название, widget: string }
-              - { name: rating, label: Рейтинг, widget: number, value_type: float, min: 0, max: 5, step: 0.1 }
-              - { name: license,  label: Лицензия, widget: string }
-              - { name: payout,   label: Выплаты,  widget: string }
-              - { name: methods,  label: Методы,   widget: string }
-              - { name: link,     label: Ссылка,   widget: string }
-              - { name: enabled,  label: Активен,  widget: boolean, default: true }
-              - { name: position, label: Позиция,  widget: number,  default: 1 }
+              - { label: "Название",  name: "name",    widget: "string", required: true }
+              - { label: "Рейтинг",   name: "rating",  widget: "number", value_type: "float", min: 0, max: 5, step: 0.1, required: true }
+              - { label: "Лицензия",  name: "license", widget: "string" }
+              - { label: "Выплаты",   name: "payout",  widget: "string" }
+              - { label: "Методы",    name: "methods", widget: "string" }
+              - { label: "Ссылка",    name: "link",    widget: "string" }
+              - { label: "Включено",  name: "enabled", widget: "boolean", default: true }
+              - { label: "Позиция",   name: "position",widget: "number", value_type: "int", min: 1, step: 1 }
