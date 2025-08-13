@@ -12,9 +12,9 @@ collections:
     label: Главная
     format: json
     files:
-      - name: home_texts
+      - name: home_texts         # ← ЭТО обязателен
         label: Тексты
-        file: content/home.json
+        file: content/home.json  # URL-путь без "public/"
         fields:
           - { name: badge, label: Бейдж, widget: string }
           - { name: title, label: Заголовок, widget: string }
@@ -24,7 +24,7 @@ collections:
     label: Офферы
     format: json
     files:
-      - name: offers_list
+      - name: offers_list        # ← ЭТО обязателен
         label: Список офферов
         file: content/offers.json
         fields:
