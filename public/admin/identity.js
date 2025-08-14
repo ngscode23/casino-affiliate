@@ -1,45 +1,17 @@
-// если в урле есть invite_token или recovery_token — перенаправим на /admin/ и сохраним хэш
 (function () {
-  const hash = window.location.hash || '';
-  if (hash.startsWith('#invite_token=') || hash.startsWith('#recovery_token=')) {
-    try {
-      localStorage.setItem('netlify-cms-token', hash);
-    } catch (e) {}
-
-    if (!window.location.pathname.startsWith('/admin/')) {
-      window.location.replace('/admin/' + hash);
-      return;
-    }
+  const h = location.hash || '';
+  if ((h.startsWith('#invite_token=') || h.startsWith('#recovery_token=')) && !location.pathname.startsWith('/admin/')) {
+    location.replace('/admin/' + h);
+    return;
   }
 })();
-
-// дождёмся виджета
-function onIdentityReady(cb) {
-  if (window.netlifyIdentity) return cb();
-  document.addEventListener('NetlifyIdentityLoaded', cb, { once: true });
-}
-
-onIdentityReady(() => {
-  const ni = window.netlifyIdentity;
-  if (!ni) return;
-
-  ni.on('init', (user) => {
-    const hash = window.location.hash || '';
-
-    if (!user && hash.includes('invite_token')) {
-      ni.open('signup');
-    }
-
-    if (!user && hash.includes('recovery_token')) {
-      ni.open('recovery');
-    }
+function whenIdentity(cb, t){ if(window.netlifyIdentity) return cb(window.netlifyIdentity); setTimeout(()=>whenIdentity(cb,(t||0)+200),200); }
+whenIdentity((ni)=>{
+  ni.on('init',(user)=>{
+    const h=location.hash||'';
+    if(!user && h.includes('invite_token')) ni.open('signup');
+    if(!user && h.includes('recovery_token')) ni.open('recovery');
   });
-
-  ni.on('login', () => {
-    // убираем токены из хэша и перезагружаем
-    history.replaceState(null, '', '/admin/');
-    window.location.reload();
-  });
-
+  ni.on('login',()=>{ history.replaceState(null,'','/admin/'); location.reload(); });
   ni.init();
 });
