@@ -1,48 +1,58 @@
-// identity.js — без ручного init, без повторных подписок
+// public/admin/identity.js
 
-// Если пришли с токеном НЕ на /admin — перебросить на /admin c тем же hash
 (function () {
-  var h = location.hash || "";
-  var onAdmin = location.pathname.startsWith("/admin/");
-  var hasToken =
-    h.indexOf("invite_token=") !== -1 ||
-    h.indexOf("recovery_token=") !== -1;
+  const h = window.location.hash || "";
 
-  if (hasToken && !onAdmin) {
+  // полный список возможных хэшей, которые присылает Netlify Identity
+  const isIdentityHash =
+    /#(?:invite_token|recovery_token|confirmation_token|access_token|token)=/i.test(h);
+
+  // если хэш с токеном пришёл не на /admin — перенаправим туда с тем же хэшем
+  if (isIdentityHash && !location.pathname.startsWith("/admin/")) {
+    try {
+      localStorage.setItem("netlify-cms-token", h);
+    } catch (_) {}
     location.replace("/admin/" + h);
     return;
   }
+
+  // если пришли на /admin/ без хэша, но ранее мы сохраняли его — вернём обратно
+  if (!h) {
+    const saved = localStorage.getItem("netlify-cms-token");
+    if (saved && /#(?:invite_token|recovery_token|confirmation_token|access_token|token)=/i.test(saved)) {
+      localStorage.removeItem("netlify-cms-token");
+      history.replaceState(null, "", "/admin/" + saved);
+    }
+  }
 })();
 
-// Ждём, пока виджет поднимется САМ (мы init не вызываем)
-function whenIdentity(cb, waited) {
-  if (window.netlifyIdentity && typeof window.netlifyIdentity === "object") return cb(window.netlifyIdentity);
-  if ((waited || 0) > 10000) return; // сдаёмся через 10с
-  setTimeout(function () { whenIdentity(cb, (waited || 0) + 200); }, 200);
-}
+// Ждём, пока скрипт виджета подключится
+(function whenIdentity(cb) {
+  if (window.netlifyIdentity && window.netlifyIdentity.on) return cb(window.netlifyIdentity);
+  setTimeout(() => whenIdentity(cb), 50);
+})(function (ni) {
+  // Диагностика в консоли
+  ni.on("init", (user) => console.log("[identity] init:", !!user));
+  ni.on("open",     () => console.log("[identity] open"));
+  ni.on("close",    () => console.log("[identity] close"));
+  ni.on("login",    (user) => console.log("[identity] login:", !!user));
+  ni.on("logout",   () => console.log("[identity] logout"));
+  ni.on("error",    (e) => console.error("[identity] error:", e));
 
-whenIdentity(function (ni) {
-  // Флаг: провели проводку один раз
-  if (window.__IDENTITY_WIRED__) return;
-  window.__IDENTITY_WIRED__ = true;
+  // Если пришёл инвайт — откроем форму регистрации
+  if ((location.hash || "").includes("invite_token")) {
+    ni.open("signup");
+  }
 
-  // Откроем модалку только если реально пришли с токеном
-  var h = location.hash || "";
-  var hasInvite = h.indexOf("invite_token=") !== -1;
-  var hasRecovery = h.indexOf("recovery_token=") !== -1;
+  // Начинаем
+  ni.init();
 
-  ni.on("init", function (user) {
-    if (!user && (hasInvite || hasRecovery)) {
-      // login подхватит recovery_token, signup — invite_token
-      ni.open(hasInvite ? "signup" : "login");
-    }
-  });
-
-  ni.on("login", function () {
-    // после входа чистим hash и перегружаем админку
-    if (location.hash) history.replaceState(null, "", "/admin/");
+  // После логина просто попадаем на /admin/ без хэша
+  ni.on("login", () => {
+    try { localStorage.removeItem("netlify-cms-token"); } catch (_) {}
+    // убираем хэш, остаёмся на админке
+    history.replaceState(null, "", "/admin/");
+    // лёгкая перезагрузка, чтобы CMS точно подцепила user
     location.reload();
   });
-
-  // НИКАКОГО ni.init() тут нет. Виджет и так инициализируется автоматически.
 });
