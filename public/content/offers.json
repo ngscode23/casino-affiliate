@@ -29,16 +29,6 @@
       "payout": "r",
       "license": "44",
       "rating": 0
-    },
-    {
-      "enabled": true,
-      "name": "wew",
-      "rating": 5,
-      "license": "we",
-      "payout": "23",
-      "methods": "133",
-      "position": 1,
-      "link": "2"
     }
   ]
 }
