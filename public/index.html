@@ -1,8 +1,0 @@
-<script>
-  (function () {
-    const h = location.hash || '';
-    if (h.startsWith('#invite_token=') || h.startsWith('#recovery_token=')) {
-      location.replace('/admin/' + h);
-    }
-  })();
-</script>
