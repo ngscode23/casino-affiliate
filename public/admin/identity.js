@@ -1,39 +1,33 @@
-/* Netlify Identity bootstrap (CSP-safe, no inline) */
+// identity.js — единоразовая инициализация Netlify Identity + обработка токенов
 (function () {
-  var HASH = location.hash || "";
-  var ON_ADMIN = location.pathname.startsWith("/admin/");
-  var TOKEN = (function () {
-    if (!HASH) return null;
-    if (HASH.indexOf("#invite_token=") === 0) return "invite";
-    if (HASH.indexOf("&invite_token=") !== -1) return "invite";
-    if (HASH.indexOf("#recovery_token=") === 0) return "recovery";
-    if (HASH.indexOf("&recovery_token=") !== -1) return "recovery";
-    return null;
-  })();
+  // Если пришли по токену НЕ на /admin — переносим на /admin c тем же hash
+  var h = location.hash || "";
+  var onAdmin = location.pathname.startsWith("/admin/");
+  var hasToken =
+    h.startsWith("#invite_token=") ||
+    h.indexOf("&invite_token=") !== -1 ||
+    h.startsWith("#recovery_token=") ||
+    h.indexOf("&recovery_token=") !== -1;
 
-  // Если пришли по ссылке с токеном не на /admin — перебросить
-  if (TOKEN && !ON_ADMIN) {
-    location.replace("/admin/" + HASH);
+  if (hasToken && !onAdmin) {
+    location.replace("/admin/" + h);
     return;
   }
 })();
 
+// Ждём появления виджета (скрипт identity.netlify.com)
 function waitForIdentity(cb, waited) {
-  if (window.netlifyIdentity && typeof window.netlifyIdentity === "object") {
-    return cb(window.netlifyIdentity);
-  }
-  if ((waited || 0) > 10000) return; // сдаёмся через 10с
+  if (window.netlifyIdentity && typeof window.netlifyIdentity === "object") return cb(window.netlifyIdentity);
+  if ((waited || 0) > 10000) return; // через 10с сдаёмся
   setTimeout(function () { waitForIdentity(cb, (waited || 0) + 200); }, 200);
 }
 
 waitForIdentity(function (ni) {
-  // Иногда сторонние куки выключены → виджет закрывается. Подскажем в консоль.
-  try {
-    if (document && !document.hasStorageAccess) {
-      console.info("[Identity] Если модалка закрывается сразу — разрешите third-party cookies для identity.netlify.com");
-    }
-  } catch (_e) {}
+  // Глобальный флаг: уже инициализировали — ничего не делаем
+  if (window.__IDENTITY_WIRED__) return;
+  window.__IDENTITY_WIRED__ = true;
 
+  // Навешиваем обработчики ровно один раз
   ni.on("init", function (user) {
     var h = location.hash || "";
     var hasInvite = h.indexOf("invite_token") !== -1;
@@ -44,18 +38,38 @@ waitForIdentity(function (ni) {
       return;
     }
     if (!user && hasRecovery) {
-      // У некоторых версий виджет сам определяет recovery по хэшу,
-      // но чтоб наверняка, открываем логин, он подхватит токен и покажет reset.
+      // Откроем login: виджет сам подхватит recovery_token и покажет reset
       ni.open("login");
       return;
     }
   });
 
   ni.on("login", function () {
-    // Убираем токен из адреса и перезагружаем админку уже залогиненным
-    history.replaceState(null, "", "/admin/");
+    // Чистим hash и перегружаем админку
+    if (location.hash) history.replaceState(null, "", "/admin/");
     location.reload();
   });
 
-  ni.init();
+  // Лог ошибок (для диагностики)
+  ni.on("error", function (e) {
+    console.error("[Identity error]", e);
+  });
+
+  // КРИТИЧНО: инициализируем ОДИН РАЗ
+  // Некоторые сборки уже инициализируют автоматически — тогда повторный init дергает модалку.
+  // Проверим признак из внутреннего store, если есть.
+  try {
+    var maybeInited =
+      (ni.store && (ni.store.isInitialized || ni.store.gotrue)) ||
+      (ni.currentUser && typeof ni.currentUser === "function" && ni.currentUser());
+    if (!maybeInited) {
+      ni.init();
+    }
+  } catch (_e) {
+    // На всякий случай, если апи другое — всё равно пробуем init один раз
+    if (!window.__IDENTITY_INIT_DONE__) {
+      window.__IDENTITY_INIT_DONE__ = true;
+      ni.init();
+    }
+  }
 });
