@@ -1,9 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@layer base {
-  html, body, #root { height: 100%; }
-  body { @apply bg-slate-950 text-slate-100 antialiased; font-family: "Inter", ui-sans-serif, system-ui; }
-  a { @apply text-sky-400 hover:underline; }
-  h1,h2,h3 { @apply font-extrabold tracking-tight; }
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* фон и цвет тут уже не нужны, их делает body через Tailwind */
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+}
+
+.casino-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }

@@ -1,15 +1,15 @@
-import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 
-export function Seo({ title, desc }: { title: string; desc: string }) {
-  useEffect(() => {
-    document.title = title;
-    let m = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-    if (!m) {
-      m = document.createElement("meta");
-      m.setAttribute("name", "description");
-      document.head.appendChild(m);
-    }
-    m.setAttribute("content", desc);
-  }, [title, desc]);
-  return null;
+type SeoProps = {
+  title: string;
+  description: string;
+};
+
+export function Seo({ title, description }: SeoProps) {
+  return (
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+    </Helmet>
+  );
 }

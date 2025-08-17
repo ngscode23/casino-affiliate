@@ -1,2 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import "tailwindcss";
+html, body, #root { height: 100%; }
+body { @apply bg-slate-950 text-slate-100 antialiased; }
+
+a { @apply text-sky-300 hover:text-sky-200 no-underline; }
+ul, ol { @apply list-none p-0 m-0; }
+p { @apply text-slate-300; }

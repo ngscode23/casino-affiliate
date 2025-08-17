@@ -1,9 +1,12 @@
-export function CookieBar({ onAccept }: { onAccept: () => void }) {
+import React from "react";
+export function CookieBar({ onAccept }:{ onAccept:()=>void }){
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-5xl rounded-t-2xl border border-slate-800 bg-slate-900/95 p-4 text-sm shadow-2xl">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <p className="text-slate-300">Мы используем cookie для аналитики. Продолжая пользоваться сайтом, вы соглашаетесь.</p>
-        <button onClick={onAccept} className="rounded-xl bg-slate-800 px-4 py-2 font-semibold hover:bg-slate-700">Принять</button>
+    <div style={{position:"fixed",left:0,right:0,bottom:0,zIndex:40}}>
+      <div className="container card" style={{borderTopLeftRadius:16,borderTopRightRadius:16}}>
+        <div style={{display:"flex",gap:8,alignItems:"center",justifyContent:"space-between",flexWrap:"wrap"}}>
+          <p style={{margin:0}}>Мы используем cookie для аналитики. Продолжая, вы соглашаетесь.</p>
+          <button className="btn" onClick={onAccept}>Принять</button>
+        </div>
       </div>
     </div>
   );

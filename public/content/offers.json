@@ -1,34 +1,6 @@
 {
   "items": [
-    {
-      "name": "Brand B",
-      "rating": 4.4,
-      "license": "Curacao",
-      "payout": "1–48 ч",
-      "methods": "Карты, E-wallet",
-      "link": "/out/b",
-      "enabled": true,
-      "position": 2
-    },
-    {
-      "name": "Brand C",
-      "rating": 4.2,
-      "license": "Curacao",
-      "payout": "1–72 ч",
-      "methods": "Карты, Крипто",
-      "link": "/out/c",
-      "enabled": true,
-      "position": 3
-    },
-    {
-      "enabled": true,
-      "name": "3qrrwer",
-      "link": "4w",
-      "position": 23,
-      "methods": "445r",
-      "payout": "r",
-      "license": "44",
-      "rating": 0
-    }
+    { "name":"SkySpin", "rating":4.6, "license":"MGA", "payout":"1-2 дня", "methods":"Visa, MasterCard, SEPA", "link":"/go/skyspin", "enabled":true, "position":1 },
+    { "name":"NovaWin", "rating":4.4, "license":"Curaçao", "payout":"до 48ч", "methods":"Cards, Crypto", "link":"/go/novawin", "enabled":true, "position":2 }
   ]
 }
