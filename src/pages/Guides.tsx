@@ -1,10 +1,13 @@
 import { Seo } from "../components/Seo";
 export function Guides() {
-  
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <h2 className="text-xl font-bold">Гайды</h2>
-      <p className="text-slate-300">Пара статей для новичков.</p>
-    </section>
+    <>
+      <Seo 
+        title="Гайды и советы для игроков — Casino Watch" 
+        description="Полезные статьи и гайды по онлайн-казино: стратегии, бонусы, безопасность. 18+." 
+      />
+      <h1 className="text-3xl font-bold">Гайды и советы</h1>
+      <p>Собрали для вас полезные материалы и инструкции для новичков и опытных игроков.</p>
+    </>
   );
 }

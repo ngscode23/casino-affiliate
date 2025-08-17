@@ -1,6 +1,6 @@
 // src/App.tsx
-import React, { useEffect, useMemo, useState } from "react";
-import "./App.css";
+import { useEffect, useMemo, useState } from "react";
+
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { AgeGate } from "./components/AgeGate";

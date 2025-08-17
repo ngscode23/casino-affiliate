@@ -1,5 +1,4 @@
 import { Seo } from "../components/Seo";
-// ...
 <Seo title="Топ-онлайн казино — Casino Watch" description="Честная подборка офферов, 18+." />
 export function AgeGate({ onAccept }:{ onAccept:()=>void }){
   return (

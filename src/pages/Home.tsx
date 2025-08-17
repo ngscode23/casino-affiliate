@@ -1,11 +1,20 @@
+import { Seo } from "../components/Seo";
 import { Hero } from "../components/Hero";
 import { CasinoCard } from "../components/CasinoCard";
 import { casinos } from "../data/casinos";
-import { Seo } from "../components/Seo";
+
 export function Home() {
   const items = casinos
     .filter(o => o.enabled !== false)
     .sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+    <>
+      <Seo 
+        title="Casino Watch — Топ онлайн-казино 2025" 
+        description="Рейтинг лучших онлайн-казино с бонусами и проверенной репутацией. Играй ответственно, 18+." 
+      />
+      <h1 className="text-3xl font-bold">Главная</h1>
+      <p>Честный обзор онлайн-казино и подборка лучших предложений.</p>
+    </>
 
   return (
     <>
