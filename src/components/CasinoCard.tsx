@@ -1,19 +1,24 @@
-type Props = {
-  name:string; rating:number; license:string; payout:string; methods:string; link:string;
-};
+// src/components/CasinoCard.tsx
+import type { Offer } from "../data/casinos";
 
-export function CasinoCard({ name, rating, license, payout, methods, link }: Props) {
+export function CasinoCard({ offer }: { offer: Offer }) {
+  const { name, rating, license, payout, methods, link } = offer;
+
   return (
     <li className="rounded-xl border border-slate-800 bg-slate-900 p-4">
       <div className="flex items-center justify-between">
         <div className="text-lg font-bold">{name}</div>
-        <div className="text-sm text-amber-300">★ {rating}</div>
+        <div className="text-sm text-amber-300">
+          ★ {typeof rating === "number" ? rating.toFixed(1) : rating}
+        </div>
       </div>
 
       <ul className="mt-2 grid gap-1 text-sm text-slate-300">
         <li>Лицензия: {license}</li>
         <li>Выплаты: {payout}</li>
-        <li>Методы: {methods}</li>
+        <li>
+          Методы: {Array.isArray(methods) ? methods.join(", ") : methods}
+        </li>
       </ul>
 
       <div className="mt-3 flex gap-2">
