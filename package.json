@@ -13,8 +13,20 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
+  
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "baseUrl": ".",
+    "types": ["vite/client", "@netlify/functions"]
+  },
+
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@netlify/functions": "^2.8.2",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
@@ -29,5 +41,6 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
-  }
+  },
+   "include": ["src", "netlify/functions", "vite.config.ts"]
 }
