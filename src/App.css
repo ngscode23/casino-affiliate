@@ -16,3 +16,6 @@ main {
   flex-wrap: wrap;
   justify-content: center;
 }
+body {
+  font-family: 'Inter', sans-serif;
+}
