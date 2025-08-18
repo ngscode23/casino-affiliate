@@ -1,12 +1,20 @@
-// src/components/CasinoCard.tsx
 import type { Offer } from "../data/casinos";
 import { track } from "../lib/analytics";
 
 export function CasinoCard({ offer }: { offer: Offer }) {
-  const { name, license, payout, methods, link } = offer; // добавил link
+  const { name, license, payout, methods, link, rating } = offer; // добавил rating
 
   return (
     <li className="rounded-lg border border-slate-800 p-4">
+      <meta itemProp="name" content={name} />
+      <meta
+        itemProp="aggregateRating"
+        itemScope
+        itemType="https://schema.org/AggregateRating"
+      />
+      <meta itemProp="ratingValue" content={String(rating)} />
+      <meta itemProp="bestRating" content="5" />
+
       <h2 className="text-lg font-bold">{name}</h2>
       <p>Лицензия: {license}</p>
       <p>Выплаты: {payout}</p>
