@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import "./App.css";
 
@@ -6,49 +7,49 @@ import { Footer } from "./components/Footer";
 import { AgeGate } from "./components/AgeGate";
 import { CookieBar } from "./components/CookieBar";
 
-// Ленивая загрузка страниц (named exports → мапим на default)
-const Home = lazy(() => import("./pages/Home").then(m => ({ default: m.Home })));
-const Compare = lazy(() => import("./pages/Compare").then(m => ({ default: m.Compare })));
-const Guides = lazy(() => import("./pages/Guides").then(m => ({ default: m.Guides })));
-const Responsible = lazy(() => import("./pages/Responsible").then(m => ({ default: m.Responsible })));
+// Все страницы — дефолтные экспорты
+const Home = lazy(() => import("./pages/Home"));
+const Compare = lazy(() => import("./pages/Compare"));
+const Guides = lazy(() => import("./pages/Guides").then(module => ({ default: module.Guides })));
+const Responsible = lazy(() =>
+  import("./pages/Responsible").then(module => ({ default: module.Responsible }))
+);
 
 type Route = "/" | "/compare" | "/guides" | "/responsible";
+const ALLOWED_ROUTES: Route[] = ["/", "/compare", "/guides", "/responsible"];
+
+function getPathFromHash(): Route {
+  // "#/compare?sort=rating&dir=desc" -> "/compare"
+  const raw = (window.location.hash || "").replace(/^#/, "");
+  const path = (raw.split("?")[0] || "/") as Route;
+  return (ALLOWED_ROUTES as string[]).includes(path) ? (path as Route) : "/";
+}
 
 export default function App() {
-  const [route, setRoute] = useState<Route>("/");
-  const [ageOk, setAgeOk] = useState(false);
-  const [cookiesOk, setCookiesOk] = useState(false);
+  const [route, setRoute] = useState<Route>(getPathFromHash());
+  const [ageOk, setAgeOk] = useState<boolean>(!!localStorage.getItem("age_ok_v1"));
+  const [cookiesOk, setCookiesOk] = useState<boolean>(!!localStorage.getItem("cookies_ok_v1"));
 
   useEffect(() => {
-    if (localStorage.getItem("age_ok_v1")) setAgeOk(true);
-    if (localStorage.getItem("cookies_ok_v1")) setCookiesOk(true);
-
-    const onHash = () => {
-      const r = (location.hash.replace("#", "") || "/") as Route;
-      setRoute(r);
-    };
-    onHash();
+    const onHash = () => setRoute(getPathFromHash());
     window.addEventListener("hashchange", onHash);
+    // первичная синхронизация (на случай прямого входа)
+    setRoute(getPathFromHash());
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
   const Page = useMemo(() => {
     switch (route) {
-      case "/compare":
-        return <Compare />;
-      case "/guides":
-        return <Guides />;
-      case "/responsible":
-        return <Responsible />;
-      default:
-        return <Home />;
+      case "/compare": return <Compare />;
+      case "/guides": return <Guides />;
+      case "/responsible": return <Responsible />;
+      default: return <Home />;
     }
   }, [route]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <Header />
-
       <Suspense fallback={<div className="text-slate-400 p-8">Загрузка…</div>}>
         {!ageOk && (
           <AgeGate

@@ -1,10 +1,14 @@
-export function OrgJsonLd() {
-  const json = {
+import { useEffect } from "react";
+import { upsertJsonLd } from "../lib/jsonld";
+import { SITE_NAME, SITE_URL, SITE_LOGO } from "../config/site";
+
+type Props = { name?: string; url?: string; logo?: string };
+
+export default function OrgJsonLd({ name = SITE_NAME, url = SITE_URL, logo = SITE_LOGO }: Props) {
+  useEffect(() => upsertJsonLd("org", {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Casino Watch",
-    url: "https://your-domain.com/",
-    logo: "https://your-domain.com/logo.png",
-  };
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(json) }} />;
+    name, url, logo
+  }), [name, url, logo]);
+  return null;
 }

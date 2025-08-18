@@ -1,19 +1,18 @@
-export function ItemListJsonLd({ items }: { items: { name: string; url: string; rating?: number; reviews?: number }[] }) {
-  const data = {
+import { useEffect } from "react";
+import { upsertJsonLd } from "../lib/jsonld";
+
+type Item = { name: string; url: string; position: number };
+
+export default function ItemListJsonLd({ items }: { items: Item[] }) {
+  useEffect(() => upsertJsonLd("itemlist", {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "itemListElement": items.map((it, i) => ({
+    itemListElement: items.map(i => ({
       "@type": "ListItem",
-      "position": i + 1,
-      "item": {
-        "@type": "Organization",
-        "name": it.name,
-        "url": it.url,
-        ...(it.rating && it.reviews ? {
-          "aggregateRating": { "@type": "AggregateRating", "ratingValue": it.rating.toFixed(1), "reviewCount": it.reviews }
-        } : {})
-      }
-    }))
-  };
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
+      position: i.position,
+      name: i.name,
+      url: i.url,
+    })),
+  }), [JSON.stringify(items)]);
+  return null;
 }
