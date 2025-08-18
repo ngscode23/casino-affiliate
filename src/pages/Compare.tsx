@@ -4,8 +4,7 @@ import CompareTable from "../components/CompareTable";
 import CompareFilters from "../components/CompareFilters";
 import { casinos } from "../data/casinos";
 import type { Offer } from "../data/schema";
-import { parseHash, writeHash } from "../lib/hashState";
-import { type LicenseFilter, type MethodFilter } from "../lib/hashState";
+import { parseHash, writeHash, type LicenseFilter, type MethodFilter } from "../lib/hashState";
 
 export default function ComparePage() {
   const [state, setState] = useState(parseHash());
@@ -38,29 +37,42 @@ export default function ComparePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-semibold mb-4">Сравнение офферов</h1>
+    <section className="mx-auto max-w-6xl px-4 pb-16 pt-10">
+      <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">
+        Сравнение казино
+      </h1>
+      <p className="mt-2 text-slate-600">
+        Фильтруй по лицензии, методам и скорости выплат.
+      </p>
 
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <aside className="md:col-span-1">
+          <div className="sticky top-20 rounded-2xl bg-white p-4 shadow-card border border-slate-200">
+            <CompareFilters
+              total={casinos.length}
+              filteredCount={filtered.length}
+              onChange={({ license, method }: { license: LicenseFilter; method: MethodFilter }) => {
+                setState((s) => ({ ...s, license, method }));
+              }}
+            />
+          </div>
+        </aside>
 
-<CompareFilters
-  total={casinos.length}
-  filteredCount={filtered.length}
-  onChange={({ license, method }: { license: LicenseFilter; method: MethodFilter }) => {
-    setState((s) => ({ ...s, license, method }));
-  }}
-      />
-      <CompareTable
-        offers={filtered}
-        sortKey={state.sort}
-        sortDir={state.dir}
-        onSortChange={onSortChange}
-      />
+        <div className="md:col-span-3 rounded-2xl bg-white p-4 shadow-card border border-slate-200">
+          <CompareTable
+            offers={filtered}
+            sortKey={state.sort}
+            sortDir={state.dir}
+            onSortChange={onSortChange}
+          />
 
-      {filtered.length === 0 && (
-        <p className="mt-6 text-gray-600">
-          Ничего не найдено под текущие фильтры. Сними часть условий.
-        </p>
-      )}
-    </div>
+          {filtered.length === 0 && (
+            <p className="mt-6 text-gray-600">
+              Ничего не найдено под текущие фильтры. Сними часть условий.
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

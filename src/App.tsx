@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import "./App.css";
 
-import { Header } from "./components/Header";
+import Header from "./components/Header";
 import { Footer } from "./components/Footer";
 import { AgeGate } from "./components/AgeGate";
 import { CookieBar } from "./components/CookieBar";

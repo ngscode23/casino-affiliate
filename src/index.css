@@ -5,9 +5,9 @@
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/800.css";
+
+:root { color-scheme: light; }
+html, body { background: #f8fafc; } /* slate-50 */
+body { font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif; }
 html, body, #root { height: 100%; }
 body { @apply bg-slate-950 text-slate-100 antialiased; }
-
-a { @apply text-sky-300 hover:text-sky-200 no-underline; }
-ul, ol { @apply list-none p-0 m-0; }
-p { @apply text-slate-300; }

@@ -1,3 +1,4 @@
+// src/data/schema.ts
 import { z } from "zod";
 
 export const OfferSchema = z.object({
@@ -13,4 +14,5 @@ export const OfferSchema = z.object({
   position: z.number().optional(),
 });
 
+// <-- Вот тут важно: экспортируем тип Offer
 export type Offer = z.infer<typeof OfferSchema>;
