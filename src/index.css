@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 @import "@fontsource-variable/inter";   /* вариативный Inter */
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/800.css";
 html, body, #root { height: 100%; }
 body { @apply bg-slate-950 text-slate-100 antialiased; }
 
