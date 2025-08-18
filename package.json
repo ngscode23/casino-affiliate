@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.2.6",
+    "@fontsource/inter": "^5.2.6",
     "dotenv": "^17.2.1",
     "lucide-react": "^0.539.0",
     "openai": "^5.12.2",
