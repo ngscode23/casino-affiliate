@@ -1,4 +1,5 @@
-import { Seo } from "../components/Seo";
+import Seo from "../components/Seo";
+
 
 export function Guides() {
   return <div>

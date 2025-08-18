@@ -10,7 +10,7 @@ export const OfferSchema = z.object({
   methods: z.array(z.enum(["Cards", "SEPA", "Crypto", "Paypal", "Skrill"])),
   link: z.string().url().optional(),
   enabled: z.boolean().optional(),
-  position: z.number().optional()
+  position: z.number().optional(),
 });
 
 export type Offer = z.infer<typeof OfferSchema>;

@@ -1,33 +1,34 @@
 // src/pages/Home.tsx
-import { Seo } from "../components/Seo";
-import { ItemListJsonLd } from "../components/ItemListJsonLd";
-import { OrgJsonLd } from "../components/OrgJsonLd";
-import { SiteJsonLd } from "../components/SiteJsonLd";
-import { CasinoCard } from "../components/CasinoCard";
+import Seo from "../components/Seo";
+import OrgJsonLd from "../components/OrgJsonLd";
+import SiteJsonLd from "../components/SiteJsonLd";
+import ItemListJsonLd from "../components/ItemListJsonLd";
+import { CasinoCard } from "../components/CasinoCard"; // ← ты это пропустил
+import { SITE_URL } from "../config/site";
 import { casinos } from "../data/casinos";
 
-export function Home() {
-  const enabled = casinos
-    .filter((c) => c.enabled !== false)
-    .sort((a, b) => (a.position ?? 9999) - (b.position ?? 9999));
+const enabled = casinos.filter((c) => c.enabled !== false);
 
+export default function Home() {
   return (
     <>
       <Seo
-        title="Топ онлайн-казино — Casino Watch"
-        description="Подборка лучших онлайн-казино с лицензией и быстрыми выплатами. 18+."
-        // canonical="https://your-domain.com/"
+        title="Casino Watch — сравнение офферов"
+        description="Рейтинг, лицензии и скорость выплат онлайн-казино."
+        canonical={`${SITE_URL}/`}
       />
 
-      {/* Структурированные данные сайта/организации */}
+      {/* JSON-LD */}
       <OrgJsonLd />
       <SiteJsonLd />
-
-      {/* JSON-LD списка офферов */}
       <ItemListJsonLd
         items={enabled.map((c, i) => ({
           name: c.name,
-          url: c.link ?? (c.slug ? `/go/${c.slug}` : "#"),
+          // абсолютные URL для JSON-LD
+          url:
+            c.link && /^https?:\/\//i.test(c.link)
+              ? c.link
+              : `${SITE_URL}${c.link ?? (c.slug ? `/go/${c.slug}` : "/")}`,
           position: i + 1,
         }))}
       />
@@ -45,7 +46,7 @@ export function Home() {
         ) : (
           <ul className="casino-list">
             {enabled.map((c) => (
-              <CasinoCard key={c.name} offer={c} />
+              <CasinoCard key={c.slug ?? c.name} offer={c} />
             ))}
           </ul>
         )}
