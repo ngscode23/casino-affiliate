@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter/index.css"; /* импорты через CSS, если пакет предоставляет css-файл */
+
+@layer base {
+  body { @apply bg-slate-950 text-slate-100; }
+}

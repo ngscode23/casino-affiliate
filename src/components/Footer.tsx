@@ -1,9 +1,12 @@
-export function Footer() {
+// Footer.tsx
+
+import Section from "../ui/Section";
+export default function Footer(){
   return (
-    <footer className="border-t border-slate-800/80 bg-slate-950/80">
-      <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-400">
-        © 2025 Casino Watch · 18+
-      </div>
+    <footer className="py-10 neon-footer">
+      <Section>
+        <p>18+ Play responsibly. Bonuses have T&C. This site contains affiliate links.</p>
+      </Section>
     </footer>
   );
 }

@@ -1,0 +1,124 @@
+/* ==== Neon Dark Theme (clean) ==== */
+
+/* Reset */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+html, body { margin: 0; padding: 0; }
+
+/* Tokens */
+:root {
+  --bg-0: #0b0a0f;
+  --bg-1: #111018;
+  --bg-2: #171526;
+  --surface: rgba(255,255,255,0.06);
+  --text: #eae9f3;
+  --text-dim: #b9b7c9;
+  --muted: #8e8aa5;
+
+  --primary: #b86bff;
+  --primary-2: #7c3aed;
+  --accent: #22d3ee;
+  --hot: #ff1f8f;
+  --lime: #3bd671;
+
+  --grad-hero:
+    radial-gradient(1200px 800px at 10% 10%, rgba(184,107,255,0.25) 0%, rgba(34,211,238,0.12) 40%, transparent 70%),
+    radial-gradient(1000px 700px at 90% 20%, rgba(255,31,143,0.18) 0%, transparent 60%),
+    linear-gradient(180deg, #0b0a0f 0%, #0f0e14 100%);
+
+  --ring: 0 0 0 2px rgba(184,107,255,0.35), 0 0 30px rgba(184,107,255,0.25);
+}
+
+/* Global */
+html, body { background: var(--bg-0); color: var(--text); }
+
+/* Layout */
+.neon-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+.site-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; } /* alias */
+
+/* Hero */
+.neon-hero {
+  background: var(--grad-hero);
+  border-radius: 24px;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset, 0 10px 50px rgba(0,0,0,0.6);
+}
+.neon-hero h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: clamp(28px, 4.5vw, 46px);
+  text-shadow: 0 0 18px rgba(184,107,255,0.25);
+}
+.neon-subline { color: var(--text-dim); margin-top: 10px; }
+
+/* Inputs & buttons */
+.neon-search { margin-top: 24px; display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+.neon-input {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  outline: none;
+}
+.neon-input:focus { border-color: rgba(184,107,255,0.5); box-shadow: var(--ring); }
+
+.neon-btn {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+  color: #0b0a0f;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .08s ease, filter .2s ease;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset, 0 10px 24px rgba(184,107,255,0.25);
+}
+.neon-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.neon-btn:active { transform: translateY(0); }
+
+/* Chips & cards */
+.neon-chip {
+  font-size: 12px;
+  background: rgba(184,107,255,0.12);
+  color: #decaff;
+  border: 1px solid rgba(184,107,255,0.35);
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.neon-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+.neon-card.featured { border-color: rgba(184,107,255,0.6); box-shadow: 0 0 24px rgba(184,107,255,0.25); }
+.section-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; } /* alias */
+
+/* Badges */
+.neon-badge { border-radius: 10px; padding: 6px 8px; font-weight: 700; font-size: 12px; color: #0b0a0f; }
+.badge-green { background: linear-gradient(90deg, #34d399, #a7f3d0); }
+.badge-pink  { background: linear-gradient(90deg, #ff1f8f, #ff85c2); }
+.badge-cyan  { background: linear-gradient(90deg, #22d3ee, #93c5fd); }
+
+/* Table */
+.neon-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+.neon-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 0 10px; }
+.neon-table td {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 12px 10px;
+}
+.neon-table tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+.neon-table tr td:last-child  { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+/* Footer */
+.neon-footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
+.neon-footer a { color: #bba8ff; text-decoration: underline dotted; }
+
+/* Focus ring */
+[data-glow] { transition: box-shadow .2s ease, border-color .2s ease; }
+[data-glow]:focus { box-shadow: var(--ring); border-color: rgba(184,107,255,0.6); }

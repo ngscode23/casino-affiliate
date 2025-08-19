@@ -18,12 +18,9 @@ export default function OfferCardPFM({ offer }: { offer: Offer }) {
                 Выплата ~{offer.payoutHours}ч
               </span>
             )}
-            {offer.methods?.slice(0, 3).map((m) => (
-              <span
-                key={m}
-                className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700"
-              >
-                {m}
+               {offer.methods?.slice(0, 3).map((m: string) => (
+  <span key={m} className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700">
+    {m}
               </span>
             ))}
           </div>
@@ -59,6 +56,7 @@ export default function OfferCardPFM({ offer }: { offer: Offer }) {
       </div>
 
       {/* JSON-LD для SEO */}
+      
       {typeof offer.rating === "number" && (
         <script
           type="application/ld+json"

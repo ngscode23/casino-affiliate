@@ -1,13 +1,16 @@
+// src/components/CookieBar.tsx
+import { useState } from "react";
 
-export function CookieBar({ onAccept }:{ onAccept:()=>void }){
+export default function CookieBar() {
+  const [open, setOpen] = useState(true);
+
+  if (!open) return null;
+
   return (
-    <div style={{position:"fixed",left:0,right:0,bottom:0,zIndex:40}}>
-      <div className="container card" style={{borderTopLeftRadius:16,borderTopRightRadius:16}}>
-        <div style={{display:"flex",gap:8,alignItems:"center",justifyContent:"space-between",flexWrap:"wrap"}}>
-          <p style={{margin:0}}>Мы используем cookie для аналитики. Продолжая, вы соглашаетесь.</p>
-          <button className="btn" onClick={onAccept}>Принять</button>
-        </div>
-      </div>
+    <div className="neon-card fixed bottom-4 left-1/2 -translate-x-1/2 p-4 flex items-center gap-4 z-50">
+      <span>We use cookies to improve your experience.</span>
+      <button className="neon-btn" onClick={() => setOpen(false)}>Accept</button>
+      <button className="neon-btn" onClick={() => alert("Settings modal")}>Settings</button>
     </div>
   );
 }

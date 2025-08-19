@@ -1,112 +1,56 @@
-import { useMemo } from "react";
-import type { Offer } from "../data/schema";
-import { track } from "../lib/analytics";
+import Table from "../ui/Table";
+import type { Column } from "../ui/Table";
+import Rating from "../ui/Rating";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
+
+export type Offer = {
+  slug?: string;
+  name: string;
+  rating: number;
+  license: "MGA" | "Curaçao" | "UKGC" | "Other" | string;
+  payout: string;
+  payoutHours?: number;
+  methods?: string[];   // ← добавили
+  payments?: string[];  // ← совместимость
+  link?: string;
+};
 
 type Props = {
   offers: Offer[];
-  sortKey: "rating" | "payoutHours";
+  sortKey: string;
   sortDir: "asc" | "desc";
-  onSortChange: (key: "rating" | "payoutHours", dir: "asc" | "desc") => void;
+  onSortChange: (key: "rating" | "payoutHours" | string, dir: "asc" | "desc") => void; // ← расширили
 };
 
-function toAriaSort(
-  active: boolean,
-  dir: "asc" | "desc"
-): "none" | "ascending" | "descending" | "other" {
-  if (!active) return "none";
-  return dir === "asc" ? "ascending" : "descending";
+function header(label: string, key: "rating" | "payoutHours" | string, sortKey: string, dir: "asc" | "desc", onSort: Props["onSortChange"]) {
+  const is = sortKey === key;
+  const arrow = is ? (dir === "asc" ? "↑" : "↓") : "";
+  return (
+    <button className="text-left text-[var(--muted)] hover:text-[var(--text)]"
+            onClick={() => onSort(key, is && dir === "asc" ? "desc" : "asc")}>
+      {label} {arrow}
+    </button>
+  );
 }
 
 export default function CompareTable({ offers, sortKey, sortDir, onSortChange }: Props) {
-  const sorted = useMemo(() => {
-    const arr = offers.slice();
-    const dirMul = sortDir === "asc" ? 1 : -1;
-    arr.sort((a, b) => {
-      const va = (a as any)[sortKey] ?? Infinity; // undefined в конец
-      const vb = (b as any)[sortKey] ?? Infinity;
-      if (va === vb) return 0;
-      return va > vb ? dirMul : -dirMul;
-    });
-    return arr;
-  }, [offers, sortKey, sortDir]);
+  const columns: Column<Offer>[] = [
+    { key: "name", title: "FIRM", render: (r) => (
+        <div className="flex items-center gap-3">
+          <div className="neon-chip">{r.name?.[0] ?? "?"}</div>
+          <div className="font-semibold">{r.name}</div>
+        </div>
+      ) },
+    { key: "rating", title: header("RATING", "rating", sortKey, sortDir, onSortChange), render: (r) => <Rating value={r.rating} />, width: 140 },
+    { key: "license", title: "LICENSE", width: 140 },
+    { key: "payout", title: header("PAYOUT", "payoutHours", sortKey, sortDir, onSortChange), render: (r) => <span>{r.payout}</span>, width: 160 },
+    { key: "methods", title: "METHODS", render: (r) => {
+        const list = r.methods ?? r.payments ?? [];
+        return <div className="flex flex-wrap gap-2">{list.map((m, i) => <span key={i} className="neon-chip">{m}</span>)}</div>;
+      } },
+    { key: "link", title: "ACTION", render: (r) => <a href={r.link ?? "#"}><Button>Play</Button></a>, width: 140 },
+  ];
 
-  const toggleSort = (key: "rating" | "payoutHours") => {
-    const nextDir = sortKey === key ? (sortDir === "asc" ? "desc" : "asc") : "desc";
-    onSortChange(key, nextDir);
-    track("compare_sort", { key, dir: nextDir });
-  };
-
-  return (
-    <div className="overflow-x-auto rounded-2xl shadow border border-gray-200 bg-white">
-      <table className="min-w-full text-sm text-gray-900">
-        <thead className="bg-gray-100">
-          <tr className="uppercase text-xs tracking-wider text-gray-700">
-            <th scope="col" className="text-left p-3">Оффер</th>
-
-            <th
-              scope="col"
-              className="text-left p-3"
-              aria-sort={toAriaSort(sortKey === "rating", sortDir)}
-              title="Сортировать по рейтингу"
-            >
-              <button
-                type="button"
-                className="cursor-pointer select-none hover:underline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleSort("rating");
-                }}
-              >
-                Рейтинг {sortKey === "rating" ? (sortDir === "asc" ? "↑" : "↓") : ""}
-              </button>
-            </th>
-
-            <th
-              scope="col"
-              className="text-left p-3"
-              aria-sort={toAriaSort(sortKey === "payoutHours", sortDir)}
-              title="Сортировать по среднему времени выплаты (ч)"
-            >
-              <button
-                type="button"
-                className="cursor-pointer select-none hover:underline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleSort("payoutHours");
-                }}
-              >
-                Выплаты (ч) {sortKey === "payoutHours" ? (sortDir === "asc" ? "↑" : "↓") : ""}
-              </button>
-            </th>
-
-            <th scope="col" className="text-left p-3">Методы</th>
-            <th scope="col" className="text-left p-3">Лицензия</th>
-            <th scope="col" className="text-left p-3">Действия</th>
-          </tr>
-        </thead>
-
-        <tbody className="[&>tr:nth-child(odd)]:bg-white [&>tr:nth-child(even)]:bg-gray-50">
-          {sorted.map((o) => (
-            <tr key={o.slug ?? o.name} className="border-t border-gray-200">
-              <td className="p-3 font-medium">{o.name}</td>
-              <td className="p-3">{o.rating?.toFixed(1)}</td>
-              <td className="p-3">{o.payoutHours ?? "—"}</td>
-              <td className="p-3">{o.methods?.join(", ")}</td>
-              <td className="p-3">{o.license}</td>
-              <td className="p-3">
-                <a
-                  href={o.link ?? (o.slug ? `/go/${o.slug}` : "#")}
-                  className="inline-block rounded-xl px-3 py-2 border border-gray-300 hover:bg-gray-50 text-blue-600"
-                >
-                  Перейти
-                </a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  return <Card className="p-0"><Table columns={columns} rows={offers} /></Card>;
 }
