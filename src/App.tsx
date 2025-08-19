@@ -1,34 +1,78 @@
 // src/App.tsx
-function App() {
-  return (
-    <main className="min-h-screen bg-gray-50 text-gray-900">
-      <section className="mx-auto max-w-3xl px-6 py-20 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">
-          🚀 Tailwind + React работает
-        </h1>
-        <p className="mt-4 text-base text-gray-600">
-          Это стартовая страница проекта. Дальше сюда добавим ваш интерфейс казино-аффилиата.
-        </p>
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import "./App.css";
 
-        <div className="mt-10 flex items-center justify-center gap-4">
-          <a
-            href="https://tailwindcss.com/docs"
-            target="_blank"
-            className="rounded-lg bg-brand-500 px-5 py-2.5 font-medium text-white shadow-card hover:bg-brand-600 transition"
-          >
-            Документация Tailwind
-          </a>
-          <a
-            href="https://vite.dev/guide/"
-            target="_blank"
-            className="rounded-lg border border-gray-300 px-5 py-2.5 font-medium hover:bg-white shadow-card transition"
-          >
-            Гайд Vite
-          </a>
-        </div>
-      </section>
-    </main>
-  );
+import Header from "./components/Header";
+import { Footer } from "./components/Footer";
+import { AgeGate } from "./components/AgeGate";
+import { CookieBar } from "./components/CookieBar";
+
+// Все страницы — дефолтные экспорты
+const Home = lazy(() => import("./pages/Home"));
+const Compare = lazy(() => import("./pages/Compare"));
+const Guides = lazy(() => import("./pages/Guides").then(module => ({ default: module.Guides })));
+const Responsible = lazy(() =>
+  import("./pages/Responsible").then(module => ({ default: module.Responsible }))
+);
+
+type Route = "/" | "/compare" | "/guides" | "/responsible";
+const ALLOWED_ROUTES: Route[] = ["/", "/compare", "/guides", "/responsible"];
+
+function getPathFromHash(): Route {
+  // "#/compare?sort=rating&dir=desc" -> "/compare"
+  const raw = (window.location.hash || "").replace(/^#/, "");
+  const path = (raw.split("?")[0] || "/") as Route;
+  return (ALLOWED_ROUTES as string[]).includes(path) ? (path as Route) : "/";
 }
 
-export default App;
+export default function App() {
+  const [route, setRoute] = useState<Route>(getPathFromHash());
+  const [ageOk, setAgeOk] = useState<boolean>(!!localStorage.getItem("age_ok_v1"));
+  const [cookiesOk, setCookiesOk] = useState<boolean>(!!localStorage.getItem("cookies_ok_v1"));
+
+  useEffect(() => {
+    const onHash = () => setRoute(getPathFromHash());
+    window.addEventListener("hashchange", onHash);
+    // первичная синхронизация (на случай прямого входа)
+    setRoute(getPathFromHash());
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  const Page = useMemo(() => {
+    switch (route) {
+      case "/compare": return <Compare />;
+      case "/guides": return <Guides />;
+      case "/responsible": return <Responsible />;
+      default: return <Home />;
+    }
+  }, [route]);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <Header />
+      <Suspense fallback={<div className="text-slate-400 p-8">Загрузка…</div>}>
+        {!ageOk && (
+          <AgeGate
+            onAccept={() => {
+              setAgeOk(true);
+              localStorage.setItem("age_ok_v1", "1");
+            }}
+          />
+        )}
+
+        <main className="mx-auto max-w-6xl px-4 pb-16 pt-20">{Page}</main>
+
+        <Footer />
+
+        {!cookiesOk && (
+          <CookieBar
+            onAccept={() => {
+              setCookiesOk(true);
+              localStorage.setItem("cookies_ok_v1", "1");
+            }}
+          />
+        )}
+      </Suspense>
+    </div>
+  );
+}

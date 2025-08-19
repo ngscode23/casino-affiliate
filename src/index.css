@@ -1,44 +1,13 @@
-/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Шрифты */
+@import "@fontsource-variable/inter";   /* вариативный Inter */
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/800.css";
 
-/* Глобальные стили */
-html {
-  height: 100%;
-}
-
-body {
-  min-height: 100%;
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Ссылки */
-a {
-  color: #3b82f6; /* tailwind blue-500 */
-  text-decoration: none;
-}
-a:hover {
-  color: #2563eb; /* tailwind blue-600 */
-}
-
-/* Кнопки */
-button {
-  border-radius: 0.5rem;
-  padding: 0.6em 1.2em;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-button:hover {
-  opacity: 0.9;
-}
+:root { color-scheme: light; }
+html, body { background: #f8fafc; } /* slate-50 */
+body { font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif; }
+html, body, #root { height: 100%; }
+body { @apply bg-slate-950 text-slate-100 antialiased; }
