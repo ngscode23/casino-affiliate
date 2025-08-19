@@ -13,7 +13,7 @@
    // "noEmit": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    //"moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
