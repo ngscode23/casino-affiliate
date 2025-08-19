@@ -1,4 +1,3 @@
-// src/components/CompareTable.tsx
 import { useMemo } from "react";
 import type { Offer } from "../data/schema";
 import { track } from "../lib/analytics";
@@ -22,14 +21,12 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
   const sorted = useMemo(() => {
     const arr = offers.slice();
     const dirMul = sortDir === "asc" ? 1 : -1;
-
     arr.sort((a, b) => {
       const va = (a as any)[sortKey] ?? Infinity; // undefined в конец
       const vb = (b as any)[sortKey] ?? Infinity;
       if (va === vb) return 0;
       return va > vb ? dirMul : -dirMul;
     });
-
     return arr;
   }, [offers, sortKey, sortDir]);
 
@@ -40,10 +37,10 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
   };
 
   return (
-    <div className="overflow-x-auto rounded-2xl shadow">
-      <table className="min-w-full text-sm">
-        <thead className="bg-gray-900 text-white">
-          <tr className="uppercase text-xs tracking-wider">
+    <div className="overflow-x-auto rounded-2xl shadow border border-gray-200 bg-white">
+      <table className="min-w-full text-sm text-gray-900">
+        <thead className="bg-gray-100">
+          <tr className="uppercase text-xs tracking-wider text-gray-700">
             <th scope="col" className="text-left p-3">Оффер</th>
 
             <th
@@ -54,7 +51,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
             >
               <button
                 type="button"
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none hover:underline"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -73,7 +70,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
             >
               <button
                 type="button"
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none hover:underline"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -90,18 +87,18 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="[&>tr:nth-child(odd)]:bg-white [&>tr:nth-child(even)]:bg-gray-50">
           {sorted.map((o) => (
-            <tr key={o.slug ?? o.name} className="border-t">
-              <td className="p-3">{o.name}</td>
+            <tr key={o.slug ?? o.name} className="border-t border-gray-200">
+              <td className="p-3 font-medium">{o.name}</td>
               <td className="p-3">{o.rating?.toFixed(1)}</td>
               <td className="p-3">{o.payoutHours ?? "—"}</td>
               <td className="p-3">{o.methods?.join(", ")}</td>
               <td className="p-3">{o.license}</td>
               <td className="p-3">
                 <a
-                  href={o.link ?? `/go/${o.slug}`}
-                  className="inline-block rounded-xl px-3 py-2 border hover:bg-gray-50"
+                  href={o.link ?? (o.slug ? `/go/${o.slug}` : "#")}
+                  className="inline-block rounded-xl px-3 py-2 border border-gray-300 hover:bg-gray-50 text-blue-600"
                 >
                   Перейти
                 </a>
