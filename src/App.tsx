@@ -1,35 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+// src/App.tsx
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+    <main className="min-h-screen bg-gray-50 text-gray-900">
+      <section className="mx-auto max-w-3xl px-6 py-20 text-center">
+        <h1 className="text-4xl font-bold tracking-tight">
+          🚀 Tailwind + React работает
+        </h1>
+        <p className="mt-4 text-base text-gray-600">
+          Это стартовая страница проекта. Дальше сюда добавим ваш интерфейс казино-аффилиата.
         </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+        <div className="mt-10 flex items-center justify-center gap-4">
+          <a
+            href="https://tailwindcss.com/docs"
+            target="_blank"
+            className="rounded-lg bg-brand-500 px-5 py-2.5 font-medium text-white shadow-card hover:bg-brand-600 transition"
+          >
+            Документация Tailwind
+          </a>
+          <a
+            href="https://vite.dev/guide/"
+            target="_blank"
+            className="rounded-lg border border-gray-300 px-5 py-2.5 font-medium hover:bg-white shadow-card transition"
+          >
+            Гайд Vite
+          </a>
+        </div>
+      </section>
+    </main>
+  );
 }
 
-export default App
+export default App;
