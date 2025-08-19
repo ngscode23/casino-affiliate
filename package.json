@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/ngscode23/casino-affiliate#readme",
   "dependencies": {
+    "@fontsource-variable/inter": "^5.2.6",
+    "@fontsource/inter": "^5.2.6",
     "@types/pg": "^8.15.5",
     "drizzle-orm": "^0.44.4",
     "pg": "^8.16.3",
@@ -30,6 +32,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.1",

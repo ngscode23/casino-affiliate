@@ -1,18 +1,6 @@
-/* 1) Сначала ВСЕ @import */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "@fontsource-variable/inter/index.css"; /* импорты через CSS, если пакет предоставляет css-файл */
 
-/* твои кастомные темы/импорты идут ниже */
-/* 3) Дальше — твои стили */
-:root { color-scheme: light; }
-html, body { background: #f8fafc; } /* slate-50 */
-body { font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif; }
-html, body, #root { height: 100%; }
-body { @apply bg-slate-950 text-slate-100 antialiased; }
-
-@import "@fontsource-variable/inter";
-
-
-
-
+@layer base {
+  body { @apply bg-slate-950 text-slate-100; }
+}
