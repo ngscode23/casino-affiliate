@@ -1,25 +1,36 @@
-
-//import Section from "../ui/Section";
-import Card from "../ui/Card";
-import Chip from "../ui/Chip";
+// src/components/CompareFilters.tsx
 import Button from "../ui/Button";
+import Card from "../ui/Card";
 
-export function CompareFilters() {
+export type LicenseFilter = "all" | "MGA" | "Curaçao" | "UKGC" | "Other";
+export type MethodFilter  = "all" | "Cards" | "SEPA" | "Crypto" | "Paypal" | "Skrill";
+
+type Props = {
+  total: number;
+  filteredCount: number;
+  onChange: (v: { license: LicenseFilter; method: MethodFilter }) => void;
+};
+
+export default function CompareFilters({ total, filteredCount, onChange }: Props) {
   return (
     <Card>
       <div className="flex flex-wrap items-center gap-8">
-        <div className="flex gap-6 items-center">
-          <span className="text-[var(--text-dim)] text-sm">Filters:</span>
-          <Chip>MGA</Chip>
-          <Chip>Fast payout</Chip>
-          <Chip>Crypto</Chip>
+        <div className="text-sm text-[var(--text-dim)]">
+          Showing {filteredCount} of {total}
         </div>
+
         <div className="ml-auto flex gap-3">
-          <Button variant="soft">Reset</Button>
-          <Button>Apply</Button>
+          <Button
+            variant="soft"
+            onClick={() => onChange({ license: "all", method: "all" })}
+          >
+            Reset
+          </Button>
+          <Button onClick={() => onChange({ license: "MGA", method: "Cards" })}>
+            Apply
+          </Button>
         </div>
       </div>
     </Card>
   );
 }
-export default CompareFilters;

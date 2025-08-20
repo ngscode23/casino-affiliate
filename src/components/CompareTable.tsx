@@ -1,8 +1,11 @@
+// src/components/CompareTable.tsx
 import Table from "../ui/Table";
 import type { Column } from "../ui/Table";
 import Rating from "../ui/Rating";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
+
+export type SortKey = "rating" | "payoutHours";
 
 export type Offer = {
   slug?: string;
@@ -11,24 +14,32 @@ export type Offer = {
   license: "MGA" | "Curaçao" | "UKGC" | "Other" | string;
   payout: string;
   payoutHours?: number;
-  methods?: string[];   // ← добавили
-  payments?: string[];  // ← совместимость
+  methods?: string[];
+  payments?: string[];
   link?: string;
 };
 
 type Props = {
   offers: Offer[];
-  sortKey: string;
+  sortKey: SortKey;
   sortDir: "asc" | "desc";
-  onSortChange: (key: "rating" | "payoutHours" | string, dir: "asc" | "desc") => void; // ← расширили
+  onSortChange: (key: SortKey, dir: "asc" | "desc") => void;
 };
 
-function header(label: string, key: "rating" | "payoutHours" | string, sortKey: string, dir: "asc" | "desc", onSort: Props["onSortChange"]) {
+function header(
+  label: string,
+  key: SortKey,
+  sortKey: SortKey,
+  dir: "asc" | "desc",
+  onSort: Props["onSortChange"]
+) {
   const is = sortKey === key;
   const arrow = is ? (dir === "asc" ? "↑" : "↓") : "";
   return (
-    <button className="text-left text-[var(--muted)] hover:text-[var(--text)]"
-            onClick={() => onSort(key, is && dir === "asc" ? "desc" : "asc")}>
+    <button
+      className="text-left text-[var(--muted)] hover:text-[var(--text)]"
+      onClick={() => onSort(key, is && dir === "asc" ? "desc" : "asc")}
+    >
       {label} {arrow}
     </button>
   );
@@ -42,9 +53,11 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
           <div className="font-semibold">{r.name}</div>
         </div>
       ) },
-    { key: "rating", title: header("RATING", "rating", sortKey, sortDir, onSortChange), render: (r) => <Rating value={r.rating} />, width: 140 },
+    { key: "rating", title: header("RATING", "rating", sortKey, sortDir, onSortChange),
+      render: (r) => <Rating value={r.rating} />, width: 140 },
     { key: "license", title: "LICENSE", width: 140 },
-    { key: "payout", title: header("PAYOUT", "payoutHours", sortKey, sortDir, onSortChange), render: (r) => <span>{r.payout}</span>, width: 160 },
+    { key: "payout", title: header("PAYOUT", "payoutHours", sortKey, sortDir, onSortChange),
+      render: (r) => <span>{r.payout}</span>, width: 160 },
     { key: "methods", title: "METHODS", render: (r) => {
         const list = r.methods ?? r.payments ?? [];
         return <div className="flex flex-wrap gap-2">{list.map((m, i) => <span key={i} className="neon-chip">{m}</span>)}</div>;

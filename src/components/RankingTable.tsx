@@ -1,4 +1,4 @@
-import React from "react";
+
 import Card from "../ui/Card";
 
 export default function RankingTable({ total, filteredCount }: { total: number; filteredCount: number }) {
