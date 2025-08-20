@@ -5,7 +5,7 @@ export default function Home() {
       <section className="neon-hero">
         <div className="neon-container">
           <div className="mb-4 flex items-center gap-2">
-            <span className="neon-chip" data-glow>500+ Offers</span>
+            <span className="neon-chip" data-glow>5000+ Offers</span>
             <span className="neon-chip" data-glow>Real reviews</span>
             <span className="neon-chip" data-glow>Fast payouts</span>
           </div>
