@@ -1,10 +1,18 @@
 /* ==== Neon Dark Theme (clean) ==== */
+/* Глобальные отступы секций */
+.section-y { padding-block: 24px; }
+@media (min-width: 640px){ .section-y { padding-block: 32px; } }
+@media (min-width:1024px){ .section-y { padding-block: 40px; } }
+.neon-card { transition: transform .12s ease, box-shadow .2s ease; }
+.neon-card:hover { transform: translateY(-1px); }
 
+a, button { transition: color .2s ease, background-color .2s ease, border-color .2s ease, opacity .2s ease; }
 /* Reset */
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
 html, body { margin: 0; padding: 0; }
-
+.btn-row { display:flex; flex-wrap:wrap; gap:10px; }
+@media (min-width:640px){ .btn-row { gap:12px; } }
 /* Tokens */
 :root {
   --bg-0: #0b0a0f;
@@ -37,6 +45,11 @@ html, body { background: var(--bg-0); color: var(--text); }
 .site-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; } /* alias */
 
 /* Hero */
+.neon-chip { padding: 6px 10px; font-size: 12px; }
+@media (min-width:1024px){ .neon-chip { padding: 7px 12px; font-size: 13px; } }
+
+.neon-input { padding: 14px 16px; }
+@media (min-width:1024px){ .neon-input { padding: 16px 18px; } }
 .neon-hero {
   background: var(--grad-hero);
   border-radius: 24px;
@@ -129,7 +142,8 @@ html, body {
   height: auto !important;
   min-height: 100%;
 }
-
+body { padding-bottom: 64px; }
+@media (min-width:640px){ body { padding-bottom: 0; } }
 /* Корневой контейнер не должен запирать высоту */
 #root {
   min-height: 100%;

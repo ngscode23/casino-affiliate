@@ -21,7 +21,7 @@ export default function CompareFilters({ total, filteredCount, onChange }: Props
         </div>
 
         {/* кнопки справа: на мобиле столбиком и на всю ширину */}
-        <div className="ml-auto flex w-full sm:w-auto flex-col sm:flex-row gap-3">
+        <div className="mt-4 flex gap-2">
           <Button
             variant="soft"
             className="w-full sm:w-auto"

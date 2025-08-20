@@ -7,4 +7,4 @@ export default function Rating({ value }: { value: number }) {
       <span className="ml-1 text-[var(--text-dim)]">{value.toFixed(1)}</span>
     </div>
   );
-}
+};

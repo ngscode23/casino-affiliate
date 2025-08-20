@@ -1,8 +1,7 @@
 // src/components/MobileOfferCard.tsx
-
-import { useMemo } from "react"
-import Rating from "../ui/Rating"
-import { Button } from "@/components/ui/button"
+import { useMemo } from "react";
+import Rating from "../ui/Rating";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetTrigger,
@@ -10,25 +9,26 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from "@/components/ui/sheet"
-import { Info, ExternalLink } from "lucide-react"
-import { motion } from "framer-motion"   // ✅ добавляем
+} from "@/components/ui/sheet";
+import { Info, ExternalLink } from "lucide-react";
+import { motion } from "framer-motion";
 
 export type MobileOffer = {
-  slug?: string
-  name: string
-  rating: number
-  license: string
-  payout: string
-  payoutHours?: number
-  methods?: string[]
-  payments?: string[]
-  link?: string
-}
+  slug?: string;
+  name: string;
+  rating: number;
+  license: string;
+  payout: string;
+  payoutHours?: number;
+  methods?: string[];
+  payments?: string[];
+  link?: string;
+};
 
 export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
-  const methods = offer.methods ?? offer.payments ?? []
+  const methods = offer.methods ?? offer.payments ?? [];
 
+  // краткое описание под детали
   const summary = useMemo(() => {
     const speed =
       offer.payoutHours != null
@@ -37,33 +37,33 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
           : offer.payoutHours <= 48
           ? "быстрые выплаты"
           : "средняя скорость выплат"
-        : "стабильные выплаты"
-
+        : "стабильные выплаты";
     const trust =
       offer.rating >= 4.6
         ? "высокий пользовательский рейтинг"
         : offer.rating >= 4.2
         ? "хороший пользовательский рейтинг"
-        : "средний пользовательский рейтинг"
-
-    return `${offer.name}: ${speed}, ${trust}. Лицензия ${offer.license}.`
-  }, [offer])
+        : "средний пользовательский рейтинг";
+    return `${offer.name}: ${speed}, ${trust}. Лицензия ${offer.license}.`;
+  }, [offer]);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-[var(--bg-1)] p-4">
+    <div className="rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,0.35)]">
       {/* Верх карточки */}
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="font-semibold">{offer.name}</div>
-          <div className="mt-1 text-sm text-[var(--text-dim)]">
-            {offer.license}
-          </div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <div className="text-base font-semibold">{offer.name}</div>
+          <div className="text-xs text-[var(--text-dim)]">{offer.license}</div>
         </div>
-        <Rating value={offer.rating} />
+        <div className="shrink-0">
+          <Rating value={offer.rating} />
+        </div>
       </div>
 
-      {/* Краткая инфа */}
-      <div className="mt-2 text-sm">Payout: {offer.payout}</div>
+      {/* Короткая инфа */}
+      <div className="mt-3 text-sm">Payout: {offer.payout}</div>
+
+      {/* Методы */}
       {methods.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {methods.map((m, i) => (
@@ -87,19 +87,23 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button
-              variant="secondary"
-              className="inline-flex items-center justify-center gap-2"
-            >
+            {/* у нас в button.tsx уже добавлен variant="soft" — он валиден */}
+            <Button variant="soft" className="inline-flex items-center justify-center gap-2">
               Details <Info className="h-4 w-4" />
             </Button>
           </SheetTrigger>
 
-          {/* Sheet с анимацией */}
+          {/* Детали — нижний шит с плавным выездом */}
           <SheetContent
             side="bottom"
             className="max-h-[80vh] w-full rounded-t-2xl border-white/10 bg-[var(--bg-0)] text-[var(--text)] p-0 overflow-hidden"
           >
+            {/* a11y для Radix */}
+            <SheetHeader className="sr-only">
+              <SheetTitle>{offer.name}</SheetTitle>
+              <SheetDescription>Casino details</SheetDescription>
+            </SheetHeader>
+
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
@@ -107,17 +111,14 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
               className="p-6"
             >
-              <SheetHeader>
-                <SheetTitle className="text-base sm:text-lg">
-                  {offer.name}
-                </SheetTitle>
-                <SheetDescription className="text-[var(--text-dim)]">
-                  {summary}
-                </SheetDescription>
-              </SheetHeader>
+              {/* Заголовок и саммари, которые уже видимы */}
+              <div>
+                <div className="text-base sm:text-lg font-semibold">{offer.name}</div>
+                <div className="mt-1 text-[var(--text-dim)]">{summary}</div>
+              </div>
 
               <div className="mt-6 space-y-6 text-sm">
-                {/* блоки характеристик */}
+                {/* Характеристики */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-[var(--text-dim)]">Rating</div>
@@ -141,10 +142,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
                     <div className="mt-1 flex flex-wrap gap-2">
                       {methods.length
                         ? methods.map((m, i) => (
-                            <span
-                              key={`${m}-${i}`}
-                              className="neon-chip"
-                            >
+                            <span key={`${m}-${i}`} className="neon-chip">
                               {m}
                             </span>
                           ))
@@ -153,11 +151,9 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
                   </div>
                 </div>
 
-                {/* Why we like it */}
+                {/* Почему он классный */}
                 <div className="rounded-xl border border-white/10 bg-[var(--bg-1)] p-4">
-                  <div className="text-[var(--text-dim)] mb-2">
-                    Why we like it
-                  </div>
+                  <div className="text-[var(--text-dim)] mb-2">Why we like it</div>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Прозрачные условия бонусов</li>
                     <li>Адекватная скорость вывода</li>
@@ -180,5 +176,5 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
         </Sheet>
       </div>
     </div>
-  )
+  );
 }
