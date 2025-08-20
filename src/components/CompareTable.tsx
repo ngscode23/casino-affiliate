@@ -5,8 +5,9 @@ import Rating from "../ui/Rating";
 import { Button } from "@/components/ui/button";
 import Card from "../ui/Card";
 import MobileOfferCard from "./MobileOfferCard"; // ← вверху файла добавь этот импорт
-
 export type SortKey = "rating" | "payoutHours";
+import { Link } from "react-router-dom";
+
 
 export type Offer = {
   slug?: string;
@@ -49,14 +50,21 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
   });
 
   const columns: Column<Offer>[] = [
-    {
-      key: "name",
-      title: "FIRM",
-      width: 260,
-      headerProps: { className: "px-4 py-2" },
-      cellProps: { className: "px-4 py-3" },
-      render: r => <div className="font-semibold">{r.name}</div>,
-    },
+ {
+  key: "name",
+  title: "FIRM",
+  width: 260,
+  headerProps: { className: "px-4 py-2" },
+  cellProps: { className: "px-4 py-3" },
+  render: r => (
+    <div className="font-semibold">
+      <Link to={`/offers/${encodeURIComponent(r.slug ?? r.name.toLowerCase().replace(/\s+/g, "-"))}`}>
+        {r.name}
+      </Link>
+    </div>
+  ),
+},
+
     {
       key: "rating",
       title: `RATING${ratingArrow}`,
