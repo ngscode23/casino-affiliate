@@ -1,37 +1,26 @@
 {
   "compilerOptions": {
-    /* Базовые */
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-
-    /* Разрешение модулей */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true,
     "isolatedModules": true,
 
-    /* Алиасы */
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/components/*": ["src/components/*"],
+      "@/ui/*": ["src/ui/*"],
+      "@/data/*": ["src/data/*"]
     },
 
-    /* Безопасность и чистота */
-    "strict": true,
-    "skipLibCheck": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Vite специфичное */
-    "types": ["vite/client"],
-
-    /* Компиляция */
-    "noEmit": true
+    "types": ["vite/client", "node", "@netlify/functions"]
   },
-  "include": ["src"],
+  "include": ["src", "netlify/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
