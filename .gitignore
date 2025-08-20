@@ -32,3 +32,15 @@ build
 .next
 .vite
 *.tsbuildinfo
+
+# dependencies
+node_modules/
+
+# builds
+dist/
+build/
+.vite/
+.next/
+
+# misc
+*.tsbuildinfo
