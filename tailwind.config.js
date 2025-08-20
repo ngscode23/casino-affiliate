@@ -3,6 +3,13 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",                // ручной контроль тёмной темы
   theme: {
+  screens: {
+    sm: "640px",
+    md: "768px",
+    lg: "1024px",
+    xl: "1280px",
+  },
+
     extend: {
       fontFamily: {
         // чтобы Inter подтянулся по классу font-sans
@@ -15,5 +22,6 @@ export default {
       }
     }
   },
+  
   plugins: []
 };

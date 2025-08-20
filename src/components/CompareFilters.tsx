@@ -14,19 +14,25 @@ type Props = {
 export default function CompareFilters({ total, filteredCount, onChange }: Props) {
   return (
     <Card>
-      <div className="flex flex-wrap items-center gap-8">
+      <div className="flex flex-wrap items-center gap-4 sm:gap-8">
+        {/* счетчик */}
         <div className="text-sm text-[var(--text-dim)]">
           Showing {filteredCount} of {total}
         </div>
 
-        <div className="ml-auto flex gap-3">
+        {/* кнопки справа: на мобиле столбиком и на всю ширину */}
+        <div className="ml-auto flex w-full sm:w-auto flex-col sm:flex-row gap-3">
           <Button
             variant="soft"
+            className="w-full sm:w-auto"
             onClick={() => onChange({ license: "all", method: "all" })}
           >
             Reset
           </Button>
-          <Button onClick={() => onChange({ license: "MGA", method: "Cards" })}>
+          <Button
+            className="w-full sm:w-auto"
+            onClick={() => onChange({ license: "MGA", method: "Cards" })}
+          >
             Apply
           </Button>
         </div>

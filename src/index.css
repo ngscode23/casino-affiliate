@@ -1,6 +1,8 @@
 /* src/index.css */
 /* Tailwind v4 entry point */
 /* Tailwind v4 */
+/* src/index.css */
+@import "tailwindcss";
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";
 

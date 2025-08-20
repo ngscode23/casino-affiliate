@@ -122,3 +122,85 @@ html, body { background: var(--bg-0); color: var(--text); }
 /* Focus ring */
 [data-glow] { transition: box-shadow .2s ease, border-color .2s ease; }
 [data-glow]:focus { box-shadow: var(--ring); border-color: rgba(184,107,255,0.6); }
+
+/* Force-enable page scroll */
+html, body {
+  overflow-y: auto !important;
+  height: auto !important;
+  min-height: 100%;
+}
+
+/* Корневой контейнер не должен запирать высоту */
+#root {
+  min-height: 100%;
+  overflow: visible !important;
+}
+/* в src/styles/neon-theme.css */
+main {
+  min-height: 100vh; /* контент будет как минимум на всю высоту окна */
+}
+.cookie-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* поверх всего */
+}
+:root { --btn-gap: 12px; }
+
+/* Любые две кнопки подряд — раздвигаем */
+.neon-btn + .neon-btn { margin-left: var(--btn-gap); }
+
+/* Кнопка и чипы — тоже раздвигаем (если у тебя рядом фильтры/бейджи) */
+.neon-btn + .neon-chip,
+.neon-chip + .neon-btn { margin-left: var(--btn-gap); }
+
+/* Кнопки, завернутые в ссылки <a><button class="neon-btn"></button></a> */
+a + .neon-btn,
+.neon-btn + a .neon-btn,
+a + a .neon-btn { margin-left: var(--btn-gap); }
+
+/* Чтобы по вертикали не «ломались» по базовой линии текста */
+.neon-btn { vertical-align: middle; }
+.neon-chip + .neon-chip { margin-left: 0.75rem; }
+/* ===== Адаптивные базовые вещи ===== */
+
+/* Контейнер и карточки */
+.neon-container { max-width: 1200px; margin: 0 auto; padding: 0 12px; }
+@media (min-width: 640px) { .neon-container { padding: 0 16px; } }
+
+.neon-card { padding: 12px; }
+@media (min-width: 640px) { .neon-card { padding: 16px; } }
+
+/* Герой — не ломаемся на мобилке */
+.neon-hero { padding: 28px 14px; }
+@media (min-width: 640px) { .neon-hero { padding: 40px 20px; } }
+
+.neon-hero h1 { font-size: clamp(22px, 6vw, 46px); }
+
+/* Поиск в герое — в столбик на узких */
+.neon-search { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 640px) { .neon-search { grid-template-columns: 1fr auto; } }
+
+/* Кнопочные группы и чипы не слипаются и переносятся */
+.btn-row, .chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.neon-chip { display: inline-flex; align-items: center; }
+
+/* Любые подряд идущие кнопки — раздвигаем */
+.neon-btn + .neon-btn { margin-left: 10px; }
+@media (max-width: 420px) { .neon-btn + .neon-btn { margin-left: 0; } }
+
+/* Таблица: горизонтальный скролл на узких, минимальная ширина */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-min { min-width: 720px; } /* под себя подстрой, если больше колонок */
+
+/* Изображения и линки не ломают вёрстку */
+img { max-width: 100%; height: auto; }
+a { word-break: break-word; }
+
+/* Футер/низ страницы — не выпадает за экран, если мало контента */
+main { min-height: 60vh; }
+
+/* CookieBar: в две строки на узких */
+.cookie-bar { gap: 10px; flex-wrap: wrap; }
+.cookie-actions { display: flex; gap: 8px; flex-wrap: wrap; }
