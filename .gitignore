@@ -26,3 +26,9 @@ backup-inner-casino-affiliate.zip
 backup-inner-casino-affiliate.zip
 backup-inner-casino-affiliate.zip
 backup-inner-casino-affiliate.zip
+# build artifacts
+dist
+build
+.next
+.vite
+*.tsbuildinfo
