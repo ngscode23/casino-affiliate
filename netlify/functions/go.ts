@@ -1,35 +1,35 @@
 // netlify/functions/go.ts
 import type { Handler } from "@netlify/functions";
-
+import { offers } from "../../src/data/offers";
 const map: Record<string, string> = {
   skyspin:  "https://partner.example/skyspin?utm_source=casinowatch&utm_medium=aff",
   novawin:  "https://partner.example/novawin?utm_source=casinowatch&utm_medium=aff",
   rapidpay: "https://partner.example/rapidpay?utm_source=casinowatch&utm_medium=aff",
 };
 
+// 302 на внешний партнёрский URL + базовая разметка UTM
 export const handler: Handler = async (event) => {
-  const slug = (event.path ?? "").split("/go/")[1]?.replace(/^\//, "") ?? "";
-  const base = map[slug];
+  const slug = (event.queryStringParameters?.slug || "").toLowerCase();
+  const ref = event.headers.referer || "";
 
-  if (!base) {
-    return { statusCode: 404, body: "Unknown offer" };
-  }
+  const found = offers.find(
+    (o) => (o.slug || "").toLowerCase() === slug
+  );
 
-  const q = event.queryStringParameters ?? {};
-  const params = new URLSearchParams();
+  const fallback = "https://google.com/"; // на всякий случай
+  const target = found?.link || fallback;
 
-  if (q.ref) params.set("ref", q.ref);
-  if (q.cid) params.set("cid", q.cid);
-
-  // Бережно добавляем параметры — если в base уже есть ?, используем &, иначе ?
-  const separator = base.includes("?") ? "&" : "?";
-  const target = params.toString() ? `${base}${separator}${params.toString()}` : base;
+  const url = new URL(target);
+  url.searchParams.set("utm_source", "casinowatch");
+  url.searchParams.set("utm_medium", "affiliate");
+  if (ref) url.searchParams.set("utm_ref", ref);
 
   return {
     statusCode: 302,
     headers: {
-      Location: target,
+      Location: url.toString(),
       "Cache-Control": "no-store",
+      "Referrer-Policy": "no-referrer-when-downgrade",
     },
   };
 };

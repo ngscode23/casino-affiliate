@@ -1,12 +1,12 @@
+// src/pages/Offer.tsx
 import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+
 import Section from "@/ui/Section";
 import Card from "@/ui/Card";
 import Rating from "@/ui/Rating";
 import { Button } from "@/components/ui/button";
 
-// Источник данных. У тебя уже есть casinos — используем его.
-// Если у тебя другой файл/экспорт — поправь импорт.
 import { casinos } from "@/data/casinos";
 
 type OfferItem = {
@@ -23,15 +23,20 @@ type OfferItem = {
   position?: number;
 };
 
+// простой нормализатор «имя → slug»
+const slugify = (s: string) =>
+  s.toLowerCase().trim().replace(/[^a-z0-9]+/gi, "-").replace(/(^-|-$)/g, "");
+
 export default function OfferPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug = "" } = useParams<{ slug: string }>();
 
   const offer: OfferItem | undefined = useMemo(() => {
-    if (!slug) return undefined;
-    const bySlug = casinos.find(o => (o.slug ?? "").toLowerCase() === slug.toLowerCase());
-    if (bySlug) return bySlug;
-    // запасной вариант: по имени
-    return casinos.find(o => o.name.toLowerCase().replace(/\s+/g, "-") === slug.toLowerCase());
+    const s = decodeURIComponent(slug).toLowerCase();
+    // 1) точное совпадение по slug
+    let found = casinos.find(o => (o.slug ?? "").toLowerCase() === s);
+    if (found) return found;
+    // 2) запасной — по имени, приведённому к slug-форме
+    return casinos.find(o => slugify(o.name) === s);
   }, [slug]);
 
   if (!offer) {
@@ -39,11 +44,12 @@ export default function OfferPage() {
       <Section>
         <div className="neon-card p-6">
           <h1 className="text-xl font-semibold">Оффер не найден</h1>
-          <p className="mt-2 text-[var(--text-dim)]">Возможно, ссылка устарела или оффер выключен.</p>
-          <div className="mt-4">
-            <Button asChild>
-              <Link to="/">На главную</Link>
-            </Button>
+          <p className="mt-2 text-[var(--text-dim)]">
+            Возможно, ссылка устарела или оффер выключен.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Button asChild><Link to="/">На главную</Link></Button>
+            <Button variant="secondary" asChild><Link to="/compare">К сравнению</Link></Button>
           </div>
         </div>
       </Section>
@@ -53,22 +59,37 @@ export default function OfferPage() {
   const methods = offer.methods ?? offer.payments ?? [];
   const payoutHint =
     offer.payoutHours != null
-      ? offer.payoutHours <= 24 ? "очень быстрые выплаты" :
-        offer.payoutHours <= 48 ? "быстрые выплаты" : "средняя скорость выплат"
+      ? offer.payoutHours <= 24
+        ? "очень быстрые выплаты"
+        : offer.payoutHours <= 48
+        ? "быстрые выплаты"
+        : "средняя скорость выплат"
       : "стабильные выплаты";
+
+  // безопасная ссылка через Netlify Function
+  const safeSlug = offer.slug ?? slugify(offer.name);
+  const trackHref = `/go/${encodeURIComponent(safeSlug)}`;
 
   return (
     <>
-      {/* HERO секция */}
+      {/* HERO */}
       <section className="neon-hero">
         <Section>
-          <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
             <span className="neon-chip" data-glow>{offer.license}</span>
-            {offer.payoutHours != null && <span className="neon-chip" data-glow>~{offer.payoutHours}h payout</span>}
+            {offer.payoutHours != null && (
+              <span className="neon-chip" data-glow>~{offer.payoutHours}h payout</span>
+            )}
             <span className="neon-chip" data-glow>{payoutHint}</span>
           </div>
 
-          <h1 style={{ fontWeight: 800, letterSpacing: "-0.02em", fontSize: "clamp(28px,4.5vw,46px)" }}>
+          <h1
+            style={{
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              fontSize: "clamp(28px,4.5vw,46px)",
+            }}
+          >
             {offer.name}
           </h1>
 
@@ -78,11 +99,7 @@ export default function OfferPage() {
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Button asChild>
-              <a
-                href={offer.link ?? "#"}
-                target={offer.link?.startsWith("http") ? "_blank" : undefined}
-                rel={offer.link?.startsWith("http") ? "nofollow sponsored noopener" : undefined}
-              >
+              <a href={trackHref} rel="nofollow sponsored">
                 Играть сейчас
               </a>
             </Button>
@@ -96,27 +113,32 @@ export default function OfferPage() {
       {/* Основной контент */}
       <Section>
         <div className="grid gap-6 md:grid-cols-3">
-          {/* Левая колонка */}
+          {/* левая колонка */}
           <Card className="p-4 md:col-span-2">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <div className="text-[var(--text-dim)] text-sm">Рейтинг</div>
+                <div className="text-sm text-[var(--text-dim)]">Рейтинг</div>
                 <div className="mt-2"><Rating value={offer.rating} /></div>
               </div>
               <div>
-                <div className="text-[var(--text-dim)] text-sm">Лицензия</div>
+                <div className="text-sm text-[var(--text-dim)]">Лицензия</div>
                 <div className="mt-2">{offer.license}</div>
               </div>
               <div>
-                <div className="text-[var(--text-dim)] text-sm">Выплаты</div>
-                <div className="mt-2">{offer.payout}{offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}</div>
+                <div className="text-sm text-[var(--text-dim)]">Выплаты</div>
+                <div className="mt-2">
+                  {offer.payout}
+                  {offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}
+                </div>
               </div>
               <div>
-                <div className="text-[var(--text-dim)] text-sm">Методы</div>
+                <div className="text-sm text-[var(--text-dim)]">Методы</div>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {methods.length ? methods.map((m, i) => (
-                    <span key={`${m}-${i}`} className="neon-chip">{m}</span>
-                  )) : "—"}
+                  {methods.length
+                    ? methods.map((m, i) => (
+                        <span key={`${m}-${i}`} className="neon-chip">{m}</span>
+                      ))
+                    : "—"}
                 </div>
               </div>
             </div>
@@ -131,18 +153,12 @@ export default function OfferPage() {
             </div>
           </Card>
 
-          {/* Правая колонка */}
-          <Card className="p-4 h-fit">
-            <div className="text-[var(--text-dim)] text-sm">Быстрый старт</div>
+          {/* правая колонка */}
+          <Card className="h-fit p-4">
+            <div className="text-sm text-[var(--text-dim)]">Быстрый старт</div>
             <div className="mt-3">
               <Button asChild className="w-full">
-                <a
-                  href={offer.link ?? "#"}
-                  target={offer.link?.startsWith("http") ? "_blank" : undefined}
-                  rel={offer.link?.startsWith("http") ? "nofollow sponsored noopener" : undefined}
-                >
-                  Играть сейчас
-                </a>
+                <a href={trackHref} rel="nofollow sponsored">Играть сейчас</a>
               </Button>
             </div>
             <div className="mt-3">
