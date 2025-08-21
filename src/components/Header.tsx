@@ -1,7 +1,6 @@
-// src/components/Header.tsx
-import Section from '../components/ui/Section";
+import Section from "@/components/ui/section";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
 import {
   Sheet,
   SheetTrigger,
@@ -67,15 +66,9 @@ export default function Header() {
               </SheetHeader>
 
               <nav className="mt-8 flex flex-col gap-6 text-lg">
-                <Link to="/" className="cursor-pointer hover:underline">
-                  Home
-                </Link>
-                <Link to="/compare" className="cursor-pointer hover:underline">
-                  Compare
-                </Link>
-                <Link to="/favorites" className="cursor-pointer hover:underline">
-                  Favorites
-                </Link>
+                <Link to="/" className="cursor-pointer hover:underline">Home</Link>
+                <Link to="/compare" className="cursor-pointer hover:underline">Compare</Link>
+                <Link to="/favorites" className="cursor-pointer hover:underline">Favorites</Link>
                 <Button className="mt-2 w-full">Sign Up</Button>
               </nav>
             </SheetContent>

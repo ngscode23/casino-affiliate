@@ -27,3 +27,19 @@ export const offers: Offer[] = [
     methods: ["Cards", "Crypto"],
   }
 ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,9 +2,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import CompareFilters, { type LicenseFilter, type MethodFilter } from "@/components/CompareFilters";
+import CompareFilters, {
+  type LicenseFilter,
+  type MethodFilter,
+} from "@/components/CompareFilters";
 import CompareTable, { type SortKey } from "@/components/CompareTable";
 import MobileOfferCard from "@/components/MobileOfferCard";
+
 import { offers as allOffers } from "@/data/offers";
 import type { Offer } from "@/types/offer";
 import Seo from "@/components/Seo";
@@ -20,8 +24,8 @@ export default function Compare() {
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [license, setLicense] = useState<LicenseFilter>("all");
-  const [method,  setMethod ] = useState<MethodFilter>("all");
-  const [search,  setSearch ] = useState<string>(initialQ);
+  const [method, setMethod] = useState<MethodFilter>("all");
+  const [search, setSearch] = useState<string>(initialQ);
 
   // обновляем URL, когда меняется строка поиска
   useEffect(() => {
@@ -35,17 +39,16 @@ export default function Compare() {
   const filtered: Offer[] = useMemo(() => {
     let arr = [...allOffers];
 
-    if (license !== "all") arr = arr.filter((o) => o.license === license);
-    if (method  !== "all") arr = arr.filter((o) => (o.methods ?? o.payments ?? []).includes(method));
+    if (license !== "all") arr = arr.filter(o => o.license === license);
+    if (method !== "all")
+      arr = arr.filter(o => (o.methods ?? o.payments ?? []).includes(method));
 
     if (search.trim()) {
       const q = normalize(search.trim());
-      arr = arr.filter((o) => {
-        const hay = [
-          o.name,
-          o.license,
-          ...(o.methods ?? o.payments ?? []),
-        ].join(" ").toString();
+      arr = arr.filter(o => {
+        const hay = [o.name, o.license, ...(o.methods ?? o.payments ?? [])]
+          .join(" ")
+          .toString();
         return normalize(hay).includes(q);
       });
     }
@@ -60,13 +63,13 @@ export default function Compare() {
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "ItemList",
-          "itemListElement": filtered.map((o, i) => ({
+          itemListElement: filtered.map((o, i) => ({
             "@type": "ListItem",
-            "position": i + 1,
-            "url": `${location.origin}/offers/${encodeURIComponent(
-              o.slug ?? o.name.toLowerCase().replace(/\s+/g, "-")
+            position: i + 1,
+            url: `${location.origin}/offers/${encodeURIComponent(
+              (o.slug ?? o.name.toLowerCase()).replace(/\s+/g, "-")
             )}`,
-            "name": o.name,
+            name: o.name,
           })),
         }}
       />
@@ -78,15 +81,24 @@ export default function Compare() {
           license={license}
           method={method}
           search={search}
-          onChange={({ license, method }) => { setLicense(license); setMethod(method); }}
+          onChange={({ license, method }: { license: LicenseFilter; method: MethodFilter }) => {
+            setLicense(license);
+            setMethod(method);
+          }}
           onSearchChange={setSearch}
         />
       </div>
 
       {/* Мобильные карточки */}
       <div className="grid gap-3 sm:gap-4 md:hidden">
-        {filtered.map((o) => (
-          <MobileOfferCard key={o.slug ?? o.name} offer={o} />
+        {filtered.map(o => (
+          <MobileOfferCard
+            key={o.slug ?? o.name}
+            offer={o}
+            // заглушка, чтобы не падало: заменишь на реальный toggle из контекста
+            toggle={() => {}}
+            selected={false}
+          />
         ))}
       </div>
 
@@ -96,7 +108,10 @@ export default function Compare() {
           offers={filtered}
           sortKey={sortKey}
           sortDir={sortDir}
-          onSortChange={(k, d) => { setSortKey(k); setSortDir(d); }}
+          onSortChange={(k, d) => {
+            setSortKey(k);
+            setSortDir(d);
+          }}
         />
       </div>
     </section>

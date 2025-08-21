@@ -1,10 +1,14 @@
 // src/components/CompareFilters.tsx
 import * as React from "react";
-import Button from '../components/ui/Button";
-import Card from '../components/ui/Card";
+import Button from "@/components/ui/button";
+import Card from "@/components/ui/card";
 
-export type LicenseFilter = "all" | "MGA" | "Curaçao" | "UKGC" | "Other";
-export type MethodFilter  = "all" | "Cards" | "SEPA" | "Crypto" | "Paypal" | "Skrill";
+/** Единый источник правды для фильтров — СНАЧАЛА типы, потом всё остальное */
+export const LICENSES = ["all", "MGA", "UKGC", "Curacao", "Other"] as const;
+export type LicenseFilter = typeof LICENSES[number];
+
+export const METHODS = ["all", "Cards", "SEPA", "Crypto", "Paypal", "Skrill"] as const;
+export type MethodFilter = typeof METHODS[number];
 
 type Props = {
   total: number;
@@ -24,7 +28,7 @@ const LICENSE_OPTIONS: { label: string; value: LicenseFilter }[] = [
   { label: "All licenses", value: "all" },
   { label: "MGA",         value: "MGA" },
   { label: "UKGC",        value: "UKGC" },
-  { label: "Curaçao",     value: "Curaçao" },
+  { label: "Curaçao",     value: "Curacao" },
   { label: "Other",       value: "Other" },
 ];
 
@@ -46,11 +50,10 @@ export default function CompareFilters({
   onChange,
   onSearchChange,
 }: Props) {
-  // локальный драфт для Apply/Reset (license/method)
+  // локальный драфт для Apply/Reset
   const [draftLicense, setDraftLicense] = React.useState<LicenseFilter>(license);
   const [draftMethod,  setDraftMethod]  = React.useState<MethodFilter>(method);
 
-  // если родитель снаружи поменял license/method — синхронизируем драфт
   React.useEffect(() => { setDraftLicense(license); }, [license]);
   React.useEffect(() => { setDraftMethod(method);   }, [method]);
 
@@ -72,9 +75,9 @@ export default function CompareFilters({
           Showing <span className="font-medium text-[var(--text)]">{filteredCount}</span> of {total}
         </div>
 
-        {/* Блок поиска + селекты */}
+        {/* Поиск + селекты */}
         <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 md:max-w-3xl">
-          {/* Поиск (контроллируется родителем, без Apply) */}
+          {/* Поиск */}
           <label className="block">
             <span className="sr-only">Search</span>
             <input
@@ -86,14 +89,14 @@ export default function CompareFilters({
             />
           </label>
 
-          {/* License (локальный драфт) */}
+          {/* License */}
           <label className="block">
             <span className="sr-only">License</span>
             <select
               className="neon-input w-full"
-              value={draftLicense}
+              value={license}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setDraftLicense(e.target.value as LicenseFilter)
+                onChange({ license: e.target.value as LicenseFilter, method })
               }
               aria-label="License filter"
             >
@@ -103,14 +106,14 @@ export default function CompareFilters({
             </select>
           </label>
 
-          {/* Method (локальный драфт) */}
+          {/* Method */}
           <label className="block">
             <span className="sr-only">Payment method</span>
             <select
               className="neon-input w-full"
-              value={draftMethod}
+              value={method}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setDraftMethod(e.target.value as MethodFilter)
+                onChange({ license, method: e.target.value as MethodFilter })
               }
               aria-label="Payment method filter"
             >

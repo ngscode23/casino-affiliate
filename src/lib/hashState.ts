@@ -46,3 +46,19 @@ export function writeHash(state: Partial<HashState>) {
   const qs = params.toString();
   window.location.hash = (path ? path : "") + (qs ? `?${qs}` : "");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

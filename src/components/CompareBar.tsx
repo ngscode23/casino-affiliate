@@ -1,6 +1,6 @@
 // src/components/CompareBar.tsx
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
 import {
   Sheet,
   SheetTrigger,
@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/sheet";
 import { X } from "lucide-react";
 import { useCompare } from "@/ctx/CompareContext";
-import Rating from '@/components/ui/Rating";
+import Rating from "@/components/ui/rating";
+
+
+
+
 
 export default function CompareBar() {
   const { selected, clear, remove } = useCompare();
@@ -142,3 +146,19 @@ export default function CompareBar() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

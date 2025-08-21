@@ -16,3 +16,19 @@ export type Offer = {
   enabled?: boolean;
   position?: number;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

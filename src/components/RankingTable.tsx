@@ -1,5 +1,5 @@
 
-import Card from '../components/ui/Card";
+import Card from "@/components/ui/card";
 
 export default function RankingTable({ total, filteredCount }: { total: number; filteredCount: number }) {
   return (
@@ -14,3 +14,19 @@ export default function RankingTable({ total, filteredCount }: { total: number; 
     </Card>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

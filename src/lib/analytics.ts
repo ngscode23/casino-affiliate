@@ -56,3 +56,19 @@ export const analytics = {
   favoriteAdd:   (slug: string)                 => track("favorite_add",   { slug }),
   favoriteRemove:(slug: string)                 => track("favorite_remove",{ slug }),
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
