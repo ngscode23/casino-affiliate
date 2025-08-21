@@ -1,7 +1,7 @@
 // src/pages/Favorites.tsx
 import { useState } from "react";
-import Section from "@/ui/Section";
-import Card from "@/ui/Card";
+import Section from '@/components/ui/Section";
+import Card from '@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/lib/useFavorites";
 import { casinos } from "@/data/casinos";

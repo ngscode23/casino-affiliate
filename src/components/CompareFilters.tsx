@@ -1,7 +1,7 @@
 // src/components/CompareFilters.tsx
 import * as React from "react";
-import Button from "../ui/Button";
-import Card from "../ui/Card";
+import Button from '../components/ui/Button";
+import Card from '../components/ui/Card";
 
 export type LicenseFilter = "all" | "MGA" | "Curaçao" | "UKGC" | "Other";
 export type MethodFilter  = "all" | "Cards" | "SEPA" | "Crypto" | "Paypal" | "Skrill";

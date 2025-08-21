@@ -2,9 +2,9 @@
 import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 
-import Section from "@/ui/Section";
-import Card from "@/ui/Card";
-import Rating from "@/ui/Rating";
+import Section from '@/components/ui/Section";
+import Card from '@/components/ui/Card";
+import Rating from '@/components/ui/Rating";
 import { Button } from "@/components/ui/button";
 
 import { casinos } from "@/data/casinos";

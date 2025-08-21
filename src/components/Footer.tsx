@@ -1,6 +1,6 @@
 // Footer.tsx
 
-import Section from "../ui/Section";
+import Section from '../components/ui/Section";
 export default function Footer(){
   return (
     <footer className="py-10 neon-footer">

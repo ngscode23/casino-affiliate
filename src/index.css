@@ -1,3 +1,4 @@
+@import "./styles/theme.css";
 /* ========== THEME TOKENS (replace your :root + base) ========== */
 @import "tailwindcss";
 @import "./styles/neon-theme.css";

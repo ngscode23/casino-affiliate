@@ -1,6 +1,6 @@
 // src/components/MobileOfferCard.tsx
 import { useMemo } from "react";
-import Rating from "../ui/Rating";
+import Rating from '../components/ui/Rating";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

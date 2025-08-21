@@ -1,5 +1,5 @@
 // src/components/CompareBar.tsx
-import Section from "@/ui/Section";
+import Section from '@/components/ui/Section";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";

@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-import Section from "../ui/Section";
+import Section from '../components/ui/Section";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {

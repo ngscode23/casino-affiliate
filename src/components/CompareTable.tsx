@@ -1,9 +1,9 @@
 // src/components/CompareTable.tsx
-import Table from "@/ui/Table";
-import type { Column } from "@/ui/Table";
-import Rating from "@/ui/Rating";
+import Table from '@/components/ui/Table";
+import type { Column } from '@/components/ui/Table";
+import Rating from '@/components/ui/Rating";
 import { Button } from "@/components/ui/button";
-import Card from "@/ui/Card";
+import Card from '@/components/ui/Card";
 import { Link } from "react-router-dom";
 import type { Offer } from "@/types/offer";
 

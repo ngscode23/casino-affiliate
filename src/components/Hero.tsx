@@ -1,5 +1,5 @@
-import Section from "../ui/Section";
-import Chip from "../ui/Chip";
+import Section from '../components/ui/Section";
+import Chip from '../components/ui/Chip";
 
 export default function HomeHero() {
   return (
