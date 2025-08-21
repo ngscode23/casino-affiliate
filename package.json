@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --report-unused-disable-directives",
     "preview": "vite preview",
     "clean": "rimraf node_modules package-lock.json .turbo .vite .cache dist",
     "lint:fix": "eslint . --fix",
