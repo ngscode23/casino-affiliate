@@ -9,11 +9,15 @@ export type MethodFilter  = "all" | "Cards" | "SEPA" | "Crypto" | "Paypal" | "Sk
 type Props = {
   total: number;
   filteredCount: number;
-  // контролируемые значения из родителя
+
+  // controlled-пропсы из родителя
   license: LicenseFilter;
   method: MethodFilter;
-  // коллбэк на применение
+  search: string;
+
+  // коллбэки наверх
   onChange: (v: { license: LicenseFilter; method: MethodFilter }) => void;
+  onSearchChange: (value: string) => void;
 };
 
 const LICENSE_OPTIONS: { label: string; value: LicenseFilter }[] = [
@@ -38,15 +42,17 @@ export default function CompareFilters({
   filteredCount,
   license,
   method,
+  search,
   onChange,
+  onSearchChange,
 }: Props) {
-  // локальный черновик (для кнопки Apply)
+  // локальный драфт для Apply/Reset (license/method)
   const [draftLicense, setDraftLicense] = React.useState<LicenseFilter>(license);
-  const [draftMethod,  setDraftMethod ] = React.useState<MethodFilter>(method);
+  const [draftMethod,  setDraftMethod]  = React.useState<MethodFilter>(method);
 
-  // синхронизируем черновик, если родитель поменял состояние извне
+  // если родитель снаружи поменял license/method — синхронизируем драфт
   React.useEffect(() => { setDraftLicense(license); }, [license]);
-  React.useEffect(() => { setDraftMethod(method); }, [method]);
+  React.useEffect(() => { setDraftMethod(method);   }, [method]);
 
   const apply = React.useCallback(() => {
     onChange({ license: draftLicense, method: draftMethod });
@@ -61,11 +67,26 @@ export default function CompareFilters({
   return (
     <Card>
       <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center">
+        {/* Счётчик */}
         <div className="text-sm text-[var(--text-dim)]">
           Showing <span className="font-medium text-[var(--text)]">{filteredCount}</span> of {total}
         </div>
 
-        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 md:max-w-xl">
+        {/* Блок поиска + селекты */}
+        <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 md:max-w-3xl">
+          {/* Поиск (контроллируется родителем, без Apply) */}
+          <label className="block">
+            <span className="sr-only">Search</span>
+            <input
+              className="neon-input w-full"
+              placeholder="Search casinos, licenses, methods…"
+              value={search}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
+              aria-label="Search"
+            />
+          </label>
+
+          {/* License (локальный драфт) */}
           <label className="block">
             <span className="sr-only">License</span>
             <select
@@ -76,12 +97,13 @@ export default function CompareFilters({
               }
               aria-label="License filter"
             >
-              {LICENSE_OPTIONS.map((opt) => (
+              {LICENSE_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
           </label>
 
+          {/* Method (локальный драфт) */}
           <label className="block">
             <span className="sr-only">Payment method</span>
             <select
@@ -92,13 +114,14 @@ export default function CompareFilters({
               }
               aria-label="Payment method filter"
             >
-              {METHOD_OPTIONS.map((opt) => (
+              {METHOD_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
           </label>
         </div>
 
+        {/* Кнопки */}
         <div className="md:ml-auto btn-row">
           <Button variant="soft" onClick={reset} aria-label="Reset filters">Reset</Button>
           <Button onClick={apply} aria-label="Apply filters">Apply</Button>
