@@ -1,7 +1,9 @@
 // src/types/offer.ts
-
+export type PaymentMethod =
+  | "Cards" | "SEPA" | "Crypto" | "Paypal" | "Skrill"
+  | string;
+  
 export type Offer = {
-  id?: string;
   slug?: string;
   name: string;
   rating: number;

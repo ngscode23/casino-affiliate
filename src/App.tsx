@@ -5,7 +5,7 @@ import "./index.css";
 
 import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/CompareBar";
-import type { SortKey } from "@/components/CompareTable";
+
 
 
 

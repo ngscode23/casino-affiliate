@@ -33,7 +33,7 @@ export default function OfferPage() {
   const offer: OfferItem | undefined = useMemo(() => {
     const s = decodeURIComponent(slug).toLowerCase();
     // 1) точное совпадение по slug
-    let found = casinos.find(o => (o.slug ?? "").toLowerCase() === s);
+    const found = casinos.find(o => (o.slug ?? "").toLowerCase() === s);
     if (found) return found;
     // 2) запасной — по имени, приведённому к slug-форме
     return casinos.find(o => slugify(o.name) === s);

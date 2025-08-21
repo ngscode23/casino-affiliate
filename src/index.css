@@ -1,58 +1,204 @@
 /* === Tailwind v4 core === */
 @import "tailwindcss";
 
-/* === Токены темы === */
-:root{
-  --bg-0:#0b0f1a;      /* фон страницы */
-  --bg-1:#101526;      /* карточки/плашки */
-  --text:#e6e9f3;      /* основной текст */
-  --text-dim:#a8b0c2;  /* вторичный текст */
-  --muted:#8c94a7;     /* подписи/мьютед */
-  --brand:#22d3ee;     /* акцент (циан) */
+/* =========================
+   Theme tokens
+   ========================= */
+@layer base {
+  :root {
+    --bg-0: #0b0f16;          /* page background */
+    --bg-1: #101725;          /* cards/sections */
+    --bg-2: #0e1421;
+    --border: rgba(255,255,255,.08);
+
+    --text: #e6ecff;
+    --text-dim: #9aa5c3;
+    --muted: #7e8aa8;
+
+    --primary: #7c3aed;       /* violet */
+    --accent:  #22d3ee;       /* cyan  */
+    --hot:     #ff1f8f;       /* pink  */
+
+    --ring: rgba(124,58,237,.55);
+  }
+
+  html, body, #root {
+    height: 100%;
+    background: var(--bg-0);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: InterVariable, Inter, ui-sans-serif, system-ui;
+  }
+
+  /* Глобально «палец» на кликабельных */
+  :where(
+    a[href],
+    button,
+    [role="button"],
+    [type="button"],
+    [type="submit"],
+    [type="reset"],
+    select,
+    summary,
+    input[type="checkbox"],
+    input[type="radio"]
+  ) { cursor: pointer; }
+  :where(button:disabled, [aria-disabled="true"]) { cursor: not-allowed; }
 }
 
-/* === База === */
-html,body,#root{height:100%;}
-body{
-  background:var(--bg-0);
-  color:var(--text);
-  font-family:InterVariable,Inter,ui-sans-serif,system-ui;
+/* =========================
+   Layout & surfaces
+   ========================= */
+.neon-container {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1rem;
 }
 
-/* === Контейнеры === */
-.neon-container{ @apply mx-auto max-w-6xl px-4; }
-.neon-card{ @apply rounded-2xl border border-white/10 bg-[var(--bg-1)] shadow-[0_6px_24px_rgba(0,0,0,0.35)]; }
-
-/* === Hero === */
-.neon-hero{
-  background:linear-gradient(180deg,rgba(34,211,238,0.08),transparent 60%);
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  padding:48px 0;
+.neon-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.03);
+  backdrop-filter: saturate(140%) blur(6px);
+  transition: box-shadow .25s ease;
+}
+.neon-card:hover {
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
 }
 
-/* === Чипы/бейджи === */
-.neon-chip{
-  @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.12);
-  color:var(--text);
-}
-.neon-chip[data-glow="true"]{
-  box-shadow:0 0 0.5rem rgba(34,211,238,.4), 0 0 1.2rem rgba(34,211,238,.25);
+/* Hero */
+.neon-hero {
+  padding: 48px 0 32px;
+  background:
+    radial-gradient(800px 300px at 10% -20%, rgba(124,58,237,.22), transparent 60%),
+    radial-gradient(800px 300px at 90% -20%, rgba(34,211,238,.18), transparent 60%);
+  border-bottom: 1px solid var(--border);
 }
 
-/* === Поиск на главной === */
-.neon-search{ @apply mt-5 flex gap-2 flex-col sm:flex-row; }
-.neon-input{
-  @apply h-11 w-full rounded-md border border-white/10 bg-[var(--bg-1)] px-3 text-[var(--text)]
-         outline-none focus:ring-2 focus:ring-white/20;
+/* =========================
+   Chips / badges
+   ========================= */
+.neon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+  font-size: 12px;
+  letter-spacing: .2px;
 }
-.neon-btn{
-  @apply h-11 rounded-md px-4 font-medium;
-  background: var(--brand);
-  color: #000;
-}
-.neon-btn:hover{ filter:brightness(1.05); }
 
-/* === Утилиты === */
-.btn-row{ @apply flex flex-wrap gap-2; }
+.neon-chip[data-glow] {
+  box-shadow: 0 0 0 3px rgba(124,58,237,.07), 0 8px 24px rgba(124,58,237,.15);
+}
+
+/* Крестик внутри чипа — без белой подсветки/фоновой заливки */
+.neon-chip button {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.neon-chip button:hover,
+.neon-chip button:active,
+.neon-chip button:focus-visible {
+  background: transparent;
+}
+
+/* =========================
+   Inputs / selects / search
+   ========================= */
+.neon-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 .8rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text);
+  outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+.neon-input:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 4px rgba(124,58,237,.15);
+}
+
+.neon-search {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .6rem;
+}
+@media (max-width: 640px) {
+  .neon-search { grid-template-columns: 1fr; }
+}
+
+/* Кнопка из темы */
+.neon-btn {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg, rgba(124,58,237,.9), rgba(124,58,237,.75));
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: .2px;
+  transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+  box-shadow: 0 8px 20px rgba(124,58,237,.25);
+}
+.neon-btn:hover { filter: brightness(1.05); }
+.neon-btn:active { transform: translateY(1px); }
+
+/* Ряд кнопок */
+.btn-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+/* =========================
+   Table styling
+   ========================= */
+table.neon-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+table.neon-table th,
+table.neon-table td {
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+table.neon-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: .08em;
+}
+table.neon-table tr:hover td {
+  background: rgba(255,255,255,.02);
+}
+/* chip close button: убираем подсветку/рамку/тап-хайлайт */
+.neon-chip .chip-close {
+  background: transparent;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  user-select: none;
+}
+.neon-chip .chip-close:focus,
+.neon-chip .chip-close:focus-visible,
+.neon-chip .chip-close:active {
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.neon-chip .chip-close::-moz-focus-inner { border: 0; }

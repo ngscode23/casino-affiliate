@@ -1,3 +1,4 @@
+// src/components/MobileOfferCard.tsx
 import { useMemo } from "react";
 import Rating from "../ui/Rating";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import {
 import { Info, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCompare } from "@/ctx/CompareContext";
+import CompareInline from "@/components/CompareInline";
 
 export type MobileOffer = {
   slug?: string;
@@ -27,11 +29,10 @@ export type MobileOffer = {
 
 export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
   const { toggle, isSelected } = useCompare();
-  const selected = isSelected(offer); // ✅ теперь проверяем по самому офферу
-
+  const selected = isSelected(offer);
   const methods = offer.methods ?? offer.payments ?? [];
 
-  // краткое описание для шита (можешь заменить реальным контентом)
+  // краткое описание для шита
   const summary = useMemo(() => {
     const speed =
       offer.payoutHours != null
@@ -53,8 +54,8 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
   }, [offer]);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,0.35)]">
-      {/* верх карточки */}
+    <div className="rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow">
+      {/* шапка карточки */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1 min-w-0">
           <div className="text-base font-semibold truncate">{offer.name}</div>
@@ -65,7 +66,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
         </div>
       </div>
 
-      {/* короткая инфа */}
+      {/* краткая инфа */}
       <div className="mt-3 text-sm">Payout: {offer.payout}</div>
 
       {/* методы */}
@@ -82,7 +83,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
       {/* действия */}
       <div className="mt-4 grid grid-cols-3 gap-2">
         {/* Play */}
-        <Button asChild>
+        <Button asChild aria-label={`Open ${offer.name}`}>
           <a
             href={offer.link ?? "#"}
             className="inline-flex items-center justify-center gap-2"
@@ -102,10 +103,14 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
           {selected ? "Selected" : "Compare"}
         </Button>
 
-        {/* Details (sheet снизу) */}
+        {/* Details — нижний шит */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" className="inline-flex items-center justify-center gap-2">
+            <Button
+              variant="ghost"
+              aria-label={`Details for ${offer.name}`}
+              className="inline-flex items-center justify-center gap-2"
+            >
               Details <Info className="h-4 w-4" />
             </Button>
           </SheetTrigger>
@@ -114,7 +119,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
             side="bottom"
             className="max-h-[80vh] w-full rounded-t-2xl border-white/10 bg-[var(--bg-0)] text-[var(--text)] p-0 overflow-hidden"
           >
-            {/* a11y для Radix — Title/Description обязательны */}
+            {/* a11y для Radix */}
             <SheetHeader className="sr-only">
               <SheetTitle>{offer.name}</SheetTitle>
               <SheetDescription>Casino details</SheetDescription>
@@ -127,7 +132,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
               className="p-6"
             >
-              {/* Заголовок и summary */}
+              {/* заголовок и summary */}
               <div>
                 <div className="text-base sm:text-lg font-semibold">{offer.name}</div>
                 <div className="mt-1 text-[var(--text-dim)]">{summary}</div>
@@ -188,6 +193,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
                       Play now
                     </a>
                   </Button>
+
                   <Button
                     variant={selected ? "secondary" : "soft"}
                     className="w-full"
@@ -197,6 +203,9 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
                     {selected ? "Selected for compare" : "Add to compare"}
                   </Button>
                 </div>
+
+                {/* локальная панель сравнения — только на мобиле */}
+                <CompareInline className="md:hidden mt-6" />
               </div>
             </motion.div>
           </SheetContent>
