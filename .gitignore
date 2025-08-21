@@ -44,3 +44,6 @@ build/
 
 # misc
 *.tsbuildinfo
+.tmp/
+.env
+.env.*

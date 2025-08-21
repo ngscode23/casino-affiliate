@@ -33,48 +33,61 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : "button";
+    const classes = cn(
+      "relative",
+      buttonVariants({ variant, size }),
+      loading && "pointer-events-none opacity-80",
+      className
+    );
 
+    // Ветка asChild: НИКАКИХ доп. спанов тут — только один child
+    if (asChild) {
+      // На asChild не поддерживаем встроенный спиннер/иконки, чтобы не сломать <Slot>
+      // Если очень надо — положи иконки и спиннер САМ внутрь <a> или <Link>.
+      return (
+        <Slot
+          // ref у <Slot> может быть не button — это нормально, типизируем как any
+          ref={ref as any}
+          data-slot="button"
+          className={classes}
+          aria-busy={undefined}
+          {...props}
+        >
+          {children /* ДОЛЖЕН быть ровно один элемент: <a> или <Link> */}
+        </Slot>
+      );
+    }
+
+    // Обычная кнопка
     return (
-      <Comp
+      <button
         ref={ref}
         data-slot="button"
-        // нужен relative для спиннера поверх контента
-        className={cn(
-          "relative",
-          buttonVariants({ variant, size }),
-          loading && "pointer-events-none opacity-80",
-          className
-        )}
+        className={classes}
         aria-busy={loading || undefined}
-        // блокируем кнопку в режиме загрузки
         disabled={loading || disabled}
         {...props}
       >
-        {/* left icon */}
         {leftIcon ? (
           <span className={cn("inline-flex", children && "mr-2 -ml-1")}>
             {leftIcon}
           </span>
         ) : null}
 
-        {/* контент прячем на время лоадинга, чтобы не прыгала ширина */}
         <span className={loading ? "opacity-0" : ""}>{children}</span>
 
-        {/* right icon */}
         {rightIcon ? (
           <span className={cn("inline-flex", children && "ml-2 -mr-1")}>
             {rightIcon}
           </span>
         ) : null}
 
-        {/* спиннер поверх */}
         {loading && (
           <span className="pointer-events-none absolute inset-0 grid place-items-center">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--text)] border-r-transparent" />
           </span>
         )}
-      </Comp>
+      </button>
     );
   }
 );

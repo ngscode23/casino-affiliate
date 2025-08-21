@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-
+     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
@@ -24,3 +25,4 @@
   "include": ["src", "netlify/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
+

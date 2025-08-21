@@ -1,10 +1,10 @@
 
-  /* фон и цвет тут уже не нужны, их делает body через Tailwind 
+
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-
+  /* фон и цвет тут уже не нужны, их делает body через Tailwind */
 }
 
 main {

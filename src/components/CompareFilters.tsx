@@ -1,7 +1,7 @@
 // src/components/CompareFilters.tsx
-import { useCallback, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";   // единый Button (shadcn)
-import Card from "@/ui/Card";
+import * as React from "react";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
 
 export type LicenseFilter = "all" | "MGA" | "Curaçao" | "UKGC" | "Other";
 export type MethodFilter  = "all" | "Cards" | "SEPA" | "Crypto" | "Paypal" | "Skrill";
@@ -9,12 +9,10 @@ export type MethodFilter  = "all" | "Cards" | "SEPA" | "Crypto" | "Paypal" | "Sk
 type Props = {
   total: number;
   filteredCount: number;
-
-  // 🔹 текущее состояние из родителя
+  // контролируемые значения из родителя
   license: LicenseFilter;
   method: MethodFilter;
-
-  // 🔹 применяем выбранные значения наверх
+  // коллбэк на применение
   onChange: (v: { license: LicenseFilter; method: MethodFilter }) => void;
 };
 
@@ -42,19 +40,19 @@ export default function CompareFilters({
   method,
   onChange,
 }: Props) {
-  // локальные черновики (изменяются сразу в селектах)
-  const [draftLicense, setDraftLicense] = useState<LicenseFilter>(license);
-  const [draftMethod,  setDraftMethod ] = useState<MethodFilter>(method);
+  // локальный черновик (для кнопки Apply)
+  const [draftLicense, setDraftLicense] = React.useState<LicenseFilter>(license);
+  const [draftMethod,  setDraftMethod ] = React.useState<MethodFilter>(method);
 
-  // если родитель поменял состояние — синхронизируем драфты
-  useEffect(() => setDraftLicense(license), [license]);
-  useEffect(() => setDraftMethod(method),   [method]);
+  // синхронизируем черновик, если родитель поменял состояние извне
+  React.useEffect(() => { setDraftLicense(license); }, [license]);
+  React.useEffect(() => { setDraftMethod(method); }, [method]);
 
-  const apply = useCallback(() => {
+  const apply = React.useCallback(() => {
     onChange({ license: draftLicense, method: draftMethod });
   }, [draftLicense, draftMethod, onChange]);
 
-  const reset = useCallback(() => {
+  const reset = React.useCallback(() => {
     setDraftLicense("all");
     setDraftMethod("all");
     onChange({ license: "all", method: "all" });
@@ -63,22 +61,22 @@ export default function CompareFilters({
   return (
     <Card>
       <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center">
-        {/* Счётчик */}
         <div className="text-sm text-[var(--text-dim)]">
           Showing <span className="font-medium text-[var(--text)]">{filteredCount}</span> of {total}
         </div>
 
-        {/* Селекты */}
         <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 md:max-w-xl">
           <label className="block">
             <span className="sr-only">License</span>
             <select
               className="neon-input w-full"
               value={draftLicense}
-              onChange={(e) => setDraftLicense(e.target.value as LicenseFilter)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setDraftLicense(e.target.value as LicenseFilter)
+              }
               aria-label="License filter"
             >
-              {LICENSE_OPTIONS.map(opt => (
+              {LICENSE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
@@ -89,24 +87,21 @@ export default function CompareFilters({
             <select
               className="neon-input w-full"
               value={draftMethod}
-              onChange={(e) => setDraftMethod(e.target.value as MethodFilter)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setDraftMethod(e.target.value as MethodFilter)
+              }
               aria-label="Payment method filter"
             >
-              {METHOD_OPTIONS.map(opt => (
+              {METHOD_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
           </label>
         </div>
 
-        {/* Кнопки */}
         <div className="md:ml-auto btn-row">
-          <Button variant="soft" onClick={reset} aria-label="Reset filters">
-            Reset
-          </Button>
-          <Button onClick={apply} aria-label="Apply filters">
-            Apply
-          </Button>
+          <Button variant="soft" onClick={reset} aria-label="Reset filters">Reset</Button>
+          <Button onClick={apply} aria-label="Apply filters">Apply</Button>
         </div>
       </div>
     </Card>

@@ -1,5 +1,5 @@
 import type { Offer } from "../data/casinos";
-import { track } from "../lib/analytics";
+import { track } from "@/lib/analytics";
 
 export function CasinoCard({ offer }: { offer: Offer }) {
   const { name, license, payout, methods, link, rating } = offer; // добавил rating
@@ -22,7 +22,12 @@ export function CasinoCard({ offer }: { offer: Offer }) {
 
       {link && (
         <a
-          onClick={() => track("offer_click", { name })}
+       onClick={() =>
+  track("offer_click", {
+    slug: offer.slug ?? offer.name,
+    name: offer.name,
+  })
+}
           href={link}
           target="_blank"
           rel="noreferrer nofollow"
@@ -34,3 +39,6 @@ export function CasinoCard({ offer }: { offer: Offer }) {
     </li>
   );
 }
+
+
+

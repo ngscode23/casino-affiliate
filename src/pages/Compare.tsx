@@ -5,6 +5,7 @@ import CompareTable, { type SortKey } from "@/components/CompareTable";
 import MobileOfferCard from "@/components/MobileOfferCard";
 import { offers as allOffers } from "@/data/offers";
 import type { Offer } from "@/types/offer";
+import Seo from "@/components/Seo";
 
 export default function Compare() {
   const [sortKey, setSortKey] = useState<SortKey>("rating");
@@ -14,38 +15,62 @@ export default function Compare() {
 
   const filtered: Offer[] = useMemo(() => {
     let arr = [...allOffers];
-    if (license !== "all") arr = arr.filter(o => o.license === license);
-    if (method !== "all") arr = arr.filter(o => (o.methods ?? o.payments ?? []).includes(method));
+    if (license !== "all") arr = arr.filter((o) => o.license === license);
+    if (method !== "all")  arr = arr.filter((o) => (o.methods ?? o.payments ?? []).includes(method));
     return arr;
   }, [license, method]);
 
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+
   return (
     <section className="neon-container space-y-6">
+      <Seo
+        title="Compare Casinos — Fast Payouts, Ratings"
+        description="Сравните казино по рейтингу, лицензии, методам выплат и скорости вывода."
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          itemListElement: filtered.map((o, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            url: `${origin}/offers/${encodeURIComponent(
+              o.slug ?? o.name.toLowerCase().replace(/\s+/g, "-")
+            )}`,
+            name: o.name,
+          })),
+        }}
+      />
+
       <div className="neon-card p-4">
-   <CompareFilters
-  total={allOffers.length}
-  filteredCount={filtered.length}
-  license={license}           // ← текущее из родителя
-  method={method}             // ← текущее из родителя
-  onChange={({ license, method }) => {
-    setLicense(license);
-    setMethod(method);
-  }}
-/>
+        <CompareFilters
+          total={allOffers.length}
+          filteredCount={filtered.length}
+          license={license}
+          method={method}
+          onChange={({ license, method }) => {
+            setLicense(license);
+            setMethod(method);
+          }}
+        />
       </div>
 
-      {/* Мобильные карточки */}
+      {/* мобильные карточки */}
       <div className="grid gap-3 sm:gap-4 md:hidden">
-        {filtered.map(o => <MobileOfferCard key={o.slug ?? o.name} offer={o} />)}
+        {filtered.map((o) => (
+          <MobileOfferCard key={o.slug ?? o.name} offer={o} />
+        ))}
       </div>
 
-      {/* Десктоп таблица */}
+      {/* десктоп-таблица */}
       <div className="neon-card p-0 hidden md:block">
         <CompareTable
           offers={filtered}
           sortKey={sortKey}
           sortDir={sortDir}
-          onSortChange={(k, d) => { setSortKey(k); setSortDir(d); }}
+          onSortChange={(k: SortKey, d: "asc" | "desc") => {
+            setSortKey(k);
+            setSortDir(d);
+          }}
         />
       </div>
     </section>
