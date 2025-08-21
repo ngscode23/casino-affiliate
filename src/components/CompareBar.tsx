@@ -1,6 +1,7 @@
 // src/components/CompareBar.tsx
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
+
 import {
   Sheet,
   SheetTrigger,
@@ -10,27 +11,57 @@ import {
   SheetDescription,
   SheetClose,
 } from "@/components/ui/sheet";
+
 import { X } from "lucide-react";
 import { useCompare } from "@/ctx/CompareContext";
-import Rating from "@/ui/Rating";
+import Rating from "@/components/ui/rating";
+
+// Универсальный «оффер-лайк», чтобы не падать, если selected хранит урезанные объекты
+type OfferLike = {
+  name: string;
+  slug?: string;
+  rating?: number;
+  license?: string;
+  payout?: string;
+  payoutHours?: number;
+  methods?: string[];
+  payments?: string[];
+  link?: string | null;
+};
+
+function toOfferLike(x: unknown): OfferLike {
+  const o = x as Record<string, unknown>;
+  return {
+    name: String(o.name ?? "Unknown"),
+    slug: typeof o.slug === "string" ? o.slug : undefined,
+    rating: typeof o.rating === "number" ? o.rating : 0,
+    license: typeof o.license === "string" ? o.license : "—",
+    payout: typeof o.payout === "string" ? o.payout : "—",
+    payoutHours: typeof o.payoutHours === "number" ? o.payoutHours : undefined,
+    methods: Array.isArray(o.methods) ? (o.methods as string[]) : undefined,
+    payments: Array.isArray(o.payments) ? (o.payments as string[]) : undefined,
+    link: typeof o.link === "string" ? o.link : null,
+  };
+}
 
 export default function CompareBar() {
   const { selected, clear, remove } = useCompare();
   const canCompare = selected.length >= 2;
 
   const rows = useMemo(
-    () => [
-      { k: "Rating",  render: (o: any) => <Rating value={o.rating} /> },
-      { k: "License", render: (o: any) => o.license },
-      {
-        k: "Payout",
-        render: (o: any) => `${o.payout}${o.payoutHours ? ` (~${o.payoutHours}h)` : ""}`,
-      },
-      {
-        k: "Methods",
-        render: (o: any) => (o.methods ?? o.payments ?? []).join(", ") || "—",
-      },
-    ],
+    () =>
+      [
+        { k: "Rating", render: (o: OfferLike) => <Rating value={o.rating ?? 0} /> },
+        { k: "License", render: (o: OfferLike) => o.license ?? "—" },
+        {
+          k: "Payout",
+          render: (o: OfferLike) => `${o.payout ?? "—"}${o.payoutHours ? ` (~${o.payoutHours}h)` : ""}`,
+        },
+        {
+          k: "Methods",
+          render: (o: OfferLike) => (o.methods ?? o.payments ?? []).join(", ") || "—",
+        },
+      ] as Array<{ k: string; render: (o: OfferLike) => React.ReactNode }>,
     []
   );
 
@@ -44,7 +75,8 @@ export default function CompareBar() {
 
           {/* Чипы выбранных офферов */}
           <div className="flex flex-wrap gap-2">
-            {selected.map((o) => {
+            {selected.map((raw) => {
+              const o = toOfferLike(raw);
               const id = o.slug ?? o.name;
               return (
                 <span key={id} className="neon-chip inline-flex items-center gap-2">
@@ -64,7 +96,9 @@ export default function CompareBar() {
 
           <div className="ml-auto flex items-center gap-2">
             {/* Верхняя кнопка Clear */}
-            <Button variant="ghost" onClick={clear}>Clear</Button>
+            <Button variant="ghost" onClick={clear}>
+              Clear
+            </Button>
 
             <Sheet>
               <SheetTrigger asChild>
@@ -78,9 +112,7 @@ export default function CompareBar() {
                 {/* A11y: скрытый заголовок + описание для DialogContent */}
                 <SheetHeader className="sr-only">
                   <SheetTitle>Compare panel</SheetTitle>
-                  <SheetDescription>
-                    Manage your selected casinos for comparison.
-                  </SheetDescription>
+                  <SheetDescription>Manage your selected casinos for comparison.</SheetDescription>
                 </SheetHeader>
 
                 {/* Видимый заголовок в шите */}
@@ -92,22 +124,28 @@ export default function CompareBar() {
                     <thead>
                       <tr>
                         <th className="text-left px-3 py-2">Field</th>
-                        {selected.map((o) => (
-                          <th key={o.slug ?? o.name} className="text-left px-3 py-2">
-                            {o.name}
-                          </th>
-                        ))}
+                        {selected.map((raw) => {
+                          const o = toOfferLike(raw);
+                          return (
+                            <th key={o.slug ?? o.name} className="text-left px-3 py-2">
+                              {o.name}
+                            </th>
+                          );
+                        })}
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map((row) => (
                         <tr key={row.k}>
                           <td className="px-3 py-2 text-[var(--text-dim)]">{row.k}</td>
-                          {selected.map((o) => (
-                            <td key={(o.slug ?? o.name) + row.k} className="px-3 py-2">
-                              {row.render(o)}
-                            </td>
-                          ))}
+                          {selected.map((raw) => {
+                            const o = toOfferLike(raw);
+                            return (
+                              <td key={(o.slug ?? o.name) + row.k} className="px-3 py-2">
+                                {row.render(o)}
+                              </td>
+                            );
+                          })}
                         </tr>
                       ))}
                     </tbody>
@@ -118,16 +156,12 @@ export default function CompareBar() {
                 <div className="mt-6 flex flex-col gap-2 px-4 pb-4 md:hidden">
                   {/* Нижняя кнопка Clear: чистит и закрывает шит */}
                   <SheetClose asChild>
-                    <Button
-                      variant="soft"
-                      onClick={clear}
-                      aria-label="Clear and close"
-                    >
+                    <Button variant="soft" onClick={clear} aria-label="Clear and close">
                       Clear
                     </Button>
                   </SheetClose>
 
-                  {/* Закрыть без очистки (опционально) */}
+                  {/* Закрыть без очистки */}
                   <SheetClose asChild>
                     <Button variant="secondary" aria-label="Close compare panel">
                       Close

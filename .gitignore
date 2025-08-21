@@ -47,3 +47,7 @@ build/
 .tmp/
 .env
 .env.*
+
+backup_before_cleanup_*/
+# Local Netlify folder
+.netlify

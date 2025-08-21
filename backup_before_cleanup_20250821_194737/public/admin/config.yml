@@ -1,0 +1,42 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - label: "Главная"
+    name: "home"
+    files:
+      - label: "Тексты"
+        name: "texts"
+        file: "public/content/home.json"
+        editor:
+          preview: false
+        fields:
+          - { label: "Бейдж", name: "badge", widget: "string", required: true }
+          - { label: "Заголовок", name: "title", widget: "string", required: true }
+          - { label: "Подзаголовок", name: "subtitle", widget: "text", required: true }
+
+  - label: "Офферы"
+    name: "offers"
+    files:
+      - label: "Список офферов"
+        name: "items"
+        file: "public/content/offers.json"
+        editor:
+          preview: false
+        fields:
+          - label: "Офферы"
+            name: "items"
+            widget: "list"
+            fields:
+              - { label: "Название",  name: "name",    widget: "string", required: true }
+              - { label: "Рейтинг",   name: "rating",  widget: "number", value_type: "float", min: 0, max: 5, step: 0.1, required: true }
+              - { label: "Лицензия",  name: "license", widget: "string" }
+              - { label: "Выплаты",   name: "payout",  widget: "string" }
+              - { label: "Методы",    name: "methods", widget: "string" }
+              - { label: "Ссылка",    name: "link",    widget: "string" }
+              - { label: "Включено",  name: "enabled", widget: "boolean", default: true }
+              - { label: "Позиция",   name: "position",widget: "number", value_type: "int", min: 1, step: 1 }

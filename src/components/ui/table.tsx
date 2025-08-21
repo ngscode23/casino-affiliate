@@ -1,114 +1,49 @@
-import * as React from "react"
+import type { HTMLAttributes, ReactNode } from "react";
 
-import { cn } from "@/lib/utils"
+export type Column<T> = {
+  key: keyof T | string;
+  title: ReactNode;
+  width?: number;
+  headerProps?: HTMLAttributes<HTMLTableCellElement>;
+  cellProps?: HTMLAttributes<HTMLTableCellElement>;
+  render?: (row: T) => ReactNode;
+};
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+export type TableProps<T> = {
+  columns: Column<T>[];
+  rows: T[];
+  rowKey: (row: T, index: number) => string;
+  className?: string;
+};
+
+export default function Table<T>({ columns, rows, rowKey, className = "" }: TableProps<T>) {
   return (
-    <div
-      data-slot="table-container"
-      className="relative w-full overflow-x-auto"
-    >
-      <table
-        data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
-    </div>
-  )
-}
-
-function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
-  return (
-    <thead
-      data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
-      {...props}
-    />
-  )
-}
-
-function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
-  return (
-    <tbody
-      data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0", className)}
-      {...props}
-    />
-  )
-}
-
-function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
-  return (
-    <tfoot
-      data-slot="table-footer"
-      className={cn(
-        "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
-  return (
-    <tr
-      data-slot="table-row"
-      className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableHead({ className, ...props }: React.ComponentProps<"th">) {
-  return (
-    <th
-      data-slot="table-head"
-      className={cn(
-        "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableCell({ className, ...props }: React.ComponentProps<"td">) {
-  return (
-    <td
-      data-slot="table-cell"
-      className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableCaption({
-  className,
-  ...props
-}: React.ComponentProps<"caption">) {
-  return (
-    <caption
-      data-slot="table-caption"
-      className={cn("text-muted-foreground mt-4 text-sm", className)}
-      {...props}
-    />
-  )
-}
-
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
+    <table className={`neon-table w-full ${className}`}>
+      <colgroup>
+        {columns.map((c, i) => (
+          <col key={String(c.key) + i} style={{ width: c.width ? `${c.width}px` : undefined }} />
+        ))}
+      </colgroup>
+      <thead>
+        <tr>
+          {columns.map((c, i) => (
+            <th key={String(c.key) + i} {...c.headerProps}>
+              {c.title}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => (
+          <tr key={rowKey(r, i)}>
+            {columns.map((c, j) => (
+              <td key={String(c.key) + j} {...c.cellProps}>
+                {c.render ? c.render(r) : (r as any)[c.key as keyof T]}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 }

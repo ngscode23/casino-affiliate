@@ -12,3 +12,19 @@ export const casinos: Offer[] = (raw as unknown[]).map((item, i) => {
 
 // 👇 Добавь, если хочешь, чтобы старый импорт не ломался
 export type { Offer } from "./schema";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

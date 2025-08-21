@@ -16,3 +16,19 @@ export default function ItemListJsonLd({ items }: { items: Item[] }) {
   }), [JSON.stringify(items)]);
   return null;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

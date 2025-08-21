@@ -1,12 +1,13 @@
 // src/components/CompareTable.tsx
-import Table from "@/ui/Table";
-import type { Column } from "@/ui/Table";
-import Rating from "@/ui/Rating";
-import { Button } from "@/components/ui/button";
-import Card from "@/ui/Card";
+
 import { Link } from "react-router-dom";
+import Button from "@/components/ui/button";
+import Rating from "@/components/ui/rating";
+import Card from "@/components/ui/card";
+import Table, { type Column } from "@/components/ui/table";
 import type { Offer } from "@/types/offer";
 
+// Ключи сортировки, которые реально используются в таблице
 export type SortKey = "rating" | "payoutHours";
 
 type Props = {
@@ -17,17 +18,19 @@ type Props = {
 };
 
 export default function CompareTable({ offers, sortKey, sortDir, onSortChange }: Props) {
-  const ratingArrow = sortKey === "rating" ? (sortDir === "asc" ? " ↑" : " ↓") : "";
-  const payoutArrow = sortKey === "payoutHours" ? (sortDir === "asc" ? " ↑" : " ↓") : "";
-
   const sortNext = (key: SortKey) => {
-    const nextDir: "asc" | "desc" = sortKey === key && sortDir === "asc" ? "desc" : "asc";
+    const nextDir: "asc" | "desc" = sortKey === key ? (sortDir === "asc" ? "desc" : "asc") : "desc";
     onSortChange(key, nextDir);
   };
 
+  const ratingArrow = sortKey === "rating" ? (sortDir === "asc" ? " ▲" : " ▼") : "";
+  const payoutArrow = sortKey === "payoutHours" ? (sortDir === "asc" ? " ▲" : " ▼") : "";
+
   const sortedOffers = [...offers].sort((a, b) => {
     if (sortKey === "rating") {
-      return sortDir === "asc" ? a.rating - b.rating : b.rating - a.rating;
+      const av = (a.rating ?? 0);
+      const bv = (b.rating ?? 0);
+      return sortDir === "asc" ? av - bv : bv - av;
     }
     const av = a.payoutHours ?? 0;
     const bv = b.payoutHours ?? 0;
@@ -45,7 +48,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
         <div className="font-semibold">
           <Link
             className="hover:underline cursor-pointer"
-            to={`/offers/${encodeURIComponent(r.slug ?? r.name.toLowerCase().replace(/\s+/g, "-"))}`}
+            to={`/offers/${encodeURIComponent((r.slug ?? r.name).toLowerCase().replace(/\s+/g, "-"))}`}
           >
             {r.name}
           </Link>
@@ -57,12 +60,11 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
       title: `RATING${ratingArrow}`,
       width: 140,
       headerProps: {
-        className:
-          "px-4 py-2 cursor-pointer select-none text-[var(--muted)] hover:text-[var(--text)]",
+        className: "px-4 py-2 cursor-pointer select-none text-[var(--muted)] hover:text-[var(--text)]",
         onClick: () => sortNext("rating"),
       },
       cellProps: { className: "px-4 py-3" },
-      render: r => <Rating value={r.rating} />,
+      render: r => <Rating value={r.rating ?? 0} />,
     },
     {
       key: "license",
@@ -76,12 +78,16 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
       title: `PAYOUT${payoutArrow}`,
       width: 160,
       headerProps: {
-        className:
-          "px-4 py-2 cursor-pointer select-none text-[var(--muted)] hover:text-[var(--text)]",
+        className: "px-4 py-2 cursor-pointer select-none text-[var(--muted)] hover:text-[var(--text)]",
         onClick: () => sortNext("payoutHours"),
       },
       cellProps: { className: "px-4 py-3" },
-      render: r => <span>{r.payout}</span>,
+      render: r => (
+        <span>
+          {r.payout}
+          {r.payoutHours ? ` (~${r.payoutHours}h)` : ""}
+        </span>
+      ),
     },
     {
       key: "methods",
@@ -92,9 +98,13 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
         const list = r.methods ?? r.payments ?? [];
         return (
           <div className="flex flex-wrap gap-2">
-            {list.length ? list.map((m, i) => (
-              <span key={`${m}-${i}`} className="neon-chip">{m}</span>
-            )) : "—"}
+            {list.length
+              ? list.map((m, i) => (
+                  <span key={`${m}-${i}`} className="neon-chip">
+                    {m}
+                  </span>
+                ))
+              : "—"}
           </div>
         );
       },
@@ -106,18 +116,25 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
       headerProps: { className: "px-4 py-2" },
       cellProps: { className: "px-4 py-3" },
       render: r => (
-        <Button asChild aria-label={`Open ${r.name}`} className="cursor-pointer">
-          <a href={r.link ?? "#"}>Play</a>
+        <Button aria-label={`Open ${r.name}`} className="cursor-pointer">
+          <a
+            href={r.link ?? "#"}
+            target={r.link?.startsWith("http") ? "_blank" : undefined}
+            rel={r.link?.startsWith("http") ? "nofollow sponsored noopener" : undefined}
+          >
+            Play
+          </a>
         </Button>
       ),
     },
   ];
 
   return (
-    <Card className="p-0 hidden md:block">
+    <Card className="p-0">
       <div className="overflow-x-auto">
         <Table columns={columns} rows={sortedOffers} rowKey={r => r.slug ?? r.name} />
       </div>
     </Card>
   );
 }
+

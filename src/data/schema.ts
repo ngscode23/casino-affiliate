@@ -16,3 +16,19 @@ export const OfferSchema = z.object({
 
 // <-- Вот тут важно: экспортируем тип Offer
 export type Offer = z.infer<typeof OfferSchema>;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

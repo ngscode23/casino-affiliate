@@ -1,17 +1,15 @@
-// src/pages/Favorites.tsx
 import { useState } from "react";
-import Section from "@/ui/Section";
-import Card from "@/ui/Card";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
+import Section from "@/components/ui/section";
 import { useFavorites } from "@/lib/useFavorites";
-import { casinos } from "@/data/casinos";
+import { casinos as allOffers } from "@/data/casinos";
 import MobileOfferCard from "@/components/MobileOfferCard";
 import CompareTable, { type SortKey } from "@/components/CompareTable";
+import Card from "@/components/ui/card";
 
 export default function FavoritesPage() {
   const { ids, clear } = useFavorites();
-
-  const list = casinos.filter(o => ids.includes(o.slug ?? o.name));
+  const list = allOffers.filter(o => ids.includes(o.slug ?? o.name));
 
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -21,11 +19,7 @@ export default function FavoritesPage() {
       <section className="neon-hero">
         <Section>
           <h1
-            style={{
-              fontWeight: 800,
-              letterSpacing: "-0.02em",
-              fontSize: "clamp(28px,4.5vw,46px)",
-            }}
+            style={{ fontWeight: 800, letterSpacing: "-0.02em", fontSize: "clamp(28px,4.5vw,46px)" }}
           >
             Избранное
           </h1>
@@ -33,9 +27,7 @@ export default function FavoritesPage() {
 
           {list.length > 0 && (
             <div className="mt-4">
-              <Button variant="secondary" onClick={clear}>
-                Очистить избранное
-              </Button>
+              <Button variant="secondary" onClick={clear}>Очистить избранное</Button>
             </div>
           )}
         </Section>
@@ -43,25 +35,28 @@ export default function FavoritesPage() {
 
       <Section>
         {list.length === 0 ? (
-          <Card className="p-6 text-[var(--text-dim)]">
-            Вы ещё ничего не добавили.
-          </Card>
+          <Card className="p-6 text-[var(--text-dim)]">Вы ещё ничего не добавили.</Card>
         ) : (
           <>
-            {/* мобильные карточки */}
+            {/* mobile cards */}
             <div className="grid gap-3 sm:gap-4 md:hidden">
               {list.map(o => (
-                <MobileOfferCard key={o.slug ?? o.name} offer={o} />
+                <MobileOfferCard
+                  key={o.slug ?? o.name}
+                  offer={o}
+                  selected={false}
+                  toggle={() => {}}
+                />
               ))}
             </div>
 
-            {/* десктопная таблица */}
+            {/* desktop table */}
             <div className="hidden md:block">
               <CompareTable
                 offers={list}
                 sortKey={sortKey}
                 sortDir={sortDir}
-                onSortChange={(k: SortKey, d: "asc" | "desc") => {
+                onSortChange={(k, d) => {
                   setSortKey(k);
                   setSortDir(d);
                 }}

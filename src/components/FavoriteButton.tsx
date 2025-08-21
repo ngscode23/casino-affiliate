@@ -1,5 +1,5 @@
 import { Heart, HeartOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
 import { useFavorites } from "@/lib/useFavorites";
 
 export default function FavoriteButton({ id }: { id: string }) {

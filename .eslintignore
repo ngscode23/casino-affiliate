@@ -1,0 +1,4 @@
+# .eslintignore
+node_modules/
+dist/
+backup_before_cleanup_*/

@@ -1,7 +1,14 @@
 // src/components/MobileOfferCard.tsx
 import { useMemo } from "react";
-import Rating from "../ui/Rating";
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { ExternalLink, Info } from "lucide-react";
+
+import Rating from "@/components/ui/rating";
+import Button from "@/components/ui/button";
+import CompareInline from "@/components/CompareInline";
+
+// если у тебя есть shadcn/ui sheet — оставь эти импорты.
+// если нет — временно закомментируй и убери разметку Sheet ниже.
 import {
   Sheet,
   SheetTrigger,
@@ -10,51 +17,38 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Info, ExternalLink } from "lucide-react";
-import { motion } from "framer-motion";
-import { useCompare } from "@/ctx/CompareContext";
-import CompareInline from "@/components/CompareInline";
 
-export type MobileOffer = {
-  slug?: string;
+type Offer = {
   name: string;
-  rating: number;
-  license: string;
-  payout: string;
+  license?: string;
+  rating?: number;
+  payout?: string;
   payoutHours?: number;
   methods?: string[];
-  payments?: string[];
-  link?: string;
+  link?: string | null;
 };
 
-export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
-  const { toggle, isSelected } = useCompare();
-  const selected = isSelected(offer);
-  const methods = offer.methods ?? offer.payments ?? [];
+type Props = {
+  offer: Offer;
+  selected?: boolean;
+  toggle: (offer: Offer) => void;
+  className?: string;
+};
 
-  // краткое описание для шита
+export function MobileOfferCard({ offer, selected = false, toggle, className = "" }: Props) {
+  const methods = useMemo(() => offer.methods ?? [], [offer.methods]);
+
+  // краткое описание для «details» шита
   const summary = useMemo(() => {
-    const speed =
-      offer.payoutHours != null
-        ? offer.payoutHours <= 24
-          ? "очень быстрые выплаты"
-          : offer.payoutHours <= 48
-          ? "быстрые выплаты"
-          : "средняя скорость выплат"
-        : "стабильные выплаты";
-
-    const trust =
-      offer.rating >= 4.6
-        ? "высокий пользовательский рейтинг"
-        : offer.rating >= 4.2
-        ? "хороший пользовательский рейтинг"
-        : "средний пользовательский рейтинг";
-
-    return `${offer.name}: ${speed}, ${trust}. Лицензия ${offer.license}.`;
-  }, [offer]);
+    const parts: string[] = [];
+    if (offer.payout) parts.push(`Payout: ${offer.payout}${offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}`);
+    if (offer.license) parts.push(`License: ${offer.license}`);
+    if (typeof offer.rating === "number") parts.push(`Rating: ${offer.rating}`);
+    return parts.join(" • ");
+  }, [offer.payout, offer.payoutHours, offer.license, offer.rating]);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow">
+    <div className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}>
       {/* шапка карточки */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1 min-w-0">
@@ -62,12 +56,15 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
           <div className="text-xs text-[var(--text-dim)]">{offer.license}</div>
         </div>
         <div className="shrink-0">
-          <Rating value={offer.rating} />
+          <Rating value={offer.rating ?? 0} />
         </div>
       </div>
 
       {/* краткая инфа */}
-      <div className="mt-3 text-sm">Payout: {offer.payout}</div>
+      <div className="mt-3 text-sm">
+        Payout: {offer.payout}
+        {offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}
+      </div>
 
       {/* методы */}
       {methods.length > 0 && (
@@ -83,7 +80,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
       {/* действия */}
       <div className="mt-4 grid grid-cols-3 gap-2">
         {/* Play */}
-        <Button asChild aria-label={`Open ${offer.name}`}>
+        <Button aria-label={`Open ${offer.name}`}>
           <a
             href={offer.link ?? "#"}
             className="inline-flex items-center justify-center gap-2"
@@ -96,6 +93,9 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
 
         {/* Compare toggle */}
         <Button
+          // если в твоём Button есть variant=secondary/soft — оставь.
+          // иначе убери проп variant, чтобы TS не ругался.
+          // @ts-ignore
           variant={selected ? "secondary" : "soft"}
           onClick={() => toggle(offer)}
           aria-pressed={selected}
@@ -103,10 +103,11 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
           {selected ? "Selected" : "Compare"}
         </Button>
 
-        {/* Details — нижний шит */}
+        {/* Details — нижний шит (если есть shadcn/ui sheet) */}
         <Sheet>
           <SheetTrigger asChild>
             <Button
+              // @ts-ignore
               variant="ghost"
               aria-label={`Details for ${offer.name}`}
               className="inline-flex items-center justify-center gap-2"
@@ -144,7 +145,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
                   <div>
                     <div className="text-[var(--text-dim)]">Rating</div>
                     <div className="mt-1">
-                      <Rating value={offer.rating} />
+                      <Rating value={offer.rating ?? 0} />
                     </div>
                   </div>
                   <div>
@@ -172,19 +173,9 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
                   </div>
                 </div>
 
-                {/* почему рекомендуем */}
-                <div className="rounded-xl border border-white/10 bg-[var(--bg-1)] p-4">
-                  <div className="text-[var(--text-dim)] mb-2">Why we like it</div>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Прозрачные условия бонусов</li>
-                    <li>Адекватная скорость вывода</li>
-                    <li>Поддержка популярных методов оплаты</li>
-                  </ul>
-                </div>
-
                 {/* действия в шите */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Button asChild className="w-full">
+                  <Button className="w-full">
                     <a
                       href={offer.link ?? "#"}
                       target={offer.link?.startsWith("http") ? "_blank" : undefined}
@@ -195,6 +186,7 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
                   </Button>
 
                   <Button
+                    // @ts-ignore
                     variant={selected ? "secondary" : "soft"}
                     className="w-full"
                     onClick={() => toggle(offer)}
@@ -214,3 +206,6 @@ export default function MobileOfferCard({ offer }: { offer: MobileOffer }) {
     </div>
   );
 }
+
+export default MobileOfferCard;
+

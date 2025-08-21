@@ -7,3 +7,19 @@ export function rankScore(o: Offer) {
   // веса: рейтинг 60%, скорость 25%, лицензия 15%
   return r/5 * 0.6 + speed * 0.25 + lic * 0.15;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

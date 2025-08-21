@@ -75,3 +75,19 @@ export const offerMethodsRelations = relations(offerMethods, ({ one }) => ({
     references: [offers.id],
   }),
 }));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

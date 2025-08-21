@@ -12,3 +12,19 @@ export default function SiteJsonLd({ name = SITE_NAME, url = SITE_URL }: Props) 
   }), [name, url]);
   return null;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
