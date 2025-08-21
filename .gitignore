@@ -47,3 +47,5 @@ build/
 .tmp/
 .env
 .env.*
+
+backup_before_cleanup_*/
