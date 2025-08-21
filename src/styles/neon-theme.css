@@ -1,220 +1,90 @@
-/* ==== Neon Dark Theme (clean) ==== */
-/* Глобальные отступы секций */
-.section-y { padding-block: 24px; }
-@media (min-width: 640px){ .section-y { padding-block: 32px; } }
-@media (min-width:1024px){ .section-y { padding-block: 40px; } }
-.neon-card { transition: transform .12s ease, box-shadow .2s ease; }
-.neon-card:hover { transform: translateY(-1px); }
 
-a, button { transition: color .2s ease, background-color .2s ease, border-color .2s ease, opacity .2s ease; }
-/* Reset */
-* { box-sizing: border-box; }
-html, body, #root { height: 100%; }
-html, body { margin: 0; padding: 0; }
-.btn-row { display:flex; flex-wrap:wrap; gap:10px; }
-@media (min-width:640px){ .btn-row { gap:12px; } }
-/* Tokens */
 :root {
-  --bg-0: #0b0a0f;
-  --bg-1: #111018;
-  --bg-2: #171526;
-  --surface: rgba(255,255,255,0.06);
-  --text: #eae9f3;
-  --text-dim: #b9b7c9;
-  --muted: #8e8aa5;
-
-  --primary: #b86bff;
-  --primary-2: #7c3aed;
-  --accent: #22d3ee;
-  --hot: #ff1f8f;
-  --lime: #3bd671;
-
-  --grad-hero:
-    radial-gradient(1200px 800px at 10% 10%, rgba(184,107,255,0.25) 0%, rgba(34,211,238,0.12) 40%, transparent 70%),
-    radial-gradient(1000px 700px at 90% 20%, rgba(255,31,143,0.18) 0%, transparent 60%),
-    linear-gradient(180deg, #0b0a0f 0%, #0f0e14 100%);
-
-  --ring: 0 0 0 2px rgba(184,107,255,0.35), 0 0 30px rgba(184,107,255,0.25);
+  --bg-950: #080b10;
+  --bg-900: #0b0f14;
+  --bg-850: #0f141b;
+  --text-100: #eef2f6;
+  --text-300: #c8d0da;
+  --text-500: #93a1b2;
+  --muted-700: #1a2230;
+  --muted-600: #1f2937;
+  --card-800: #121826;
+  --accent: #d4af37;
+  --accent-2: #8b5cf6;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --shadow-soft: 0 10px 30px rgba(0,0,0,0.35);
+  --shadow-ring: 0 0 0 1px rgba(255,255,255,0.06) inset;
 }
 
-/* Global */
-html, body { background: var(--bg-0); color: var(--text); }
-
-/* Layout */
-.neon-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
-.site-container { max-width: 1200px; margin: 0 auto; padding: 0 16px; } /* alias */
-
-/* Hero */
-.neon-chip { padding: 6px 10px; font-size: 12px; }
-@media (min-width:1024px){ .neon-chip { padding: 7px 12px; font-size: 13px; } }
-
-.neon-input { padding: 14px 16px; }
-@media (min-width:1024px){ .neon-input { padding: 16px 18px; } }
-.neon-hero {
-  background: var(--grad-hero);
-  border-radius: 24px;
-  padding: 40px 20px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset, 0 10px 50px rgba(0,0,0,0.6);
-}
-.neon-hero h1 {
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  font-size: clamp(28px, 4.5vw, 46px);
-  text-shadow: 0 0 18px rgba(184,107,255,0.25);
-}
-.neon-subline { color: var(--text-dim); margin-top: 10px; }
-
-/* Inputs & buttons */
-.neon-search { margin-top: 24px; display: grid; grid-template-columns: 1fr auto; gap: 10px; }
-.neon-input {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  padding: 14px 16px;
-  outline: none;
-}
-.neon-input:focus { border-color: rgba(184,107,255,0.5); box-shadow: var(--ring); }
-
-.neon-btn {
-  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-  color: #0b0a0f;
-  border: none;
-  border-radius: 14px;
-  padding: 12px 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform .08s ease, filter .2s ease;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset, 0 10px 24px rgba(184,107,255,0.25);
-}
-.neon-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
-.neon-btn:active { transform: translateY(0); }
-
-/* Chips & cards */
-.neon-chip {
-  font-size: 12px;
-  background: rgba(184,107,255,0.12);
-  color: #decaff;
-  border: 1px solid rgba(184,107,255,0.35);
-  padding: 6px 10px;
-  border-radius: 999px;
-}
-.neon-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 18px;
-  padding: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-}
-.neon-card.featured { border-color: rgba(184,107,255,0.6); box-shadow: 0 0 24px rgba(184,107,255,0.25); }
-.section-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; } /* alias */
-
-/* Badges */
-.neon-badge { border-radius: 10px; padding: 6px 8px; font-weight: 700; font-size: 12px; color: #0b0a0f; }
-.badge-green { background: linear-gradient(90deg, #34d399, #a7f3d0); }
-.badge-pink  { background: linear-gradient(90deg, #ff1f8f, #ff85c2); }
-.badge-cyan  { background: linear-gradient(90deg, #22d3ee, #93c5fd); }
-
-/* Table */
-.neon-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
-.neon-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 0 10px; }
-.neon-table td {
-  background: var(--surface);
-  border: 1px solid rgba(255,255,255,0.07);
-  padding: 12px 10px;
-}
-.neon-table tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-.neon-table tr td:last-child  { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
-
-/* Footer */
-.neon-footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
-.neon-footer a { color: #bba8ff; text-decoration: underline dotted; }
-
-/* Focus ring */
-[data-glow] { transition: box-shadow .2s ease, border-color .2s ease; }
-[data-glow]:focus { box-shadow: var(--ring); border-color: rgba(184,107,255,0.6); }
-
-/* Force-enable page scroll */
 html, body {
-  overflow-y: auto !important;
-  height: auto !important;
-  min-height: 100%;
+  background: radial-gradient(1200px 700px at 20% -10%, rgba(139,92,246,0.08), transparent 60%),
+              radial-gradient(900px 600px at 100% 0%, rgba(212,175,55,0.10), transparent 50%),
+              var(--bg-900);
+  color: var(--text-100);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-body { padding-bottom: 64px; }
-@media (min-width:640px){ body { padding-bottom: 0; } }
-/* Корневой контейнер не должен запирать высоту */
-#root {
-  min-height: 100%;
-  overflow: visible !important;
+
+.container, .neon-container { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--card-800);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-soft), var(--shadow-ring);
+  border: 1px solid rgba(255,255,255,0.06);
 }
-/* в src/styles/neon-theme.css */
-main {
-  min-height: 100vh; /* контент будет как минимум на всю высоту окна */
+
+.neon-hero {
+  position: relative;
+  padding: 64px 0 32px;
+  background: linear-gradient(140deg, rgba(212,175,55,0.10), rgba(139,92,246,0.12) 40%, transparent 80%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.cookie-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000; /* поверх всего */
+.neon-hero h1, .neon-hero .title { font-size: clamp(28px, 5vw, 46px); line-height: 1.05; letter-spacing: -0.02em; margin: 8px 0 14px; }
+.neon-hero p { color: var(--text-300); max-width: 800px; margin: 0; }
+
+.neon-chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: linear-gradient(180deg, rgba(139,92,246,0.18), rgba(139,92,246,0.10) 70%, rgba(255,255,255,0.02));
+  box-shadow: 0 6px 16px rgba(139,92,246,0.20);
+  color: #fff; font-weight: 600; font-size: 13px; letter-spacing: 0.25px;
 }
-:root { --btn-gap: 12px; }
+.neon-chip[data-glow] { box-shadow: 0 0 0 2px rgba(212,175,55,0.15), 0 8px 24px rgba(212,175,55,0.20);
+  background: linear-gradient(180deg, rgba(212,175,55,0.22), rgba(212,175,55,0.10)); }
 
-/* Любые две кнопки подряд — раздвигаем */
-.neon-btn + .neon-btn { margin-left: var(--btn-gap); }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 18px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.00)),
+              linear-gradient(180deg, rgba(212,175,55,0.25), rgba(212,175,55,0.15));
+  color: #111; font-weight: 700; letter-spacing: 0.2px; cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  box-shadow: 0 10px 20px rgba(212,175,55,0.20);
+}
+.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.btn:active { transform: translateY(0); filter: brightness(0.98); }
+.btn.secondary {
+  background: linear-gradient(180deg, rgba(139,92,246,0.25), rgba(139,92,246,0.15));
+  color: #fff; box-shadow: 0 10px 20px rgba(139,92,246,0.20);
+}
 
-/* Кнопка и чипы — тоже раздвигаем (если у тебя рядом фильтры/бейджи) */
-.neon-btn + .neon-chip,
-.neon-chip + .neon-btn { margin-left: var(--btn-gap); }
+.table {
+  width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: 14px;
+  background: var(--card-800); box-shadow: var(--shadow-soft), var(--shadow-ring);
+}
+.table th, .table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.table th { text-align: left; color: var(--text-500); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.4px; }
+.table tr:hover td { background: rgba(255,255,255,0.02); }
 
-/* Кнопки, завернутые в ссылки <a><button class="neon-btn"></button></a> */
-a + .neon-btn,
-.neon-btn + a .neon-btn,
-a + a .neon-btn { margin-left: var(--btn-gap); }
+.badge {
+  display: inline-block; padding: 5px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; letter-spacing: 0.3px;
+  color: #111; background: linear-gradient(180deg, rgba(212,175,55,0.9), rgba(212,175,55,0.75));
+}
 
-/* Чтобы по вертикали не «ломались» по базовой линии текста */
-.neon-btn { vertical-align: middle; }
-.neon-chip + .neon-chip { margin-left: 0.75rem; }
-/* ===== Адаптивные базовые вещи ===== */
-
-/* Контейнер и карточки */
-.neon-container { max-width: 1200px; margin: 0 auto; padding: 0 12px; }
-@media (min-width: 640px) { .neon-container { padding: 0 16px; } }
-
-.neon-card { padding: 12px; }
-@media (min-width: 640px) { .neon-card { padding: 16px; } }
-
-/* Герой — не ломаемся на мобилке */
-.neon-hero { padding: 28px 14px; }
-@media (min-width: 640px) { .neon-hero { padding: 40px 20px; } }
-
-.neon-hero h1 { font-size: clamp(22px, 6vw, 46px); }
-
-/* Поиск в герое — в столбик на узких */
-.neon-search { display: grid; grid-template-columns: 1fr; gap: 10px; }
-@media (min-width: 640px) { .neon-search { grid-template-columns: 1fr auto; } }
-
-/* Кнопочные группы и чипы не слипаются и переносятся */
-.btn-row, .chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
-.neon-chip { display: inline-flex; align-items: center; }
-
-/* Любые подряд идущие кнопки — раздвигаем */
-.neon-btn + .neon-btn { margin-left: 10px; }
-@media (max-width: 420px) { .neon-btn + .neon-btn { margin-left: 0; } }
-
-/* Таблица: горизонтальный скролл на узких, минимальная ширина */
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.table-min { min-width: 720px; } /* под себя подстрой, если больше колонок */
-
-/* Изображения и линки не ломают вёрстку */
-img { max-width: 100%; height: auto; }
-a { word-break: break-word; }
-
-/* Футер/низ страницы — не выпадает за экран, если мало контента */
-main { min-height: 60vh; }
-
-/* CookieBar: в две строки на узких */
-.cookie-bar { gap: 10px; flex-wrap: wrap; }
-.cookie-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.site-footer { margin-top: 48px; padding: 32px 0; color: var(--text-500);
+  border-top: 1px solid rgba(255,255,255,0.06); background: linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)); }
