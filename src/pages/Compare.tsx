@@ -5,6 +5,8 @@ import CompareTable from "@/components/CompareTable";
 import type { SortKey } from "@/components/CompareTable";
 import { offers as allOffers } from "@/data/offers";
 
+
+
 export default function Compare() {
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -30,3 +32,4 @@ export default function Compare() {
     </section>
   );
 }
+

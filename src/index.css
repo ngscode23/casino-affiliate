@@ -1,15 +1,58 @@
-/* src/index.css */
-/* Tailwind v4 entry point */
-/* Tailwind v4 */
-/* src/index.css */
+/* === Tailwind v4 core === */
 @import "tailwindcss";
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
 
-/* Твоя тема поверх Tailwind */
-@import "./styles/neon-theme.css";
+/* === Токены темы === */
+:root{
+  --bg-0:#0b0f1a;      /* фон страницы */
+  --bg-1:#101526;      /* карточки/плашки */
+  --text:#e6e9f3;      /* основной текст */
+  --text-dim:#a8b0c2;  /* вторичный текст */
+  --muted:#8c94a7;     /* подписи/мьютед */
+  --brand:#22d3ee;     /* акцент (циан) */
+}
 
-/* Шрифты и сглаживание — можно тут или в index.html */
-:root { --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-body, #root { height: 100%; margin: 0; font-family: var(--font-sans); }
+/* === База === */
+html,body,#root{height:100%;}
+body{
+  background:var(--bg-0);
+  color:var(--text);
+  font-family:InterVariable,Inter,ui-sans-serif,system-ui;
+}
+
+/* === Контейнеры === */
+.neon-container{ @apply mx-auto max-w-6xl px-4; }
+.neon-card{ @apply rounded-2xl border border-white/10 bg-[var(--bg-1)] shadow-[0_6px_24px_rgba(0,0,0,0.35)]; }
+
+/* === Hero === */
+.neon-hero{
+  background:linear-gradient(180deg,rgba(34,211,238,0.08),transparent 60%);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:48px 0;
+}
+
+/* === Чипы/бейджи === */
+.neon-chip{
+  @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:var(--text);
+}
+.neon-chip[data-glow="true"]{
+  box-shadow:0 0 0.5rem rgba(34,211,238,.4), 0 0 1.2rem rgba(34,211,238,.25);
+}
+
+/* === Поиск на главной === */
+.neon-search{ @apply mt-5 flex gap-2 flex-col sm:flex-row; }
+.neon-input{
+  @apply h-11 w-full rounded-md border border-white/10 bg-[var(--bg-1)] px-3 text-[var(--text)]
+         outline-none focus:ring-2 focus:ring-white/20;
+}
+.neon-btn{
+  @apply h-11 rounded-md px-4 font-medium;
+  background: var(--brand);
+  color: #000;
+}
+.neon-btn:hover{ filter:brightness(1.05); }
+
+/* === Утилиты === */
+.btn-row{ @apply flex flex-wrap gap-2; }
