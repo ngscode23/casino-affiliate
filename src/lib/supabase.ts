@@ -1,7 +1,7 @@
-// src/lib/supabase.ts
 import { createClient } from "@supabase/supabase-js";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/config";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// удобная отладка в консоли
+if (typeof window !== "undefined") (window as any).sb = supabase;

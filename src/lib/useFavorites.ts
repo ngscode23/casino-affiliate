@@ -8,7 +8,10 @@ export function useFavorites() {
   const [ids, setIds] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem(LS);
-      return raw ? (JSON.parse(raw) as string[]) : [];
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed)
+        ? parsed.filter((x): x is string => typeof x === "string")
+        : [];
     } catch {
       return [];
     }
@@ -23,33 +26,32 @@ export function useFavorites() {
     }
   }, [ids]);
 
-  // при маунте: если юзер залогинен — тянем удаленные фавориты, мержим, недостающие пушим
+  // однократно при маунте: ensure profile + загрузка и merge избранного
   useEffect(() => {
-    let stop = false;
+    let cancelled = false;
     (async () => {
       try {
         const { data: auth } = await supabase.auth.getUser();
         const user = auth.user;
-        if (!user || stop) return;
+        if (!user || cancelled) return;
 
-        // гарантируем профиль (не упадет при конфликте из-за RLS/PK)
-        try {
-          await supabase.from("profiles").insert({ id: user.id });
-        } catch {
-          /* может быть conflict — ок */
-        }
+        // гарантируем профиль без 409
+        await supabase
+          .from("profiles")
+          .upsert({ id: user.id }, { onConflict: "id", ignoreDuplicates: true });
 
         const { data, error } = await supabase
           .from("favorites")
           .select("offer_id")
           .eq("user_id", user.id);
 
-        if (error || stop) return;
+        if (error || cancelled) return;
 
         const remote = (data ?? []).map((r: { offer_id: string }) => r.offer_id);
         const merged = Array.from(new Set([...ids, ...remote]));
         setIds(merged);
 
+        // докидываем недостающие на сервер
         const toPush = merged
           .filter((id) => !remote.includes(id))
           .map((offer_id) => ({ user_id: user.id, offer_id }));
@@ -58,14 +60,13 @@ export function useFavorites() {
           await supabase.from("favorites").insert(toPush);
         }
       } catch {
-        // оффлайн/сетевые — живём на локалсторадже
+        // оффлайн — живём на локалсторадже
       }
     })();
 
     return () => {
-      stop = true;
+      cancelled = true;
     };
-    // только при маунте
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -87,7 +88,7 @@ export function useFavorites() {
           await supabase.from("favorites").delete().match({ user_id: user.id, offer_id: id });
         }
       } catch {
-        // ок — локально уже применили. потом синкнется.
+        // локально уже обновили; при следующем онлайне синкнется
       }
     },
     [ids]

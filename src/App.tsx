@@ -1,13 +1,17 @@
 // src/App.tsx
 import "./index.css";
 import "./styles/App.css"; // убери эту строку, если файла нет
-
 import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-
 import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/CompareBar";
 import Skeleton from "@/components/ui/skeleton";
+
+import AuthCallback from "@/pages/AuthCallback";
+
+
+
+
 
 // ленивые импорты
 const Header        = lazy(() => import("./components/Header"));
@@ -37,12 +41,12 @@ export default function App() {
         <CompareProvider>
           <Header />
 
-        <Routes>
+<Routes>
   <Route path="/" element={<HomePage />} />
   <Route path="/compare" element={<ComparePage />} />
   <Route path="/favorites" element={<FavoritesPage />} />
   <Route path="/offers/:slug" element={<OfferPage />} />
-  <Route path="/debug-supabase" element={<DebugSupabase />} /> {/* тест */}
+  <Route path="/auth/callback" element={<AuthCallback />} />
   <Route path="*" element={<NotFound />} />
 </Routes>
 

@@ -1,8 +1,8 @@
-// src/components/AuthButton.tsx
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/ui/button";
+import { AUTH_CALLBACK } from "@/config";
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
@@ -13,11 +13,10 @@ export default function AuthButton() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    // подтянем текущего юзера и подпишемся на изменения статуса
     supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
+      setUser(session?.user ?? null)
+    );
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -26,7 +25,10 @@ export default function AuthButton() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: AUTH_CALLBACK,
+      },
     });
     setLoading(false);
     if (error) setErr(error.message);
@@ -43,10 +45,7 @@ export default function AuthButton() {
     });
     setLoading(false);
     if (error) setErr(error.message);
-    else {
-      // простой способ пересинкать избранное (у нас merge на маунте)
-      window.location.reload();
-    }
+    else window.location.reload();
   };
 
   const signOut = async () => {
@@ -57,7 +56,7 @@ export default function AuthButton() {
   if (user) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm text-[var(--text-dim)] truncate max-w-[120px]">
+        <span className="text-sm text-[var(--text-dim)] truncate max-w-[140px]">
           {user.email}
         </span>
         <Button variant="soft" onClick={signOut}>Sign out</Button>
