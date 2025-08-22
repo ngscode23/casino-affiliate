@@ -19,8 +19,6 @@ import {
 
 import { useCompare } from "@/ctx/CompareContext";
 
-// Если у тебя есть общий тип Offer — можешь импортировать его из "@/types/offer"
-// import type { Offer } from "@/types/offer";
 type Offer = {
   slug?: string;
   name: string;
@@ -56,9 +54,7 @@ export default function MobileOfferCard({ offer, className = "" }: Props) {
   }, [offer.payout, offer.payoutHours, offer.license, offer.rating]);
 
   return (
-    <div
-      className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}
-    >
+    <div className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}>
       {/* шапка */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1 min-w-0">
@@ -118,7 +114,11 @@ export default function MobileOfferCard({ offer, className = "" }: Props) {
         {/* Details (sheet) */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" aria-label={`Details for ${offer.name}`} className="inline-flex items-center justify-center gap-2">
+            <Button
+              variant="ghost"
+              aria-label={`Details for ${offer.name}`}
+              className="inline-flex items-center justify-center gap-2"
+            >
               Details <Info className="h-4 w-4" />
             </Button>
           </SheetTrigger>
@@ -179,26 +179,27 @@ export default function MobileOfferCard({ offer, className = "" }: Props) {
                   </div>
                 </div>
 
-                {/* действия в шите */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Button className="w-full">
+                {/* actions в шите */}
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <FavControl id={id} />
+                  <Button aria-label={`Open ${offer.name}`}>
                     <a
                       href={offer.link ?? "#"}
+                      className="inline-flex items-center justify-center gap-2"
                       target={offer.link?.startsWith("http") ? "_blank" : undefined}
                       rel={offer.link?.startsWith("http") ? "nofollow sponsored noopener" : undefined}
                     >
-                      Play now
+                      Play <ExternalLink className="h-4 w-4" />
                     </a>
                   </Button>
-
-                  <Button
-                    variant={selected ? "secondary" : "soft"}
-                    className="w-full"
-                    onClick={() => toggleCompare(offer)}
-                    aria-pressed={selected}
-                  >
-                    {selected ? "Selected for compare" : "Add to compare"}
-                  </Button>
+              <Button
+  variant={selected ? "secondary" : "soft"}
+  className="w-full"
+  onClick={() => toggleCompare(offer)}   // ← было toggle(offer)
+  aria-pressed={selected}
+>
+  {selected ? "Selected for compare" : "Add to compare"}
+</Button>
                 </div>
 
                 {/* локальная панель сравнения */}

@@ -2,11 +2,7 @@
 import Section from "@/components/ui/section";
 import { Link } from "react-router-dom";
 import Button from "@/components/ui/button";
-import AuthButton from "@/components/AuthButton"; // ❌ Если у тебя нет AuthButton.tsx — удали импорт ниже или создай заглушку
-
-// ❌ Если у тебя нет AuthDialog.tsx — удали импорт ниже или создай заглушку
-// import AuthDialog from "@/components/AuthDialog";
-
+import AuthButton from "@/components/AuthButton"; // если файла нет — убери эту строку и <AuthButton />
 
 import {
   Sheet,
@@ -51,8 +47,11 @@ export default function Header() {
             Favorites
           </Link>
 
-          {/* Если есть AuthDialog — раскомментируй */}
-          {/* <AuthDialog /> */}
+          {/* Кнопка/форма авторизации */}
+          <div className="ml-2">
+            <AuthButton />
+          </div>
+
           <Button className="ml-2">Sign Up</Button>
         </nav>
 
@@ -62,9 +61,8 @@ export default function Header() {
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
                 aria-label="Open menu"
-                className="cursor-pointer"
+                className="cursor-pointer inline-flex items-center justify-center"
               >
                 <Menu className="h-6 w-6 text-[var(--text)]" />
               </Button>
@@ -80,14 +78,21 @@ export default function Header() {
                 <SheetDescription>Open the site navigation</SheetDescription>
               </SheetHeader>
 
-              <nav className="hidden md:flex items-center gap-8">
+              {/* Мобильное меню — ВАЖНО: без hidden! */}
+              <nav className="mt-8 flex flex-col gap-6 text-lg">
                 <Link to="/" className="cursor-pointer hover:underline">
                   Home
                 </Link>
-         
-  <Link to="/compare" className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Compare</Link>
-  <Link to="/favorites" className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Favorites</Link>
-  <AuthButton />
+                <Link to="/compare" className="cursor-pointer hover:underline">
+                  Compare
+                </Link>
+                <Link to="/favorites" className="cursor-pointer hover:underline">
+                  Favorites
+                </Link>
+
+                <div className="pt-2">
+                  <AuthButton />
+                </div>
 
                 <Button className="mt-2 w-full">Sign Up</Button>
               </nav>
