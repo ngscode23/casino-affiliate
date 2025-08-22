@@ -1,17 +1,16 @@
 // src/App.tsx
 import "./index.css";
-import "./styles/App.css"; // убери эту строку, если файла нет
+// import "./styles/App.css"; // подключай только если файл реально есть
+
 import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
+
 import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/CompareBar";
 import Skeleton from "@/components/ui/skeleton";
 
-import AuthCallback from "@/pages/AuthCallback";
-
-
-
-
+// GA-вариант
+import AnalyticsGateGA from "@/components/AnalyticsGateGA";
 
 // ленивые импорты
 const Header        = lazy(() => import("./components/Header"));
@@ -22,7 +21,7 @@ const ComparePage   = lazy(() => import("./pages/Compare"));
 const FavoritesPage = lazy(() => import("./pages/Favorites"));
 const OfferPage     = lazy(() => import("./pages/Offer"));
 const NotFound      = lazy(() => import("./pages/NotFound"));
-//const DebugSupabase = lazy(() => import("./pages/DebugSupabase"));
+const AuthCallback  = lazy(() => import("./pages/AuthCallback"));
 
 export default function App() {
   return (
@@ -41,14 +40,17 @@ export default function App() {
         <CompareProvider>
           <Header />
 
-<Routes>
-  <Route path="/" element={<HomePage />} />
-  <Route path="/compare" element={<ComparePage />} />
-  <Route path="/favorites" element={<FavoritesPage />} />
-  <Route path="/offers/:slug" element={<OfferPage />} />
-  <Route path="/auth/callback" element={<AuthCallback />} />
-  <Route path="*" element={<NotFound />} />
-</Routes>
+          {/* Подключаем GA только если есть согласие (см. AnalyticsGateGA) */}
+          <AnalyticsGateGA />
+
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/compare" element={<ComparePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/offers/:slug" element={<OfferPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
 
           <CompareBar />
           <Footer />
