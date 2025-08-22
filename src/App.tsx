@@ -1,8 +1,9 @@
-import './styles/App.css';
 // src/App.tsx
+import "./index.css";
+import "./styles/App.css"; // убери эту строку, если файла нет
+
 import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-import "./index.css";
 
 import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/CompareBar";
@@ -17,6 +18,7 @@ const ComparePage   = lazy(() => import("./pages/Compare"));
 const FavoritesPage = lazy(() => import("./pages/Favorites"));
 const OfferPage     = lazy(() => import("./pages/Offer"));
 const NotFound      = lazy(() => import("./pages/NotFound"));
+const DebugSupabase = lazy(() => import("./pages/DebugSupabase"));
 
 export default function App() {
   return (
@@ -35,17 +37,16 @@ export default function App() {
         <CompareProvider>
           <Header />
 
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/compare" element={<ComparePage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/offers/:slug" element={<OfferPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+        <Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/compare" element={<ComparePage />} />
+  <Route path="/favorites" element={<FavoritesPage />} />
+  <Route path="/offers/:slug" element={<OfferPage />} />
+  <Route path="/debug-supabase" element={<DebugSupabase />} /> {/* тест */}
+  <Route path="*" element={<NotFound />} />
+</Routes>
 
-          {/* глобальная панель сравнения */}
           <CompareBar />
-
           <Footer />
           <CookieBar />
         </CompareProvider>
@@ -53,20 +54,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

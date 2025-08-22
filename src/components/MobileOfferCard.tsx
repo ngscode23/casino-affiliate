@@ -2,10 +2,12 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ExternalLink, Info } from "lucide-react";
-
 import Rating from "@/components/ui/rating";
 import Button from "@/components/ui/button";
 import CompareInline from "@/components/CompareInline";
+import { FavControl } from "@/components/FavControl";
+
+
 
 // если у тебя есть shadcn/ui sheet — оставь эти импорты.
 // если нет — временно закомментируй и убери разметку Sheet ниже.

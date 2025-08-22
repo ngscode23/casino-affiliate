@@ -1,6 +1,13 @@
+// src/components/Header.tsx
 import Section from "@/components/ui/section";
 import { Link } from "react-router-dom";
 import Button from "@/components/ui/button";
+import AuthButton from "@/components/AuthButton"; // ❌ Если у тебя нет AuthButton.tsx — удали импорт ниже или создай заглушку
+
+// ❌ Если у тебя нет AuthDialog.tsx — удали импорт ниже или создай заглушку
+// import AuthDialog from "@/components/AuthDialog";
+
+
 import {
   Sheet,
   SheetTrigger,
@@ -29,7 +36,7 @@ export default function Header() {
           </span>
         </div>
 
-        {/* Desktop-навигация */}
+        {/* Desktop навигация */}
         <nav className="hidden md:flex items-center gap-8">
           <Link
             to="/compare"
@@ -43,6 +50,9 @@ export default function Header() {
           >
             Favorites
           </Link>
+
+          {/* Если есть AuthDialog — раскомментируй */}
+          {/* <AuthDialog /> */}
           <Button className="ml-2">Sign Up</Button>
         </nav>
 
@@ -50,7 +60,12 @@ export default function Header() {
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Open menu" className="cursor-pointer">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open menu"
+                className="cursor-pointer"
+              >
                 <Menu className="h-6 w-6 text-[var(--text)]" />
               </Button>
             </SheetTrigger>
@@ -59,16 +74,21 @@ export default function Header() {
               side="left"
               className="w-72 bg-[var(--bg-0)] text-[var(--text)] border-r border-white/10"
             >
-              {/* A11y заголовок (визуально скрыт) */}
+              {/* A11y заголовок */}
               <SheetHeader className="sr-only">
                 <SheetTitle>Navigation menu</SheetTitle>
                 <SheetDescription>Open the site navigation</SheetDescription>
               </SheetHeader>
 
-              <nav className="mt-8 flex flex-col gap-6 text-lg">
-                <Link to="/" className="cursor-pointer hover:underline">Home</Link>
-                <Link to="/compare" className="cursor-pointer hover:underline">Compare</Link>
-                <Link to="/favorites" className="cursor-pointer hover:underline">Favorites</Link>
+              <nav className="hidden md:flex items-center gap-8">
+                <Link to="/" className="cursor-pointer hover:underline">
+                  Home
+                </Link>
+         
+  <Link to="/compare" className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Compare</Link>
+  <Link to="/favorites" className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Favorites</Link>
+  <AuthButton />
+
                 <Button className="mt-2 w-full">Sign Up</Button>
               </nav>
             </SheetContent>
