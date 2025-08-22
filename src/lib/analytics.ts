@@ -47,8 +47,12 @@ export function gaConsentUpdate(opts: { analytics: boolean; marketing: boolean }
   });
 }
 
+// Совместимость со старым кодом:
+export function track(name: string, params?: Record<string, unknown>) {
+  return gaEvent(name, params);
+}
 
-
+export const trackPage = gaPageview;
 
 
 
