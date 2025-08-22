@@ -15,17 +15,9 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = """
-      default-src 'self';
-      script-src 'self' https://plausible.io;
-      script-src-elem 'self' https://plausible.io;
-      style-src 'self' 'unsafe-inline';
-      img-src 'self' data: https:;
-      connect-src 'self' https://plausible.io https://api.netlify.com;
-      frame-src 'none';
-      worker-src 'self' blob:;
-    """
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    X-Frame-Options = "DENY"
+    # ЕДИНСТВЕННЫЙ CSP заголовок. Разрешаем Supabase (REST+WS), Plausible и Netlify API.
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://plausible.io; script-src-elem 'self' https://plausible.io; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://plausible.io https://api.netlify.com; frame-src 'none'; worker-src 'self' blob:;"
+    Referrer-Policy = "no-referrer"
     X-Content-Type-Options = "nosniff"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

@@ -90,17 +90,12 @@ export default function Compare() {
       </div>
 
       {/* Мобильные карточки */}
-      <div className="grid gap-3 sm:gap-4 md:hidden">
-        {filtered.map(o => (
-          <MobileOfferCard
-            key={o.slug ?? o.name}
-            offer={o}
-            // заглушка, чтобы не падало: заменишь на реальный toggle из контекста
-            toggle={() => {}}
-            selected={false}
-          />
-        ))}
-      </div>
+  {/* Мобильные карточки */}
+<div className="grid gap-3 sm:gap-4 md:hidden">
+  {filtered.map((o) => (
+    <MobileOfferCard key={o.slug ?? o.name} offer={o} />
+  ))}
+</div>
 
       {/* Десктоп таблица */}
       <div className="neon-card p-0 hidden md:block">

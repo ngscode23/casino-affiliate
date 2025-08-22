@@ -51,3 +51,9 @@ build/
 backup_before_cleanup_*/
 # Local Netlify folder
 .netlify
+backup_before_cleanup_*/
+dist/
+node_modules/
+backup_before_cleanup_*/
+dist/
+node_modules/

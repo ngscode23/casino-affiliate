@@ -7,7 +7,7 @@ import Card from "@/components/ui/card";
 import Rating from "@/components/ui/rating";
 import Button from "@/components/ui/button";
 
-// ВНИМАНИЕ: если у тебя данные в "@/data/offers", поменяй импорт ниже.
+// Если у тебя данные в "@/data/offers", поменяй импорт ниже.
 import { casinos as allOffers } from "@/data/casinos";
 // import { offers as allOffers } from "@/data/offers";
 
@@ -25,9 +25,7 @@ export default function OfferPage() {
     const s = decodeURIComponent(slug);
     return (
       allOffers.find(
-        o =>
-          (o.slug ?? slugify(o.name)) === s ||
-          slugify(o.name) === s
+        (o) => (o.slug ?? slugify(o.name)) === s || slugify(o.name) === s
       ) ?? null
     );
   }, [slug]);
@@ -39,7 +37,7 @@ export default function OfferPage() {
           <div className="text-lg font-semibold mb-2">Not found</div>
           <p className="text-[var(--text-dim)]">Мы не нашли такой оффер.</p>
           <div className="mt-4">
-            <Button asChild>
+            <Button>
               <Link to="/compare">Back to compare</Link>
             </Button>
           </div>
@@ -48,7 +46,8 @@ export default function OfferPage() {
     );
   }
 
-  const methods = offer.methods ?? offer.payments ?? [];
+  // Если в типе Offer нет payments — берём methods, иначе fallback на payments.
+  const methods = (offer.methods ?? (offer as any).payments ?? []) as string[];
 
   return (
     <>
@@ -73,6 +72,7 @@ export default function OfferPage() {
       <Section className="space-y-6">
         <Card className="p-6">
           <div className="grid gap-6 md:grid-cols-3">
+            {/* Левая колонка — инфо */}
             <div className="md:col-span-2 space-y-4">
               <div className="flex items-center gap-3">
                 <span className="text-[var(--text-dim)]">Rating</span>
@@ -101,19 +101,27 @@ export default function OfferPage() {
               </div>
             </div>
 
+            {/* Правая колонка — действия */}
             <div className="space-y-3">
-              <Button asChild className="w-full">
+              <Button className="w-full">
                 <a
                   href={offer.link ?? "#"}
+                  className="inline-flex w-full items-center justify-center"
                   target={offer.link?.startsWith("http") ? "_blank" : undefined}
-                  rel={offer.link?.startsWith("http") ? "nofollow sponsored noopener" : undefined}
+                  rel={
+                    offer.link?.startsWith("http")
+                      ? "nofollow sponsored noopener"
+                      : undefined
+                  }
                 >
                   Play now
                 </a>
               </Button>
-              <Button variant="secondary" className="w-full" asChild>
-                <Link to="/compare">Compare</Link>
-              </Button>
+
+              {/* При необходимости можно оставить вторую кнопку/ссылку */}
+              {/* <Button className="w-full">
+                <Link to="/compare">Back to compare</Link>
+              </Button> */}
             </div>
           </div>
         </Card>

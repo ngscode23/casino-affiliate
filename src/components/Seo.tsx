@@ -1,67 +1,88 @@
-import { useEffect } from "react";
-
-
-
-type Og = Partial<Record<"title"|"description"|"type"|"url"|"image", string>>;
-type Tw = Partial<Record<"card"|"title"|"description"|"image", string>>;
+// src/components/Seo.tsx
+import { useEffect, useMemo } from "react";
 
 type Props = {
   title?: string;
   description?: string;
   noIndex?: boolean;
-  jsonLd?: object; // structured data
+  jsonLd?: Record<string, unknown>;
+  ogImage?: string;
+  ogUrl?: string;
 };
 
-function upsertMeta(attr: "name"|"property", key: string, content?: string) {
-  if (!content) return () => {};
-  const sel = `meta[${attr}="${key}"]`;
-  let el = document.head.querySelector<HTMLMetaElement>(sel);
-  if (!el) { el = document.createElement("meta"); el.setAttribute(attr, key); document.head.appendChild(el); }
-  el.setAttribute("content", content);
-  return () => el && el.remove();
-}
-
-// src/components/Seo.tsx
-
-
-export default function Seo({ title, description, noIndex, jsonLd }: Props) {
-  useEffect(() => {
-    if (title) document.title = title;
-    const metaDesc = ensureMeta("description");
-    if (description) metaDesc.setAttribute("content", description);
-    ensureMeta("og:title").setAttribute("content", title ?? "");
-    ensureMeta("og:description").setAttribute("content", description ?? "");
-    ensureMeta("twitter:card").setAttribute("content", "summary_large_image");
-    if (noIndex) ensureMeta("robots").setAttribute("content", "noindex,nofollow");
-  }, [title, description, noIndex]);
-
-  return jsonLd ? (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-  ) : null;
-}
-
-function ensureMeta(name: string) {
-  let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+function upsertMetaByName(name: string, content: string) {
+  let el = document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
   if (!el) {
     el = document.createElement("meta");
     el.setAttribute("name", name);
     document.head.appendChild(el);
   }
-  return el;
+  el.setAttribute("content", content);
 }
 
+function upsertMetaByProp(prop: string, content: string) {
+  let el = document.head.querySelector<HTMLMetaElement>(`meta[property="${prop}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute("property", prop);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
 
+export default function Seo({
+  title,
+  description,
+  noIndex,
+  jsonLd,
+  ogImage,
+  ogUrl,
+}: Props) {
+  // стабильная строка для эффекта, чтобы линтер не ныл
+  const jsonLdText = useMemo(() => (jsonLd ? JSON.stringify(jsonLd) : null), [jsonLd]);
 
+  useEffect(() => {
+    if (title) document.title = title;
 
+    if (description) {
+      upsertMetaByName("description", description);
+      upsertMetaByProp("og:description", description);
+      upsertMetaByName("twitter:description", description);
+    }
 
+    if (title) {
+      upsertMetaByProp("og:title", title);
+      upsertMetaByName("twitter:title", title);
+    }
 
+    // базовый twitter card
+    upsertMetaByName("twitter:card", "summary_large_image");
 
+    if (ogImage) {
+      upsertMetaByProp("og:image", ogImage);
+      upsertMetaByName("twitter:image", ogImage);
+    }
 
+    if (ogUrl) {
+      upsertMetaByProp("og:url", ogUrl);
+    }
 
+    if (noIndex) {
+      upsertMetaByName("robots", "noindex,nofollow");
+    }
+  }, [title, description, noIndex, ogImage, ogUrl]);
 
+  // вставка JSON-LD со снятием при размонтировании/обновлении
+  useEffect(() => {
+    if (!jsonLdText) return;
+    const el = document.createElement("script");
+    el.type = "application/ld+json";
+    el.text = jsonLdText;
+    document.head.appendChild(el);
+    return () => {
+      document.head.removeChild(el);
+    };
+  }, [jsonLdText]);
 
-
-
-
-
-
+  return null;
+}
