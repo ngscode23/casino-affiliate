@@ -22,7 +22,7 @@ const ComparePage   = lazy(() => import("./pages/Compare"));
 const FavoritesPage = lazy(() => import("./pages/Favorites"));
 const OfferPage     = lazy(() => import("./pages/Offer"));
 const NotFound      = lazy(() => import("./pages/NotFound"));
-const DebugSupabase = lazy(() => import("./pages/DebugSupabase"));
+//const DebugSupabase = lazy(() => import("./pages/DebugSupabase"));
 
 export default function App() {
   return (
