@@ -23,6 +23,6 @@
     "types": ["vite/client", "node", "@netlify/functions"]
   },
   "include": ["src", "netlify/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "src/db/**","netlify/functions/**"],
 }
 

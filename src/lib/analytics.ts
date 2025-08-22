@@ -21,7 +21,7 @@ export function track<E extends EventName>(event: E, payload: EventPayloads[E]):
     if (typeof window !== "undefined") {
       // Dev-лог
       if (import.meta.env?.MODE !== "production") {
-        // eslint-disable-next-line no-console
+         
         console.log("[track]", event, payload);
       }
 

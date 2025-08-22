@@ -2,15 +2,12 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ExternalLink, Info } from "lucide-react";
+
 import Rating from "@/components/ui/rating";
 import Button from "@/components/ui/button";
 import CompareInline from "@/components/CompareInline";
 import { FavControl } from "@/components/FavControl";
 
-
-
-// если у тебя есть shadcn/ui sheet — оставь эти импорты.
-// если нет — временно закомментируй и убери разметку Sheet ниже.
 import {
   Sheet,
   SheetTrigger,
@@ -20,7 +17,12 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 
+import { useCompare } from "@/ctx/CompareContext";
+
+// Если у тебя есть общий тип Offer — можешь импортировать его из "@/types/offer"
+// import type { Offer } from "@/types/offer";
 type Offer = {
+  slug?: string;
   name: string;
   license?: string;
   rating?: number;
@@ -32,26 +34,32 @@ type Offer = {
 
 type Props = {
   offer: Offer;
-  selected?: boolean;
-  toggle: (offer: Offer) => void;
   className?: string;
 };
 
-export function MobileOfferCard({ offer, selected = false, toggle, className = "" }: Props) {
+export default function MobileOfferCard({ offer, className = "" }: Props) {
+  const { toggle: toggleCompare, isSelected } = useCompare();
+  const id = offer.slug ?? offer.name;
+  const selected = isSelected(id);
+
   const methods = useMemo(() => offer.methods ?? [], [offer.methods]);
 
-  // краткое описание для «details» шита
   const summary = useMemo(() => {
     const parts: string[] = [];
-    if (offer.payout) parts.push(`Payout: ${offer.payout}${offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}`);
+    if (offer.payout)
+      parts.push(
+        `Payout: ${offer.payout}${offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}`
+      );
     if (offer.license) parts.push(`License: ${offer.license}`);
     if (typeof offer.rating === "number") parts.push(`Rating: ${offer.rating}`);
     return parts.join(" • ");
   }, [offer.payout, offer.payoutHours, offer.license, offer.rating]);
 
   return (
-    <div className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}>
-      {/* шапка карточки */}
+    <div
+      className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}
+    >
+      {/* шапка */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1 min-w-0">
           <div className="text-base font-semibold truncate">{offer.name}</div>
@@ -79,6 +87,11 @@ export function MobileOfferCard({ offer, selected = false, toggle, className = "
         </div>
       )}
 
+      {/* избранное */}
+      <div className="mt-3">
+        <FavControl id={id} />
+      </div>
+
       {/* действия */}
       <div className="mt-4 grid grid-cols-3 gap-2">
         {/* Play */}
@@ -95,25 +108,17 @@ export function MobileOfferCard({ offer, selected = false, toggle, className = "
 
         {/* Compare toggle */}
         <Button
-          // если в твоём Button есть variant=secondary/soft — оставь.
-          // иначе убери проп variant, чтобы TS не ругался.
-          // @ts-ignore
           variant={selected ? "secondary" : "soft"}
-          onClick={() => toggle(offer)}
+          onClick={() => toggleCompare(offer)}
           aria-pressed={selected}
         >
           {selected ? "Selected" : "Compare"}
         </Button>
 
-        {/* Details — нижний шит (если есть shadcn/ui sheet) */}
+        {/* Details (sheet) */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button
-              // @ts-ignore
-              variant="ghost"
-              aria-label={`Details for ${offer.name}`}
-              className="inline-flex items-center justify-center gap-2"
-            >
+            <Button variant="ghost" aria-label={`Details for ${offer.name}`} className="inline-flex items-center justify-center gap-2">
               Details <Info className="h-4 w-4" />
             </Button>
           </SheetTrigger>
@@ -122,7 +127,6 @@ export function MobileOfferCard({ offer, selected = false, toggle, className = "
             side="bottom"
             className="max-h-[80vh] w-full rounded-t-2xl border-white/10 bg-[var(--bg-0)] text-[var(--text)] p-0 overflow-hidden"
           >
-            {/* a11y для Radix */}
             <SheetHeader className="sr-only">
               <SheetTitle>{offer.name}</SheetTitle>
               <SheetDescription>Casino details</SheetDescription>
@@ -135,7 +139,7 @@ export function MobileOfferCard({ offer, selected = false, toggle, className = "
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
               className="p-6"
             >
-              {/* заголовок и summary */}
+              {/* summary */}
               <div>
                 <div className="text-base sm:text-lg font-semibold">{offer.name}</div>
                 <div className="mt-1 text-[var(--text-dim)]">{summary}</div>
@@ -188,17 +192,16 @@ export function MobileOfferCard({ offer, selected = false, toggle, className = "
                   </Button>
 
                   <Button
-                    // @ts-ignore
                     variant={selected ? "secondary" : "soft"}
                     className="w-full"
-                    onClick={() => toggle(offer)}
+                    onClick={() => toggleCompare(offer)}
                     aria-pressed={selected}
                   >
                     {selected ? "Selected for compare" : "Add to compare"}
                   </Button>
                 </div>
 
-                {/* локальная панель сравнения — только на мобиле */}
+                {/* локальная панель сравнения */}
                 <CompareInline className="md:hidden mt-6" />
               </div>
             </motion.div>
@@ -208,6 +211,3 @@ export function MobileOfferCard({ offer, selected = false, toggle, className = "
     </div>
   );
 }
-
-export default MobileOfferCard;
-

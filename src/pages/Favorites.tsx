@@ -38,17 +38,12 @@ export default function FavoritesPage() {
           <Card className="p-6 text-[var(--text-dim)]">Вы ещё ничего не добавили.</Card>
         ) : (
           <>
-            {/* mobile cards */}
-            <div className="grid gap-3 sm:gap-4 md:hidden">
-              {list.map(o => (
-                <MobileOfferCard
-                  key={o.slug ?? o.name}
-                  offer={o}
-                  selected={false}
-                  toggle={() => {}}
-                />
-              ))}
-            </div>
+         {/* mobile cards */}
+<div className="grid gap-3 sm:gap-4 md:hidden">
+  {list.map(o => (
+    <MobileOfferCard key={o.slug ?? o.name} offer={o} />
+  ))}
+</div>
 
             {/* desktop table */}
             <div className="hidden md:block">
