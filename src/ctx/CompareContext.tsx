@@ -11,15 +11,7 @@ import {
 export type CompareItem = {
   slug?: string;
   name: string;
-  rating?: number;
-  license?: string;
-  payout?: string;
-  payoutHours?: number;
-  methods?: string[];
-  payments?: string[];
-  link?: string | null;
-  [k: string]: unknown;
-};
+} & Record<string, unknown>;
 
 type Ctx = {
   selected: CompareItem[];
@@ -32,6 +24,10 @@ type Ctx = {
 
 const CompareContext = createContext<Ctx | null>(null);
 
+// helper: как получаем id элемента
+const idOf = (x: CompareItem | string) =>
+  typeof x === "string" ? x : (x.slug ?? x.name);
+
 export function CompareProvider({
   children,
   max = 4,
@@ -41,34 +37,30 @@ export function CompareProvider({
 }) {
   const [selected, setSelected] = useState<CompareItem[]>([]);
 
-  const idOf = useCallback(
-    (x: CompareItem | string) => (typeof x === "string" ? x : x.slug ?? x.name),
-    []
-  );
-
   const isSelected = useCallback(
     (id: string) => selected.some((s) => idOf(s) === id),
-    [selected, idOf]
+    [selected]
   );
 
-  const remove = useCallback(
-    (id: string) => {
-      setSelected((prev) => prev.filter((s) => idOf(s) !== id));
-    },
-    [idOf]
-  );
+  const remove = useCallback((id: string) => {
+    setSelected((prev) => prev.filter((s) => idOf(s) !== id));
+  }, []);
 
+  // Используем функциональный setState, чтобы не зависеть от isSelected/remove
   const toggle = useCallback(
     (item: CompareItem) => {
-      const id = idOf(item);
+      const itemId = idOf(item);
       setSelected((prev) => {
-        const exists = prev.some((s) => idOf(s) === id);
-        if (exists) return prev.filter((s) => idOf(s) !== id);
-        if (prev.length >= max) return prev; // лимит
+        const exists = prev.some((s) => idOf(s) === itemId);
+        if (exists) {
+          return prev.filter((s) => idOf(s) !== itemId);
+        }
+        if (typeof item === "string") return prev;
+        if (prev.length >= max) return prev;
         return [...prev, item];
       });
     },
-    [idOf, max]
+    [max]
   );
 
   const clear = useCallback(() => setSelected([]), []);
@@ -83,7 +75,6 @@ export function CompareProvider({
   );
 }
 
- 
 export function useCompare(): Ctx {
   const ctx = useContext(CompareContext);
   if (!ctx) throw new Error("useCompare must be used inside CompareProvider");
