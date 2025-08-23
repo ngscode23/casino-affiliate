@@ -1,30 +1,11 @@
 import { useEffect } from "react";
-import { upsertJsonLd } from "../lib/jsonld";
-import { SITE_NAME, SITE_URL } from "../config/site";
+import { upsertJsonLd } from "@/lib/jsonld";
 
-type Props = { name?: string; url?: string };
+type Props = { data: Record<string, unknown>; id?: string };
 
-export default function SiteJsonLd({ name = SITE_NAME, url = SITE_URL }: Props) {
-  useEffect(() => upsertJsonLd("website", {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name, url
-  }), [name, url]);
+export default function SiteJsonLd({ data, id = "jsonld-site" }: Props) {
+  useEffect(() => {
+    return upsertJsonLd(id, data);
+  }, [id, data]);
   return null;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -7,10 +7,7 @@ import Card from "@/components/ui/card";
 import Rating from "@/components/ui/rating";
 import Button from "@/components/ui/button";
 
-// Если у тебя данные в "@/data/offers", поменяй импорт ниже.
 import { casinos as allOffers } from "@/data/casinos";
-// import { offers as allOffers } from "@/data/offers";
-
 import type { Offer } from "@/types/offer";
 
 function slugify(name: string) {
@@ -46,7 +43,6 @@ export default function OfferPage() {
     );
   }
 
-  // Если в типе Offer нет payments — берём methods, иначе fallback на payments.
   const methods = (offer.methods ?? (offer as any).payments ?? []) as string[];
 
   return (
@@ -117,11 +113,6 @@ export default function OfferPage() {
                   Play now
                 </a>
               </Button>
-
-              {/* При необходимости можно оставить вторую кнопку/ссылку */}
-              {/* <Button className="w-full">
-                <Link to="/compare">Back to compare</Link>
-              </Button> */}
             </div>
           </div>
         </Card>

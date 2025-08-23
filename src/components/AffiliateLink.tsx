@@ -26,18 +26,3 @@ export default function AffiliateLink({ href, id, children, className }: Props) 
   );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

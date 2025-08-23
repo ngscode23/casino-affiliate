@@ -1,45 +1,63 @@
-// src/components/AuthButton.tsx
 import { useEffect, useState } from "react";
-import Button from "@/components/ui/button";
+import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import Button from "@/components/ui/button";
+import { AUTH_CALLBACK } from "@/config";
 
 export default function AuthButton() {
+  const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email ?? null);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, sess) => {
-      setUserEmail(sess?.user?.email ?? null);
-    });
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
+      setUser(session?.user ?? null)
+    );
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  async function signIn(e: React.FormEvent) {
-    e.preventDefault();
+  const sendCode = async () => {
     setErr(null);
-    const redirectTo = window.location.origin; // должен быть разрешён в Auth settings
+    setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: redirectTo },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: AUTH_CALLBACK,
+      },
     });
+    setLoading(false);
     if (error) setErr(error.message);
-    else setSent(true);
-  }
+    else setCodeSent(true);
+  };
 
-  async function signOut() {
+  const verify = async () => {
+    setErr(null);
+    setLoading(true);
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: "email",
+    });
+    setLoading(false);
+    if (error) setErr(error.message);
+    else window.location.reload();
+  };
+
+  const signOut = async () => {
     await supabase.auth.signOut();
-  }
+    window.location.reload();
+  };
 
-  if (userEmail) {
+  if (user) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-[var(--text-dim)] truncate max-w-[140px]" title={userEmail}>
-          {userEmail}
+        <span className="text-sm text-[var(--text-dim)] truncate max-w-[140px]">
+          {user.email}
         </span>
         <Button variant="soft" onClick={signOut}>Sign out</Button>
       </div>
@@ -47,18 +65,35 @@ export default function AuthButton() {
   }
 
   return (
-    <form onSubmit={signIn} className="flex items-center gap-2">
-      <input
-        className="neon-input h-9 w-48"
-        type="email"
-        placeholder="you@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <Button type="submit">Sign in</Button>
-      {sent && <span className="text-xs text-[var(--text-dim)]">Check inbox</span>}
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+      {!codeSent ? (
+        <>
+          <input
+            className="neon-input min-w-[220px]"
+            type="email"
+            placeholder="you@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Button onClick={sendCode} disabled={!email || loading}>
+            {loading ? "Sending..." : "Send code"}
+          </Button>
+        </>
+      ) : (
+        <>
+          <input
+            className="neon-input min-w-[160px]"
+            inputMode="numeric"
+            placeholder="6-digit code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+          <Button onClick={verify} disabled={!code || loading}>
+            {loading ? "Verifying..." : "Verify"}
+          </Button>
+        </>
+      )}
       {err && <span className="text-xs text-red-400">{err}</span>}
-    </form>
+    </div>
   );
 }

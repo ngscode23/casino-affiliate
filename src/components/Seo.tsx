@@ -8,26 +8,40 @@ type Props = {
   jsonLd?: Record<string, unknown>;
   ogImage?: string;
   ogUrl?: string;
+  canonical?: string;
 };
 
-function upsertMetaByName(name: string, content: string) {
-  let el = document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
+function upsertMeta(attr: "name" | "property", key: string, content?: string | null) {
+  const sel = `meta[${attr}="${key}"]`;
+  const head = document.head;
+  const prev = head.querySelector<HTMLMetaElement>(sel);
+
+  if (!content) {
+    if (prev) head.removeChild(prev);
+    return;
+  }
+  let el = prev;
   if (!el) {
     el = document.createElement("meta");
-    el.setAttribute("name", name);
-    document.head.appendChild(el);
+    el.setAttribute(attr, key);
+    head.appendChild(el);
   }
   el.setAttribute("content", content);
 }
 
-function upsertMetaByProp(prop: string, content: string) {
-  let el = document.head.querySelector<HTMLMetaElement>(`meta[property="${prop}"]`);
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("property", prop);
-    document.head.appendChild(el);
+function upsertCanonical(href?: string | null) {
+  const head = document.head;
+  let link = head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!href) {
+    if (link) head.removeChild(link);
+    return;
   }
-  el.setAttribute("content", content);
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "canonical";
+    head.appendChild(link);
+  }
+  link.href = href;
 }
 
 export default function Seo({
@@ -37,50 +51,51 @@ export default function Seo({
   jsonLd,
   ogImage,
   ogUrl,
+  canonical,
 }: Props) {
-  // стабильная строка для эффекта, чтобы линтер не ныл
+  // стабильная строка, чтобы не ругался линтер в deps
   const jsonLdText = useMemo(() => (jsonLd ? JSON.stringify(jsonLd) : null), [jsonLd]);
 
   useEffect(() => {
+    // title
     if (title) document.title = title;
 
-    if (description) {
-      upsertMetaByName("description", description);
-      upsertMetaByProp("og:description", description);
-      upsertMetaByName("twitter:description", description);
-    }
+    // базовые мета
+    upsertMeta("name", "description", description);
+    upsertMeta("name", "robots", noIndex ? "noindex,nofollow" : null);
 
-    if (title) {
-      upsertMetaByProp("og:title", title);
-      upsertMetaByName("twitter:title", title);
-    }
+    // OG / Twitter
+    upsertMeta("property", "og:title", title ?? null);
+    upsertMeta("property", "og:description", description ?? null);
+    upsertMeta("property", "og:url", ogUrl ?? null);
+    upsertMeta("property", "og:image", ogImage ?? null);
 
-    // базовый twitter card
-    upsertMetaByName("twitter:card", "summary_large_image");
+    upsertMeta("name", "twitter:card", "summary_large_image");
+    upsertMeta("name", "twitter:title", title ?? null);
+    upsertMeta("name", "twitter:description", description ?? null);
+    upsertMeta("name", "twitter:image", ogImage ?? null);
 
-    if (ogImage) {
-      upsertMetaByProp("og:image", ogImage);
-      upsertMetaByName("twitter:image", ogImage);
-    }
+    // canonical
+    upsertCanonical(canonical ?? null);
+  }, [title, description, noIndex, ogUrl, ogImage, canonical]);
 
-    if (ogUrl) {
-      upsertMetaByProp("og:url", ogUrl);
-    }
-
-    if (noIndex) {
-      upsertMetaByName("robots", "noindex,nofollow");
-    }
-  }, [title, description, noIndex, ogImage, ogUrl]);
-
-  // вставка JSON-LD со снятием при размонтировании/обновлении
+  // JSON-LD с корректным cleanup
   useEffect(() => {
     if (!jsonLdText) return;
     const el = document.createElement("script");
     el.type = "application/ld+json";
+    el.id = "jsonld-page"; // стабильный id, чтобы не плодить теги
     el.text = jsonLdText;
+
+    // удаляем старый, если был
+    const prev = document.getElementById(el.id);
+    if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
+
     document.head.appendChild(el);
+
     return () => {
-      document.head.removeChild(el);
+      const cur = document.getElementById(el.id);
+      if (cur && cur.parentNode) cur.parentNode.removeChild(cur);
     };
   }, [jsonLdText]);
 
