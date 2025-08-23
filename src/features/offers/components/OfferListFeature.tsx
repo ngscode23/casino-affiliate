@@ -1,37 +1,31 @@
-// src/features/offers/components/OfferListFeature.tsx
+// src/features/offers/components/OfferFiltersFeature.tsx
 import { useEffect, useState } from "react";
-import { getOffers } from "../api/getOffers";
-import OfferCard from "@/components/offers/OfferCard";
-import type { NormalizedOffer } from "@/lib/offers";
+import LicenseSelect, { type LicenseFilter } from "@/components/compare/LicenseSelect";
 
-export default function OfferListFeature() {
-  const [items, setItems] = useState<NormalizedOffer[]>([]);
+export type OffersFilterState = { license: LicenseFilter; q: string };
 
-  useEffect(() => {
-    getOffers().then(dto => {
-      const mapped: NormalizedOffer[] = dto.map(o => ({
-        slug: o.id,
-        name: o.name,
-        license: o.license,
-        rating: o.rating ?? 0,
-        payout: o.payout ?? "",
-        payoutHours: o.payoutHours,
-        methods: o.methods ?? [],
-        link: o.link ?? undefined,
-        enabled: true,
-        position: undefined,
-      }));
-      setItems(mapped);
-    });
-  }, []);
+export function OfferFiltersFeature({ onChange }: { onChange: (s: OffersFilterState) => void }) {
+  const [license, setLicense] = useState<LicenseFilter>("all");
+  const [q, setQ] = useState("");
 
-  if (!items.length) return null;
+  useEffect(() => { onChange({ license, q }); }, [license, q, onChange]);
 
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((o, i) => (
-        <OfferCard key={o.slug} offer={o} index={i} />
-      ))}
-    </ul>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div>
+        <label className="block text-sm mb-1">License</label>
+        <LicenseSelect value={license} onChange={(v) => setLicense(v)} />
+      </div>
+
+      <div className="sm:ml-auto">
+        <label className="block text-sm mb-1">Search</label>
+        <input
+          className="border rounded-md px-3 py-2 min-w-[220px]"
+          placeholder="Casino, method…"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </div>
+    </div>
   );
 }

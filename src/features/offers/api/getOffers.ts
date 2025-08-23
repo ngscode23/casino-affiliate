@@ -2,22 +2,21 @@
 import { offersNormalized } from "@/lib/offers";
 import type { OfferDTO } from "./types";
 
-const licenseMap = new Map<string, OfferDTO["license"]>([
-  ["MGA", "MGA"],
-  ["UKGC", "UKGC"],
-  ["Curaçao", "Curaçao"],
-  ["Curacao", "Curaçao"], // латинизм -> нормализуем
-  ["Other", "Other"],
-]);
-function toLicense(v?: string): OfferDTO["license"] {
-  return (v && licenseMap.get(v)) ?? "Other";
+function normalizeLicense(v?: string): OfferDTO["license"] {
+  if (!v) return "Other";
+  const s = v.normalize("NFKD").replace(/\u0301/g, ""); // убрать диакритику
+  if (/^mga$/i.test(s)) return "MGA";
+  if (/^ukgc$/i.test(s)) return "UKGC";
+  if (/^cura(c|ç|c)a[oó]?$/i.test(s) || /^curacao$/i.test(s)) return "Curaçao";
+  if (/^other$/i.test(s)) return "Other";
+  return "Other";
 }
 
 export async function getOffers(): Promise<OfferDTO[]> {
   return offersNormalized.map(o => ({
     id: o.slug,
     name: o.name,
-    license: toLicense(o.license),
+    license: normalizeLicense(o.license),
     rating: o.rating ?? 0,
     payout: o.payout ?? "",
     payoutHours: o.payoutHours ?? undefined,

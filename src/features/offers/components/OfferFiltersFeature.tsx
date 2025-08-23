@@ -1,19 +1,33 @@
 // src/features/offers/components/OfferFiltersFeature.tsx
 import { useEffect, useState } from "react";
-import LicenseSelect, { type LicenseFilter } from "@/components/compare/LicenseSelect";
+import LicenseSelect from "@/components/compare/LicenseSelect";
 
-export type OffersFilterState = { license: LicenseFilter; q: string };
+// ВАЖНО: берем ровно тот union, который поддерживает LicenseSelect
+type LicenseSelectValue = "all" | "MGA" | "UKGC" | "Curaçao";
 
-export function OfferFiltersFeature({ onChange }: { onChange: (s: OffersFilterState) => void }) {
-  const [license, setLicense] = useState<LicenseFilter>("all");
+export type OffersFilterState = {
+  license: LicenseSelectValue;
+  q: string;
+};
+
+export function OfferFiltersFeature({
+  onChange,
+}: {
+  onChange: (state: OffersFilterState) => void;
+}) {
+  const [license, setLicense] = useState<LicenseSelectValue>("all");
   const [q, setQ] = useState("");
 
-  useEffect(() => { onChange({ license, q }); }, [license, q, onChange]);
+  // триггерим коллбек корректно (не useMemo)
+  useEffect(() => {
+    onChange({ license, q });
+  }, [license, q, onChange]);
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div>
         <label className="block text-sm mb-1">License</label>
+        {/* НЕ передаём setLicense напрямую — нужна обёртка по типу */}
         <LicenseSelect value={license} onChange={(v) => setLicense(v)} />
       </div>
 
@@ -29,3 +43,5 @@ export function OfferFiltersFeature({ onChange }: { onChange: (s: OffersFilterSt
     </div>
   );
 }
+
+export default OfferFiltersFeature;
