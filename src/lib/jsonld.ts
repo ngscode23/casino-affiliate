@@ -1,28 +1,13 @@
-export function upsertJsonLd(id: string, data: unknown) {
-  const tagId = `jsonld-${id}`;
-  let el = document.head.querySelector<HTMLScriptElement>(`#${tagId}`);
-  if (!el) {
-    el = document.createElement("script");
-    el.type = "application/ld+json";
-    el.id = tagId;
-    document.head.appendChild(el);
-  }
-  el.text = JSON.stringify(data);
-  return () => el && el.remove();
+import type { Offer } from "@/types/offer";
+
+export function itemListFromOffers(baseUrl: string, offers: Offer[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": offers.map((o, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 1,
+      "url": ${baseUrl}/offers/
+    }))
+  };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

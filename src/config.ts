@@ -7,4 +7,4 @@ export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY!;
 export const AUTH_CALLBACK =
   import.meta.env.MODE === "development"
     ? "http://localhost:5173/"
-    : "https://glistening-caramel-88a555.netlify.app/";
+    : " https://lucky-macaron-c3c96c.netlify.app/";
