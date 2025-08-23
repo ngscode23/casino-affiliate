@@ -1,44 +1,44 @@
 // src/components/ui/button.tsx
-import React, { forwardRef } from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "soft" | "ghost";
-type Size = "default" | "sm" | "icon";
-
-export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: Variant;
-  size?: Size;
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: "primary" | "secondary" | "soft" | "ghost";
+  size?: "sm" | "md";
+  isActive?: boolean;
 };
 
-const base =
-  "inline-flex items-center justify-center rounded-xl text-sm font-medium transition " +
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 " +
-  "disabled:opacity-50 disabled:cursor-not-allowed";
+export default function Button({
+  className,
+  variant = "primary",
+  size = "md",
+  disabled,
+  isActive,
+  ...rest
+}: Props) {
+  const base = "inline-flex items-center justify-center rounded-lg font-semibold focus:outline-none focus-visible:ring-2 ring-offset-2";
+  const sizes = {
+    sm: "min-h-[44px] px-3 py-2 text-[13px] leading-[1.1]",
+    md: "min-h-[44px] px-4 py-2.5 text-[15px] leading-tight"
+  } as const;
+  const variants = {
+    primary: "bg-brand-600 text-white hover:bg-brand-700",
+    secondary: "bg-slate-800 text-white hover:bg-slate-700",
+    soft: "bg-slate-100 text-slate-900 hover:bg-slate-200",
+    ghost: "bg-transparent text-current hover:bg-black/5"
+  } as const;
 
-const variantClasses: Record<Variant, string> = {
-  primary: "bg-[var(--accent)] text-black hover:opacity-90",
-  secondary: "bg-white/10 text-[var(--text)] hover:bg-white/15",
-  soft: "bg-white/5 text-[var(--text)] hover:bg-white/10",
-  ghost: "bg-transparent text-[var(--text)] hover:bg-white/10",
-};
-
-const sizeClasses: Record<Size, string> = {
-  default: "h-9 px-3 py-2",
-  sm: "h-8 px-2.5 py-1.5 text-xs",
-  icon: "h-9 w-9 p-0",
-};
-
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = "primary", size = "default", className = "", ...props },
-  ref
-) {
   return (
     <button
-      ref={ref}
-      className={clsx(base, variantClasses[variant], sizeClasses[size], className)}
-      {...props}
+      className={cn(
+        base,
+        sizes[size],
+        variants[variant],
+        isActive && "ring-2 ring-brand-500",
+        disabled && "opacity-50 pointer-events-none",
+        className
+      )}
+      disabled={disabled}
+      {...rest}
     />
   );
-});
-
-export default Button;
+}

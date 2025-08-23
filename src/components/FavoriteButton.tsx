@@ -1,20 +1,28 @@
-import { Heart, HeartOff } from "lucide-react";
-import Button from "@/components/ui/button";
-import { useFavorites } from "@/lib/useFavorites";
+import { track } from "@/lib/analytics";
 
-export default function FavoriteButton({ id }: { id: string }) {
-  const { has, toggle } = useFavorites();
-  const active = has(id);
-
+export function FavoriteButton({
+  slug,
+  isActive,
+  toggleFavorite,
+  className
+}: {
+  slug: string;
+  isActive: boolean;
+  toggleFavorite: (slug: string) => boolean;
+  className?: string;
+}) {
   return (
-    <Button
-      variant={active ? "secondary" : "ghost"}
-      size="icon"
-      aria-pressed={active}
-      onClick={() => toggle(id)}
-      title={active ? "Remove from favorites" : "Add to favorites"}
+    <button
+      type="button"
+      aria-pressed={isActive}
+      onClick={() => {
+        const active = toggleFavorite(slug);
+        track({ name: "favorite_toggle", params: { offer_slug: slug, active } });
+      }}
+      className={`btn btn-ghost ${className ?? ""}`}
+      title={isActive ? "Убрать из избранного" : "В избранное"}
     >
-      {active ? <HeartOff className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-    </Button>
+      {isActive ? "★ In favorites" : "☆ Add to favorites"}
+    </button>
   );
 }

@@ -57,3 +57,6 @@ node_modules/
 backup_before_cleanup_*/
 dist/
 node_modules/
+
+# local audit reports
+/audit-*.txt

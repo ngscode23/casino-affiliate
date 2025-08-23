@@ -1,6 +1,5 @@
 // src/App.tsx
 import "./index.css";
-// import "./styles/App.css"; // подключай только если файл реально есть
 
 import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
@@ -9,29 +8,38 @@ import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/CompareBar";
 import Skeleton from "@/components/ui/skeleton";
 
-// GA (включается через согласие в CookieBar)
-import AnalyticsGateGA from "@/components/AnalyticsGateGA";
+// Ленивая подгрузка крупных кусков UI
+const Header         = lazy(() => import("@/components/Header"));
+const Footer         = lazy(() => import("@/components/Footer"));
+const CookieBar      = lazy(() => import("@/components/CookieBar"));
 
-// ленивые импорты
-const Header       = lazy(() => import("./components/Header"));
-const Footer       = lazy(() => import("./components/Footer"));
-const CookieBar    = lazy(() => import("./components/CookieBar"));
-const HomePage     = lazy(() => import("./pages/Home"));
-const ComparePage  = lazy(() => import("./pages/Compare"));
-const FavoritesPage= lazy(() => import("./pages/Favorites"));
-const OfferPage    = lazy(() => import("./pages/Offer"));
-const NotFound     = lazy(() => import("./pages/NotFound"));
-const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const HomePage       = lazy(() => import("@/pages/Home"));
+const ComparePage    = lazy(() => import("@/pages/Compare"));
+const FavoritesPage  = lazy(() => import("@/pages/Favorites"));
+const OfferPage      = lazy(() => import("@/pages/Offer"));
+const NotFound       = lazy(() => import("@/pages/NotFound"));
 
-const OffersIndex  = lazy(() => import("./pages/Offers/Index"));
-const ContactPage  = lazy(() => import("./pages/Contact/Contact"));
-const PrivacyPage  = lazy(() => import("./pages/Legal/Privacy"));
-const TermsPage    = lazy(() => import("./pages/Legal/Terms"));
-const CookiesPage  = lazy(() => import("./pages/Legal/Cookies"));
+// Подключай эти страницы только если они реально есть
+const OffersIndex    = lazy(() => import("@/pages/Offers/Index"));
+const ContactPage    = lazy(() => import("@/pages/Contact/Contact"));
+const PrivacyPage    = lazy(() => import("@/pages/Legal/Privacy"));
+const TermsPage      = lazy(() => import("@/pages/Legal/Terms"));
+const CookiesPage    = lazy(() => import("@/pages/Legal/Cookies"));
+// const Responsible   = lazy(() => import("@/pages/Legal/Responsible"));
+// const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
+// const AuthCallback  = lazy(() => import("@/pages/AuthCallback"));
 
 export default function App() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[var(--bg-0)] text-[var(--text)]">
+      {/* Skip link для клавиатуры */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:rounded-md focus:bg-black focus:text-white focus:px-3 focus:py-2"
+      >
+        Skip to content
+      </a>
+
       <Suspense
         fallback={
           <div className="neon-container py-8 space-y-4">
@@ -45,25 +53,32 @@ export default function App() {
       >
         <CompareProvider>
           <Header />
-          {/* GA подключится только при наличии cookie-согласия */}
-          <AnalyticsGateGA />
 
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/offers" element={<OffersIndex />} />
-            <Route path="/offers/:slug" element={<OfferPage />} />
-            <Route path="/compare" element={<ComparePage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/contact" element={<ContactPage />} />
+          <main id="main" className="min-h-[60vh]">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
 
-            {/* Legal */}
-            <Route path="/legal/privacy" element={<PrivacyPage />} />
-            <Route path="/legal/terms"   element={<TermsPage />} />
-            <Route path="/legal/cookies" element={<CookiesPage />} />
+              <Route path="/offers" element={<OffersIndex />} />
+              <Route path="/offers/:slug" element={<OfferPage />} />
 
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="/compare" element={<ComparePage />} />
+              <Route path="/favorites" element={<FavoritesPage />} />
+
+              <Route path="/contact" element={<ContactPage />} />
+
+              {/* Legal */}
+              <Route path="/legal/privacy" element={<PrivacyPage />} />
+              <Route path="/legal/terms" element={<TermsPage />} />
+              <Route path="/legal/cookies" element={<CookiesPage />} />
+              {/* <Route path="/legal/responsible" element={<Responsible />} /> */}
+              {/* <Route path="/legal/affiliate-disclosure" element={<AffiliateDisc />} /> */}
+
+              {/* Auth/OAuth колбэки, если используются */}
+              {/* <Route path="/auth/callback" element={<AuthCallback />} /> */}
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
 
           <CompareBar />
           <Footer />

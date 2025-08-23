@@ -1,35 +1,16 @@
-// src/main.tsx
 import React from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import "./index.css";
-// Тема грузится после index.css
-import ErrorBoundary from "./components/ErrorBoundary"; // ✅ правильный импорт
+import AnalyticsGateGA from "@/components/AnalyticsGateGA";
+import { PageViewTracker } from "@/components/PageViewTracker";
 
-createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
+      <AnalyticsGateGA />
+      <PageViewTracker /> {/* отправляет page_view на каждую смену маршрута */}
+      <App />
     </BrowserRouter>
   </React.StrictMode>
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

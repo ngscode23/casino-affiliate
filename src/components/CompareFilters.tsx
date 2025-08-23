@@ -2,9 +2,12 @@
 import * as React from "react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
+// src/components/CompareFilters.tsx
+
+
 
 /** Единый источник правды для фильтров — СНАЧАЛА типы, потом всё остальное */
-export const LICENSES = ["all", "MGA", "UKGC", "Curacao", "Other"] as const;
+export const LICENSES = ["all", "MGA", "UKGC", "Curaçao", "Other"] as const;
 export type LicenseFilter = typeof LICENSES[number];
 
 export const METHODS = ["all", "Cards", "SEPA", "Crypto", "Paypal", "Skrill"] as const;
@@ -24,12 +27,12 @@ type Props = {
   onSearchChange: (value: string) => void;
 };
 
-const LICENSE_OPTIONS: { label: string; value: LicenseFilter }[] = [
-  { label: "All licenses", value: "all" },
-  { label: "MGA",         value: "MGA" },
-  { label: "UKGC",        value: "UKGC" },
-  { label: "Curaçao",     value: "Curacao" },
-  { label: "Other",       value: "Other" },
+const LICENSE_OPTIONS = [
+  { label: "All", value: "all" },
+  { label: "MGA", value: "MGA" },
+  { label: "UKGC", value: "UKGC" },
+  { label: "Curaçao", value: "Curaçao" },
+  { label: "Other", value: "Other" }
 ];
 
 const METHOD_OPTIONS: { label: string; value: MethodFilter }[] = [
