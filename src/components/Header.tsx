@@ -53,6 +53,11 @@ export default function Header() {
           </div>
 
           <Button className="ml-2">Sign Up</Button>
+
+          <Link to="/offers"     className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Offers</Link>
+<Link to="/compare"    className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Compare</Link>
+<Link to="/favorites"  className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Favorites</Link>
+<Link to="/contact"    className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Contact</Link>
         </nav>
 
         {/* Мобильный бургер */}
@@ -80,15 +85,11 @@ export default function Header() {
 
               {/* Мобильное меню — ВАЖНО: без hidden! */}
               <nav className="mt-8 flex flex-col gap-6 text-lg">
-                <Link to="/" className="cursor-pointer hover:underline">
-                  Home
-                </Link>
-                <Link to="/compare" className="cursor-pointer hover:underline">
-                  Compare
-                </Link>
-                <Link to="/favorites" className="cursor-pointer hover:underline">
-                  Favorites
-                </Link>
+            <Link to="/"          className="cursor-pointer hover:underline">Home</Link>
+<Link to="/offers"    className="cursor-pointer hover:underline">Offers</Link>
+<Link to="/compare"   className="cursor-pointer hover:underline">Compare</Link>
+<Link to="/favorites" className="cursor-pointer hover:underline">Favorites</Link>
+<Link to="/contact"   className="cursor-pointer hover:underline">Contact</Link>
 
                 <div className="pt-2">
                   <AuthButton />

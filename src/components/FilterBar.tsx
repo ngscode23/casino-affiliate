@@ -1,34 +1,46 @@
+// src/components/FilterBar.tsx
 import { useId } from "react";
 import Button from "@/components/ui/button";
 
-type Props = {
-  query: string;
-  onQuery: (v: string) => void;
-  onClear?: () => void;
+export type Props = {
+  q: string;
+  onChange: (value: string) => void;
+  onReset?: () => void;
+  children?: React.ReactNode;
   className?: string;
 };
 
-export default function FilterBar({ query, onQuery, onClear, className = "" }: Props) {
+export default function FilterBar({
+  q,
+  onChange,
+  onReset,
+  children,
+  className = "",
+}: Props) {
   const qid = useId();
+
   return (
-    <div className={lex flex-col sm:flex-row gap-3 items-stretch sm:items-end }>
+    <div className={`flex flex-col sm:flex-row gap-3 items-stretch sm:items-end ${className}`}>
       <div className="flex-1">
-        <label htmlFor={qid} className="text-xs text-[var(--text-dim)]">Поиск по названию</label>
+        <label htmlFor={qid} className="text-xs text-[var(--text-dim)]">
+          Поиск по названию
+        </label>
         <input
           id={qid}
-          className="neon-input w-full"
-          placeholder="Например: Mega Casino"
-          value={query}
-          onChange={(e) => onQuery(e.target.value)}
-          aria-label="Поиск по названию казино"
+          className="neon-input w-full mt-1"
+          placeholder="Введите название…"
+          value={q}
+          onChange={(e) => onChange(e.target.value)}
         />
       </div>
-      <div className="flex gap-2">
-        <Button onClick={() => onQuery(query)} aria-label="Применить фильтры">Применить</Button>
-        {onClear ? (
-          <Button variant="soft" onClick={onClear} aria-label="Сброс фильтров">Сбросить</Button>
-        ) : null}
-      </div>
+
+      {children ? <div className="flex items-end gap-3">{children}</div> : null}
+
+      {onReset ? (
+        <Button variant="soft" onClick={onReset} className="shrink-0">
+          Сбросить
+        </Button>
+      ) : null}
     </div>
   );
 }
