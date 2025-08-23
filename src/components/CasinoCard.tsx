@@ -1,18 +1,19 @@
+// src/components/CasinoCard.tsx
 import type { Offer } from "../data/casinos";
-import { track } from "@/lib/analytics";
+import AffiliateLink from "@/components/AffiliateLink";
 
 export function CasinoCard({ offer }: { offer: Offer }) {
-  const { name, license, payout, methods, link, rating } = offer; // добавил rating
+  const { name, license, payout, methods = [], link, rating } = offer;
+
+  // надёжный slug даже если в типе slug?: string
+  const slug = (offer.slug ?? name).toLowerCase().trim().replace(/\s+/g, "-");
 
   return (
     <li className="rounded-lg border border-slate-800 p-4">
+      {/* Мета для микроразметки, если тебе это реально нужно в LI */}
       <meta itemProp="name" content={name} />
-      <meta
-        itemProp="aggregateRating"
-        itemScope
-        itemType="https://schema.org/AggregateRating"
-      />
-      <meta itemProp="ratingValue" content={String(rating)} />
+      <meta itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating" />
+      <meta itemProp="ratingValue" content={String(rating ?? "")} />
       <meta itemProp="bestRating" content="5" />
 
       <h2 className="text-lg font-bold">{name}</h2>
@@ -21,40 +22,15 @@ export function CasinoCard({ offer }: { offer: Offer }) {
       <p>Методы: {methods.join(", ")}</p>
 
       {link && (
-        <a
-       onClick={() =>
-  track("offer_click", {
-    slug: offer.slug ?? offer.name,
-    name: offer.name,
-  })
-}
+        <AffiliateLink
+          offerSlug={slug}
           href={link}
-          target="_blank"
-          rel="noreferrer nofollow"
-          className="inline-flex items-center rounded-xl bg-sky-400 px-4 py-2 font-semibold text-slate-900 hover:brightness-95"
+          // position можно пробросить, если знаешь индекс карточки
+          className="inline-flex items-center rounded-xl bg-sky-400 px-4 py-2 font-semibold text-slate-900 hover:brightness-95 min-h-[44px]"
         >
           Перейти
-        </a>
+        </AffiliateLink>
       )}
     </li>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
