@@ -26,8 +26,8 @@ const ContactPage  = lazy(() => import("@/pages/Contact"));
 const PrivacyPage   = lazy(() => import("@/pages/Legal/Privacy"));
 const TermsPage     = lazy(() => import("@/pages/Legal/Terms"));
 const CookiesPage   = lazy(() => import("@/pages/Legal/Cookies"));
-const Responsible   = lazy(() => import("@/pages/Legal/ResponsibleGaming"));
-const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
+// const Responsible   = lazy(() => import("@/pages/Legal/ResponsibleGaming"));
+// const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
 export default function App() {
   return (
     <div className="min-h-screen bg-[var(--bg-0)] text-[var(--text)]">
