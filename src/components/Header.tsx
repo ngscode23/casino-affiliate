@@ -2,8 +2,7 @@
 import Section from "@/components/ui/section";
 import { Link } from "react-router-dom";
 import Button from "@/components/ui/button";
-import AuthButton from "@/components/AuthButton"; // если файла нет — убери эту строку и <AuthButton />
-
+import { Menu } from "lucide-react";
 import {
   Sheet,
   SheetTrigger,
@@ -12,13 +11,15 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+
+// ЕСЛИ нет компонента AuthButton.tsx — удали эту строку и все <AuthButton /> ниже
+import AuthButton from "@/components/AuthButton";
 
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--bg-0)]/80 backdrop-blur">
       <Section className="flex h-16 items-center justify-between gap-4">
-        {/* Лого слева */}
+        {/* Лого */}
         <div className="flex items-center gap-2 min-w-0">
           <Link
             to="/"
@@ -33,31 +34,18 @@ export default function Header() {
         </div>
 
         {/* Desktop навигация */}
-        <nav className="hidden md:flex items-center gap-8">
-          <Link
-            to="/compare"
-            className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)] transition-colors"
-          >
-            Compare
-          </Link>
-          <Link
-            to="/favorites"
-            className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)] transition-colors"
-          >
-            Favorites
-          </Link>
+        <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
+          <Link to="/offers"    className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Offers</Link>
+          <Link to="/compare"   className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Compare</Link>
+          <Link to="/favorites" className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Favorites</Link>
+          <Link to="/contact"   className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Contact</Link>
 
-          {/* Кнопка/форма авторизации */}
+          {/* Авторизация (если есть компонент) */}
           <div className="ml-2">
             <AuthButton />
           </div>
 
-          <Button className="ml-2">Sign Up</Button>
-
-          <Link to="/offers"     className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Offers</Link>
-<Link to="/compare"    className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Compare</Link>
-<Link to="/favorites"  className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Favorites</Link>
-<Link to="/contact"    className="cursor-pointer text-sm text-[var(--text-dim)] hover:text-[var(--text)]">Contact</Link>
+          <Button className="ml-1">Sign Up</Button>
         </nav>
 
         {/* Мобильный бургер */}
@@ -67,7 +55,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 aria-label="Open menu"
-                className="cursor-pointer inline-flex items-center justify-center"
+                className="cursor-pointer inline-flex items-center justify-center h-10 w-10 p-0"
               >
                 <Menu className="h-6 w-6 text-[var(--text)]" />
               </Button>
@@ -77,19 +65,18 @@ export default function Header() {
               side="left"
               className="w-72 bg-[var(--bg-0)] text-[var(--text)] border-r border-white/10"
             >
-              {/* A11y заголовок */}
               <SheetHeader className="sr-only">
                 <SheetTitle>Navigation menu</SheetTitle>
                 <SheetDescription>Open the site navigation</SheetDescription>
               </SheetHeader>
 
-              {/* Мобильное меню — ВАЖНО: без hidden! */}
-              <nav className="mt-8 flex flex-col gap-6 text-lg">
-            <Link to="/"          className="cursor-pointer hover:underline">Home</Link>
-<Link to="/offers"    className="cursor-pointer hover:underline">Offers</Link>
-<Link to="/compare"   className="cursor-pointer hover:underline">Compare</Link>
-<Link to="/favorites" className="cursor-pointer hover:underline">Favorites</Link>
-<Link to="/contact"   className="cursor-pointer hover:underline">Contact</Link>
+              {/* Мобильное меню (без hidden) */}
+              <nav className="mt-8 flex flex-col gap-6 text-lg" aria-label="Mobile navigation">
+                <Link to="/"          className="cursor-pointer hover:underline">Home</Link>
+                <Link to="/offers"    className="cursor-pointer hover:underline">Offers</Link>
+                <Link to="/compare"   className="cursor-pointer hover:underline">Compare</Link>
+                <Link to="/favorites" className="cursor-pointer hover:underline">Favorites</Link>
+                <Link to="/contact"   className="cursor-pointer hover:underline">Contact</Link>
 
                 <div className="pt-2">
                   <AuthButton />
