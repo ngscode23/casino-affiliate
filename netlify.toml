@@ -1,23 +1,29 @@
+# netlify.toml
+
 [build]
   command = "npm run build"
   publish = "dist"
 
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+[build.environment]
+  NODE_VERSION = "20"
 
-# API-функция (если нужна)
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# go/* — твоя функция уже есть
 [[redirects]]
   from = "/go/*"
   to = "/.netlify/functions/go/:splat"
   status = 200
   force = true
 
-# ---- Security headers + CSP для всех путей
+# security headers (твоя текущая версия ок, оставляю минимум)
 [[headers]]
   for = "/*"
   [headers.values]
-    # CSP: без wildcard в img-src; без unsafe-inline в style-src
     Content-Security-Policy = """
       default-src 'self';
       script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com;
@@ -32,27 +38,21 @@
       form-action 'self';
       worker-src 'self' blob:;
     """
-
-    # Spectre mitigation + прочее
-    Cross-Origin-Resource-Policy = "same-origin"
-    Cross-Origin-Opener-Policy = "same-origin"
-    Cross-Origin-Embedder-Policy = "credentialless"
-
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "no-referrer"
     X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"
+    Cross-Origin-Embedder-Policy = "credentialless"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-origin"
 
-    # Отключаем доступ к чувствительным фичам
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-
-# HTML — не кэшируем
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
-
-# Долгий кэш для сгенерированных ассетов Vite
+# кэш для статических ассетов
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# html не кэшируем
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
