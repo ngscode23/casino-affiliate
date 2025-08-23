@@ -26,8 +26,8 @@ const ContactPage  = lazy(() => import("@/pages/Contact"));
 const PrivacyPage   = lazy(() => import("@/pages/Legal/Privacy"));
 const TermsPage     = lazy(() => import("@/pages/Legal/Terms"));
 const CookiesPage   = lazy(() => import("@/pages/Legal/Cookies"));
-// const Responsible   = lazy(() => import("@/pages/Legal/ResponsibleGaming"));
-// const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
+const Responsible   = lazy(() => import("@/pages/Legal/ResponsibleGaming"));
+const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
 export default function App() {
   return (
     <div className="min-h-screen bg-[var(--bg-0)] text-[var(--text)]">
@@ -67,14 +67,10 @@ export default function App() {
 
               {/* Legal */}
               <Route path="/legal/privacy" element={<PrivacyPage />} />
-              <Route path="/legal/terms" element={<TermsPage />} />
-              <Route path="/legal/cookies" element={<CookiesPage />} />
-              {/* <Route path="/legal/responsible" element={<Responsible />} /> */}
-              {/* <Route path="/legal/affiliate-disclosure" element={<AffiliateDisc />} /> */}
-
-              {/* Auth/OAuth колбэки, если используются */}
-              {/* <Route path="/auth/callback" element={<AuthCallback />} /> */}
-
+<Route path="/legal/terms" element={<TermsPage />} />
+<Route path="/legal/cookies" element={<CookiesPage />} />
+<Route path="/legal/responsible" element={<Responsible />} />
+<Route path="/legal/affiliate-disclosure" element={<AffiliateDisc />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
@@ -87,5 +83,7 @@ export default function App() {
     </div>
   );
 }
+
+
 
 
