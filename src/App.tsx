@@ -22,13 +22,12 @@ const NotFound     = lazy(() => import("@/pages/NotFound"));
 // Нормальные пути без дублей по регистру
 const OffersIndex  = lazy(() => import("@/pages/Offers"));
 const ContactPage  = lazy(() => import("@/pages/Contact"));
-const PrivacyPage  = lazy(() => import("@/pages/Legal/Privacy"));
-const TermsPage    = lazy(() => import("@/pages/Legal/Terms"));
-const CookiesPage  = lazy(() => import("@/pages/Legal/Cookies"));
-// const Responsible = lazy(() => import("@/pages/Legal/Responsible"));
-// const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
-// const AuthCallback  = lazy(() => import("@/pages/AuthCallback"));
-
+// Ленивая подгрузка страниц
+const PrivacyPage   = lazy(() => import("@/pages/Legal/Privacy"));
+const TermsPage     = lazy(() => import("@/pages/Legal/Terms"));
+const CookiesPage   = lazy(() => import("@/pages/Legal/Cookies"));
+const Responsible   = lazy(() => import("@/pages/Legal/ResponsibleGaming"));
+const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
 export default function App() {
   return (
     <div className="min-h-screen bg-[var(--bg-0)] text-[var(--text)]">

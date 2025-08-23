@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 
 import Rating from "@/components/common/rating";
-import CompareInline from "@/components/CompareInline";
+import CompareInline from "@/components/compare/CompareInline";
 import { FavControl } from "@/components/FavControl";
 import AffiliateLink from "@/components/AffiliateLink";
 import { t } from "@/lib/t";
@@ -207,4 +207,6 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
     </div>
   );
 }
+
+
 

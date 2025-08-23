@@ -5,8 +5,8 @@ import { useSearchParams } from "react-router-dom";
 import CompareFilters, {
   type LicenseFilter, // "all" | "MGA" | "UKGC" | "Curaçao"
   type MethodFilter   // "all" | ...
-} from "@/components/CompareFilters";
-import CompareTable, { type SortKey } from "@/components/CompareTable";
+} from "@/components/compare/CompareFilters";
+import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import Seo from "@/components/Seo";
 
@@ -109,4 +109,6 @@ export default function Compare() {
     </section>
   );
 }
+
+
 

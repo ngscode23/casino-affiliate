@@ -4,7 +4,7 @@ import Section from "@/components/common/section";
 import { useFavorites } from "@/lib/useFavorites";
 import { casinos as allOffers } from "@/data/casinos";
 import MobileOfferCard from "@/components/offers/MobileOfferCard";
-import CompareTable, { type SortKey } from "@/components/CompareTable";
+import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import Card from "@/components/common/card";
 
 export default function FavoritesPage() {
@@ -63,4 +63,6 @@ export default function FavoritesPage() {
     </>
   );
 }
+
+
 
