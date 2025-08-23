@@ -80,3 +80,4 @@ export function useCompare(): Ctx {
   if (!ctx) throw new Error("useCompare must be used inside CompareProvider");
   return ctx;
 }
+

@@ -1,6 +1,6 @@
 // src/components/FavControl.tsx
 import { useFavorites } from "@/lib/useFavorites";
-import Button from "@/components/ui/button";
+import Button from "@/components/common/button";
 import { Heart, HeartOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -27,3 +27,4 @@ export function FavControl({ id }: { id: string }) {
     </Button>
   );
 }
+

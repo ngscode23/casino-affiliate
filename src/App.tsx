@@ -5,8 +5,8 @@ import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import { CompareProvider } from "@/ctx/CompareContext";
-import CompareBar from "@/components/CompareBar";
-import Skeleton from "@/components/ui/skeleton";
+import CompareBar from "@/components/layout/CompareBar";
+import Skeleton from "@/components/common/skeleton";
 
 // Ленивая подгрузка крупных кусков UI
 const Header         = lazy(() => import("@/components/Header"));
@@ -88,3 +88,5 @@ export default function App() {
     </div>
   );
 }
+
+

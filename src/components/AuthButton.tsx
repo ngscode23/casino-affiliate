@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import Button from "@/components/ui/button";
+import Button from "@/components/common/button";
 import { AUTH_CALLBACK } from "@/config";
 
 export default function AuthButton() {
@@ -97,3 +97,4 @@ export default function AuthButton() {
     </div>
   );
 }
+

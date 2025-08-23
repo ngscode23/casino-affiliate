@@ -1,7 +1,7 @@
 //src/components/AuthDialog.tsx
 
 import { useState } from "react";
-import Button from "@/components/ui/button";
+import Button from "@/components/common/button";
 import { supabase } from "@/lib/supabase";
 
 export default function AuthDialog() {
@@ -54,3 +54,4 @@ export default function AuthDialog() {
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
-import Section from "@/components/ui/section";
-import Card from "@/components/ui/card";
+import Section from "@/components/common/section";
+import Card from "@/components/common/card";
 import Seo from "@/components/Seo";
 
 export default function CookiesPage() {
@@ -17,3 +17,5 @@ export default function CookiesPage() {
     </>
   );
 }
+
+

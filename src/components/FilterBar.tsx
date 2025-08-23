@@ -1,6 +1,6 @@
 // src/components/FilterBar.tsx
 import { useId } from "react";
-import Button from "@/components/ui/button";
+import Button from "@/components/common/button";
 
 export type Props = {
   q: string;
@@ -44,3 +44,4 @@ export default function FilterBar({
     </div>
   );
 }
+

@@ -10,3 +10,4 @@ export default function OrgJsonLd({ data, id = "jsonld-org" }: Props) {
   }, [id, data]); // ← НИКАКИХ stringify здесь
   return null;
 }
+

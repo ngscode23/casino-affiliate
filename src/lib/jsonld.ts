@@ -99,3 +99,4 @@ export function makeOrganizationLD(params: {
     ...(params.logo ? { logo: params.logo } : {}),
   };
 }
+

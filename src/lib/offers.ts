@@ -27,3 +27,4 @@ export function normalizeOffer(o: RawOffer): NormalizedOffer {
 export const offersNormalized: NormalizedOffer[] = (rawOffers as RawOffer[])
   .filter(Boolean)
   .map(normalizeOffer);
+

@@ -13,3 +13,4 @@ export function usePageView() {
     trackPageView(path, document.title);
   }, [pathname, search, navType]);
 }
+

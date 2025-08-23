@@ -22,3 +22,4 @@ export function toggleFavorite(slug: string): boolean {
   localStorage.setItem(KEY, JSON.stringify(arr));
   return set.has(slug);
 }
+

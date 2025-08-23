@@ -1,7 +1,7 @@
 // src/components/HomeHero.tsx
-import Section from "@/components/ui/section";
-import Button from "@/components/ui/button";
-import Chip from "@/components/ui/chip";
+import Section from "@/components/common/section";
+import Button from "@/components/common/button";
+import Chip from "@/components/common/chip";
 
 export default function HomeHero() {
   return (
@@ -25,6 +25,8 @@ export default function HomeHero() {
     </section>
   );
 }
+
+
 
 
 

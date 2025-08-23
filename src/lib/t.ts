@@ -72,3 +72,4 @@ export function t(key: string, lang: Lang = currentLang): string {
     key
   );
 }
+

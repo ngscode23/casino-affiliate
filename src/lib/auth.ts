@@ -9,3 +9,4 @@ export async function signIn(email: string) {
 }
 export const signOut = () => supabase.auth.signOut();
 export const getUser = async () => (await supabase.auth.getUser()).data.user;
+

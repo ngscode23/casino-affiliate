@@ -98,3 +98,4 @@ export function trackPageView(path: string, title?: string) {
 export function onConsentChanged() {
   flushQueue();
 }
+

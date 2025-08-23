@@ -5,3 +5,4 @@ export function PageViewTracker() {
   usePageView();
   return null;
 }
+

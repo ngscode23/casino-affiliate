@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import Button from "@/components/ui/button";
+import Button from "@/components/common/button";
 
 export default function DebugSupabase() {
   const [envOk, setEnvOk] = useState(false);
@@ -67,3 +67,4 @@ export default function DebugSupabase() {
     </div>
   );
 }
+

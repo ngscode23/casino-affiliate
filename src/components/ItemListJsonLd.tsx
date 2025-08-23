@@ -30,3 +30,4 @@ export default function ItemListJsonLd({ items }: { items: Item[] }) {
 
   return null;
 }
+

@@ -1,6 +1,6 @@
 // src/components/BonusCodeButton.tsx
 import { useState } from "react";
-import Button from "@/components/ui/button";
+import Button from "@/components/common/button";
 
 export default function BonusCodeButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
@@ -21,6 +21,8 @@ export default function BonusCodeButton({ code }: { code: string }) {
     </Button>
   );
 }
+
+
 
 
 
