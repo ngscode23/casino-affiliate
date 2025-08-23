@@ -47,28 +47,28 @@ export default function OfferCardPFM({
         )}
       </div>
 
-      <div className="mt-4 flex items-center justify-between">
-        {/* CTA через AffiliateLink — событие и rel оформлены внутри компонента */}
-      <AffiliateLink
-  offerSlug={offer.slug}
-  position={index != null ? index + 1 : undefined}
-  href={offer.link ?? `/go/${offer.slug}`}
-  size="sm"
-  className="rounded-lg bg-brand-600 text-white font-semibold hover:bg-brand-700"
->
-  {t("offer.cta") || "Перейти"}
-</AffiliateLink>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        {/* CTA через AffiliateLink — событие и rel внутри */}
+        <AffiliateLink
+          offerSlug={offer.slug}
+          position={index != null ? index + 1 : undefined}
+          href={offer.link ?? `/go/${offer.slug}`}
+          size="sm"
+          className="rounded-lg bg-brand-600 text-white font-semibold hover:bg-brand-700"
+        >
+          {t("offer.cta") || "Перейти"}
+        </AffiliateLink>
 
-        {/* «Сравнить» — оставляю как было, если у тебя на этот hash есть логика */}
-     <a
-  href={`#/compare?sort=rating&dir=desc&license=all&method=all&focus=${offer.slug}`}
-  className="text-sm text-brand-700 hover:underline min-h-[44px] inline-flex items-center px-2"
->
-  {t("compare.compareLink") || "Сравнить"}
-</a>
+        {/* «Сравнить» — если у тебя есть логика по #hash */}
+        {offer.slug && (
+          <a
+            href={`#/compare?sort=rating&dir=desc&license=all&method=all&focus=${offer.slug}`}
+            className="text-sm text-brand-700 hover:underline min-h-[44px] inline-flex items-center px-2"
+          >
+            {t("compare.compareLink") || "Сравнить"}
+          </a>
+        )}
       </div>
-
-      {/* УБРАЛ Product JSON-LD из карточки: на листинге размечай ItemList на странице, а не дублируй Product на каждом li */}
     </li>
   );
 }

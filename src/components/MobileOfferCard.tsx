@@ -1,7 +1,7 @@
 // src/components/MobileOfferCard.tsx
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink} from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 import Rating from "@/components/ui/rating";
 import CompareInline from "@/components/CompareInline";
@@ -87,6 +87,7 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
           offerSlug={offer.slug}
           position={position}
           href={offer.link ?? "#"}
+          size="sm"
           className="btn w-full inline-flex items-center justify-center gap-2"
           aria-label={`Open ${offer.name}`}
         >
@@ -94,31 +95,30 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
         </AffiliateLink>
 
         {/* Compare toggle */}
-      <button
-  type="button"
-  className={`btn ${selected ? "btn-secondary" : "btn-soft"} min-h-[44px] px-3 py-2 text-[13px] leading-[1.1]`}
-  onClick={() => toggleCompare(offer)}
-  aria-pressed={selected}
->
-  {selected ? t("compare.selected") : t("compare.add")}
-</button>
+        <button
+          type="button"
+          className={`btn ${selected ? "btn-secondary" : "btn-soft"} min-h-[44px] px-3 py-2 text-[13px] leading-[1.1]`}
+          onClick={() => toggleCompare(offer)}
+          aria-pressed={selected}
+        >
+          {selected ? t("compare.selected") : t("compare.add")}
+        </button>
 
         {/* Details (sheet) */}
         <Sheet>
           <SheetTrigger asChild>
-          <button
-  type="button"
-  className={`btn ${selected ? "btn-secondary" : "btn-soft"} w-full min-h-[44px] px-3 py-2 text-[13px] leading-[1.1]`}
-  onClick={() => toggleCompare(offer)}
-  aria-pressed={selected}
->
-  {selected ? t("compare.selectedFor") : t("compare.addTo")}
-</button>
+            <button
+              type="button"
+              className="btn btn-ghost w-full min-h-[44px] px-3 py-2 text-[13px] leading-[1.1]"
+              aria-label={`Details for ${offer.name}`}
+            >
+              {t("offer.details") || "Details"}
+            </button>
           </SheetTrigger>
 
           <SheetContent
             side="bottom"
-            className="max-h[80vh] w-full rounded-t-2xl border-white/10 bg-[var(--bg-0)] text-[var(--text)] p-0 overflow-hidden"
+            className="max-h-[80vh] w-full rounded-t-2xl border-white/10 bg-[var(--bg-0)] text-[var(--text)] p-0 overflow-hidden"
           >
             <SheetHeader className="sr-only">
               <SheetTitle>{offer.name}</SheetTitle>
@@ -180,20 +180,21 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
                     offerSlug={offer.slug}
                     position={position}
                     href={offer.link ?? "#"}
+                    size="sm"
                     className="btn w-full inline-flex items-center justify-center gap-2"
                     aria-label={`Open ${offer.name}`}
                   >
                     {t("offer.cta") || "Play"} <ExternalLink className="h-4 w-4" />
                   </AffiliateLink>
 
-                 <button
-  type="button"
-  className={`btn ${selected ? "btn-secondary" : "btn-soft"} w-full min-h-[44px] px-3 py-2 text-[13px] leading-[1.1]`}
-  onClick={() => toggleCompare(offer)}
-  aria-pressed={selected}
->
-  {selected ? t("compare.selectedFor") : t("compare.addTo")}
-</button>
+                  <button
+                    type="button"
+                    className={`btn ${selected ? "btn-secondary" : "btn-soft"} w-full min-h-[44px] px-3 py-2 text-[13px] leading-[1.1]`}
+                    onClick={() => toggleCompare(offer)}
+                    aria-pressed={selected}
+                  >
+                    {selected ? t("compare.selectedFor") : t("compare.addTo")}
+                  </button>
                 </div>
 
                 {/* локальная панель сравнения */}

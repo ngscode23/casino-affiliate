@@ -28,7 +28,7 @@ export default function OfferPage() {
           <div className="text-lg font-semibold mb-2">Not found</div>
           <p className="text-[var(--text-dim)]">Мы не нашли такой оффер.</p>
           <div className="mt-4">
-            {/* TODO: заменить текст на i18n ключ, например t('compare.back') */}
+            {/* TODO: t('compare.back') */}
             <Link to="/compare" className="btn">Back to compare</Link>
           </div>
         </Card>
@@ -120,7 +120,7 @@ export default function OfferPage() {
 
             {/* Правая колонка — действия */}
             <div className="space-y-3">
-              {/* CTA: кликаем афф-ссылку, трекинг внутри AffiliateLink */}
+              {/* CTA: трекинг внутри AffiliateLink */}
               <AffiliateLink
                 offerSlug={offer.slug}
                 position={1}
