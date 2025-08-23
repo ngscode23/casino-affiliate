@@ -9,23 +9,23 @@ import CompareBar from "@/components/layout/CompareBar";
 import Skeleton from "@/components/common/skeleton";
 
 // Ленивая подгрузка крупных кусков UI
-const Header         = lazy(() => import("@/components/Header"));
-const Footer         = lazy(() => import("@/components/Footer"));
-const CookieBar      = lazy(() => import("@/components/CookieBar"));
+const Header       = lazy(() => import("@/components/layout/Header"));
+const Footer       = lazy(() => import("@/components/layout/Footer"));
+const CookieBar    = lazy(() => import("@/components/layout/CookieBar"));
 
-const HomePage       = lazy(() => import("@/pages/Home"));
-const ComparePage    = lazy(() => import("@/pages/Compare"));
-const FavoritesPage  = lazy(() => import("@/pages/Favorites"));
-const OfferPage      = lazy(() => import("@/pages/Offer"));
-const NotFound       = lazy(() => import("@/pages/NotFound"));
+const HomePage     = lazy(() => import("@/pages/Home"));
+const ComparePage  = lazy(() => import("@/pages/Compare"));
+const FavoritesPage= lazy(() => import("@/pages/Favorites"));
+const OfferPage    = lazy(() => import("@/pages/Offer"));
+const NotFound     = lazy(() => import("@/pages/NotFound"));
 
-// Подключай эти страницы только если они реально есть
-const OffersIndex    = lazy(() => import("@/pages/Offers/Index"));
-const ContactPage    = lazy(() => import("@/pages/Contact/Contact"));
-const PrivacyPage    = lazy(() => import("@/pages/Legal/Privacy"));
-const TermsPage      = lazy(() => import("@/pages/Legal/Terms"));
-const CookiesPage    = lazy(() => import("@/pages/Legal/Cookies"));
-// const Responsible   = lazy(() => import("@/pages/Legal/Responsible"));
+// Нормальные пути без дублей по регистру
+const OffersIndex  = lazy(() => import("@/pages/Offers"));
+const ContactPage  = lazy(() => import("@/pages/Contact"));
+const PrivacyPage  = lazy(() => import("@/pages/Legal/Privacy"));
+const TermsPage    = lazy(() => import("@/pages/Legal/Terms"));
+const CookiesPage  = lazy(() => import("@/pages/Legal/Cookies"));
+// const Responsible = lazy(() => import("@/pages/Legal/Responsible"));
 // const AffiliateDisc = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
 // const AuthCallback  = lazy(() => import("@/pages/AuthCallback"));
 
@@ -88,5 +88,3 @@ export default function App() {
     </div>
   );
 }
-
-
