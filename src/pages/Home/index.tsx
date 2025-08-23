@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import OrgJsonLd from "@/components/OrgJsonLd";
 import SiteJsonLd from "@/components/SiteJsonLd";
-import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/config";
+import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/config/config";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -84,4 +84,5 @@ export default function HomePage() {
     </>
   );
 }
+
 
