@@ -49,15 +49,15 @@ export default function OfferCardPFM({
 
       <div className="mt-4 flex items-center justify-between gap-3">
         {/* CTA через AffiliateLink — событие и rel внутри */}
-        <AffiliateLink
-          offerSlug={offer.slug}
-          position={index != null ? index + 1 : undefined}
-          href={offer.link ?? `/go/${offer.slug}`}
-          size="sm"
-          className="rounded-lg bg-brand-600 text-white font-semibold hover:bg-brand-700"
-        >
-          {t("offer.cta") || "Перейти"}
-        </AffiliateLink>
+     <AffiliateLink
+  offerSlug={offer.slug}
+  position={typeof index === "number" ? index + 1 : undefined}
+  href={offer.link ?? `/go/${offer.slug}`}
+  size="sm"
+  className="rounded-lg bg-brand-600 text-white font-semibold hover:bg-brand-700"
+>
+  {t("offer.cta") || "Перейти"}
+</AffiliateLink>
 
         {/* «Сравнить» — если у тебя есть логика по #hash */}
         {offer.slug && (
