@@ -121,16 +121,16 @@ export default function OfferPage() {
             {/* Правая колонка — действия */}
             <div className="space-y-3">
               {/* CTA: трекинг внутри AffiliateLink */}
-              <AffiliateLink
-                offerSlug={offer.slug}
-                position={1}
-                href={offer.link ?? "#"}
-                className="btn w-full inline-flex items-center justify-center"
-              >
-                {/* TODO: i18n offer.cta */}
-                Play now
-              </AffiliateLink>
-
+           <AffiliateLink
+             offerSlug={offer.slug}
+             position={1}
+              href={offer.link ?? "#"}
+             className="btn w-full inline-flex items-center justify-center"
+              aria-label={`Open ${offer.name}`}
+           >
+            {/** i18n: offer.cta */}
+             Play now
+           </AffiliateLink>
               {/* Избранное отдельной кнопкой */}
               <FavoriteButton
                 slug={offer.slug}
