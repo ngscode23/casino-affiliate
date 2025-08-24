@@ -22,11 +22,11 @@ export default function OfferListFeature({
 
   return (
     <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {list.map((o, i) => (
+      {list.map((o) => (
         <li key={o.slug} className="neon-card p-4">
           <div className="font-semibold">{o.name}</div>
           <div className="text-sm text-[var(--text-dim)]">
-            {o.license} • {o.payout}{o.payoutHours ? ` (~${o.payoutHours}h)` : ""}
+            {.license} • {o.payout}{o.payoutHours ? ` (~${o.payoutHours}h)` : ""}
           </div>
         </li>
       ))}
