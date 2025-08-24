@@ -26,7 +26,7 @@ export default function OfferListFeature({
         <li key={o.slug} className="neon-card p-4">
           <div className="font-semibold">{o.name}</div>
           <div className="text-sm text-[var(--text-dim)]">
-            {.license} • {o.payout}{o.payoutHours ? ` (~${o.payoutHours}h)` : ""}
+            {o.license} • {o.payout}{o.payoutHours ? ` (~${o.payoutHours}h)` : ""}
           </div>
         </li>
       ))}
