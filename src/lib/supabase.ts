@@ -22,8 +22,13 @@ if (HAS_SUPABASE) {
 }
 
 export function getSupabase(): SupabaseClient | null {
+  if (!HAS_SUPABASE) return null;
+  if (_client) return _client;
+  _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   return _client;
 }
+
+
 
 
 
