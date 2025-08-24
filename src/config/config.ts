@@ -1,30 +1,34 @@
 // src/config.ts
 
 // Базовый URL сайта (для OG, hreflang, callback и т.п.)
-export const SITE_URL =
-  import.meta.env.VITE_SITE_URL ||
-  (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173");
+export const SITE_NAME = "CasinoHub";
+export const SITE_URL = (
+  import.meta.env.VITE_SITE_URL ??
+  (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173")
+).toString().replace(/\/+$/, ""); // без хвостового "/"
 
 // Бренд (поменяй под себя)
 export const BRAND_NAME = "CasinoHub";
 export const BRAND_LOGO = "/logo.svg";
 
-// GA4 (может быть пустым — тогда аналитика не активируется)
-export const GA_ID = import.meta.env.VITE_GA_ID || "";
+/** Аналитика (опционально) */
+export const GA_ID = (import.meta.env.VITE_GA_ID ?? "").trim();
 
-// === Supabase (ТОЛЬКО public anon key, НЕ service_role!) ===
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+/** Supabase (public anon key И URL без завершающего '/') */
+const RAW_SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL ?? "").trim();
+export const SUPABASE_URL = RAW_SUPABASE_URL.replace(/\/+$/, "");
+export const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? "").trim();
 
-// Куда вернётся магическая ссылка авторизации
-export const AUTH_CALLBACK = `${SITE_URL}/auth/callback`;
+/** Куда вернётся магическая ссылка */
+export const AUTH_CALLBACK_URL = `${SITE_URL}/auth/callback`;
 
-// Небольшая проверка в рантайме (поможет не искать потом почему 401)
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  // не бросаем ошибку на проде, но явно подсвечиваем проблему
-   
+/** Флаг: сконфигурирован ли Supabase */
+export const HAS_SUPABASE =
+  /^https?:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && !!SUPABASE_ANON_KEY;
+
+if (!HAS_SUPABASE) {
   console.warn(
-    "[config] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY — Supabase auth/sync will not work."
+    "[config] VITE_SUPABASE_URL/KEY не заданы или некорректны — Supabase-фичи будут отключены."
   );
 }
 

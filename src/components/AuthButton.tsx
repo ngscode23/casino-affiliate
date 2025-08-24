@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/common/button";
-import { AUTH_CALLBACK } from "@/config/config";
+import { AUTH_CALLBACK_URL } from "@/config/config";
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
@@ -27,7 +27,7 @@ export default function AuthButton() {
       email,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: AUTH_CALLBACK,
+        emailRedirectTo: AUTH_CALLBACK_URL,
       },
     });
     setLoading(false);
