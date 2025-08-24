@@ -9,7 +9,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   const loc = useLocation();
 
   useEffect(() => {
-    let unsub = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const unsub = supabase.auth.onAuthStateChange(async (_event, session) => {
       setOk(!!session);
       setLoading(false);
     });
