@@ -1,96 +1,100 @@
 // src/features/offers/api/getOffers.ts
 import { supabase } from "@/lib/supabase";
-import { offersNormalized } from "@/lib/offers";
-import type { OfferDTO } from "./types";
+import { offersNormalized } from "@/lib/offers"; // только данные, не типы!
+import { HAS_SUPABASE } from "@/config/config";
 
-/** Строка -> нормализованный enum лицензии для DTO */
-function normalizeLicense(v?: string | null): OfferDTO["license"] {
-  if (!v) return "Other";
-  // убираем диакритику и приводим к нижнему регистру
-  const s = v.normalize("NFKD").replace(/\u0301/g, "").toLowerCase();
-  if (s === "mga") return "MGA";
-  if (s === "ukgc") return "UKGC";
-  if (s === "curacao" || s === "curaçao" || /cura[ck]ao/.test(s)) return "Curaçao";
-  return "Other";
-}
+// каноничные типы берем отсюда
+import type { NormalizedOffer } from "@/types/offer";
 
-/** Тип строки из БД Supabase (offers) */
-type DBOfferRow = {
+// Если тип License отдельно не экспортируется, оставь локально:
+type License = "MGA" | "UKGC" | "Curaçao" | "Other";
+
+/** Строка из БД Supabase (таблица public.offers) */
+type DbOffer = {
   slug: string;
   name: string;
   rating: number | null;
-  license: string | null;
+  license: License;              // в БД у нас уже enum-подобные строки
   payout: string | null;
   payout_hours: number | null;
   methods: string[] | null;
   link: string | null;
-  enabled: boolean | null;
+  enabled: boolean;
   position: number | null;
 };
 
-/** Приведение строки БД к OfferDTO */
-function rowToDTO(r: DBOfferRow): OfferDTO {
+/** Нормализация license из произвольной строки */
+function normalizeLicense(v?: string | null): License {
+  if (!v) return "Other";
+  const s = v.normalize("NFKD").replace(/\u0301/g, "").toLowerCase();
+  if (s === "mga") return "MGA";
+  if (s === "ukgc") return "UKGC";
+  if (s === "curaçao" || s === "curacao" || /cura[ck]ao/.test(s)) return "Curaçao";
+  return "Other";
+}
+
+/** Приведение строки БД к формату UI */
+function rowToNormalized(r: DbOffer): NormalizedOffer {
   return {
-    id: r.slug,
+    slug: r.slug,
     name: r.name,
-    license: normalizeLicense(r.license),
+    license: r.license,                        // уже License
     rating: Number(r.rating ?? 0),
     payout: r.payout ?? "",
     payoutHours: r.payout_hours ?? undefined,
     methods: Array.isArray(r.methods) ? r.methods : [],
-    link: r.link ?? null,
+    link: r.link ?? undefined,                 // null -> undefined
+    enabled: !!r.enabled,
+    position: r.position ?? undefined,
   };
 }
 
-/** Приведение локального оффера из offersNormalized к OfferDTO */
-function localToDTO(o: {
-  slug: string;
-  name: string;
-  license?: string;
-  rating?: number;
-  payout?: string;
-  payoutHours?: number;
-  methods?: string[];
-  link?: string | null;
-}): OfferDTO {
+/** Приведение локального оффера к формату UI (фолбэк) */
+function localToNormalized(o: any): NormalizedOffer {
   return {
-    id: o.slug,
+    slug: o.slug,
     name: o.name,
     license: normalizeLicense(o.license),
     rating: Number(o.rating ?? 0),
     payout: o.payout ?? "",
     payoutHours: o.payoutHours ?? undefined,
     methods: Array.isArray(o.methods) ? o.methods : [],
-    link: o.link ?? null,
+    link: o.link ?? undefined,                 // null -> undefined
+    enabled: o.enabled ?? true,
+    position: o.position ?? undefined,
   };
 }
 
 /**
- * Основной источник — Supabase (offers, enabled=true, сортировки).
- * При ошибке/пустом ответе — фолбэк на локальные данные.
+ * Источник офферов:
+ *  - Supabase (offers, enabled=true, сортировка по position/name)
+ *  - fallback: локальные offersNormalized (с нормализацией лицензии)
  */
-export async function getOffers(): Promise<OfferDTO[]> {
+export async function getOffers(): Promise<NormalizedOffer[]> {
   try {
-    const { data, error } = await supabase
+    if (!HAS_SUPABASE) {
+      return offersNormalized.map(localToNormalized);
+    }
+
+    const { data, error } = await (supabase as any)
       .from("offers")
       .select("*")
       .eq("enabled", true)
       .order("position", { ascending: true, nullsFirst: true })
       .order("name", { ascending: true });
 
-    if (!error && Array.isArray(data) && data.length) {
-      return (data as DBOfferRow[]).map(rowToDTO);
+    if (error || !data) {
+      return offersNormalized.map(localToNormalized);
     }
-  } catch {
-    // игнорируем и используем фолбэк
-  }
 
-  // Фолбэк: локальные офферы
-  return offersNormalized.map(localToDTO);
+    return (data as DbOffer[]).map(rowToNormalized);
+  } catch {
+    return offersNormalized.map(localToNormalized);
+  }
 }
 
-/** Поиск одного оффера по slug с тем же источником/фолбэком */
-export async function getOfferBySlug(slug: string): Promise<OfferDTO | null> {
+/** Поиск одного оффера по slug c тем же источником/фолбэком */
+export async function getOfferBySlug(slug: string): Promise<NormalizedOffer | null> {
   const list = await getOffers();
-  return list.find((o) => o.id === slug) ?? null;
+  return list.find((o) => o.slug === slug) ?? null;
 }

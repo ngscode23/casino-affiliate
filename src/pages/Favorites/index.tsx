@@ -1,5 +1,6 @@
 // src/pages/Favorites/index.tsx
 import { useMemo, useCallback, useState } from "react";
+
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Button from "@/components/common/button";
@@ -12,19 +13,20 @@ import { offersNormalized } from "@/lib/offers";
 import { useFavorites } from "@/lib/useFavorites";
 
 export default function FavoritesPage() {
-  const { items, isLoading, remove } = useFavorites(); // items: string[] (слаги)
+  // Хук избранного: items — массив slug'ов
+  const { items, isLoading, remove } = useFavorites();
+
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  // Мэпим избранные слаги в объекты офферов
+  // Превращаем slug'и в объекты офферов (пока из локального списка)
   const favOffers = useMemo(
     () => offersNormalized.filter((o) => items.includes(o.slug)),
     [items]
   );
 
-  // Очистка избранного
+  // Очистить всё избранное
   const clearAll = useCallback(async () => {
-    // по очереди удаляем; если подключён Supabase — удалится и на сервере
     for (const slug of items) {
       await remove(slug);
     }
@@ -48,9 +50,7 @@ export default function FavoritesPage() {
           >
             Избранное
           </h1>
-          <p className="neon-subline mt-2">
-            Ваши сохранённые офферы.
-          </p>
+          <p className="neon-subline mt-2">Ваши сохранённые офферы.</p>
 
           {favOffers.length > 0 && (
             <div className="mt-4">
@@ -96,5 +96,3 @@ export default function FavoritesPage() {
     </>
   );
 }
-
-// 

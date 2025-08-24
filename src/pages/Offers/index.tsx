@@ -1,13 +1,17 @@
+// src/pages/Offers/index.tsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
+
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Seo from "@/components/Seo";
 
-import OfferListFeature, { type OffersFilterState } from "@/features/offers/components/OfferListFeature";
-import { OfferFiltersFeature } from "@/features/offers/components/OfferFiltersFeature";
+import OfferListFeature from "@/features/offers/components/OfferListFeature";
+import { OfferFiltersFeature, type OffersFilterState } from "@/features/offers/components/OfferFiltersFeature";
+import { useOffers } from "@/features/offers/api/useOffers";
 
 export default function OffersIndex() {
+  const { offers, isLoading, error } = useOffers();
   const [filters, setFilters] = useState<OffersFilterState>({ license: "all", q: "" });
 
   return (
@@ -29,7 +33,13 @@ export default function OffersIndex() {
         <OfferFiltersFeature onChange={setFilters} />
       </Card>
 
-      <OfferListFeature filters={filters} />
+      {isLoading ? (
+        <Card className="p-6">Загрузка…</Card>
+      ) : error ? (
+        <Card className="p-6 text-red-400">Ошибка: {error}</Card>
+      ) : (
+        <OfferListFeature offers={offers} filters={filters} />
+      )}
 
       <Card className="p-6 space-y-2">
         <p className="text-[var(--text-dim)]">
