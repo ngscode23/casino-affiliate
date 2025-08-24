@@ -7,7 +7,7 @@ export const hasSupabase =
   /^https?:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && !!SUPABASE_ANON_KEY;
 
 let _client: SupabaseClient | null = null;
-let client: SupabaseClient | null = null;
+
 if (hasSupabase) {
   _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: true },
@@ -16,7 +16,7 @@ if (hasSupabase) {
   console.warn("[supabase] Missing/invalid env, using local fallback.");
 }
 if (HAS_SUPABASE) {
-  client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
+  _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
 } else {
   console.warn("[supabase] disabled (missing env)");
 }
