@@ -1,31 +1,38 @@
-// src/features/offers/components/OfferFiltersFeature.tsx
-import { useEffect, useState } from "react";
-import LicenseSelect, { type LicenseFilter } from "@/components/compare/LicenseSelect";
+// src/features/offers/components/OfferListFeature.tsx
+import { offersNormalized } from "@/lib/offers";
+import type { NormalizedOffer } from "@/lib/offers";
 
-export type OffersFilterState = { license: LicenseFilter; q: string };
+type LicenseSelectValue = "all" | "MGA" | "UKGC" | "Curaçao";
 
-export function OfferFiltersFeature({ onChange }: { onChange: (s: OffersFilterState) => void }) {
-  const [license, setLicense] = useState<LicenseFilter>("all");
-  const [q, setQ] = useState("");
+export default function OfferListFeature({
+  license = "all",
+  q = "",
+}: { license?: LicenseSelectValue; q?: string }) {
+  const qn = q.trim().toLowerCase();
 
-  useEffect(() => { onChange({ license, q }); }, [license, q, onChange]);
+  const list: NormalizedOffer[] = offersNormalized
+    .filter(o => license === "all" ? true : o.license === license)
+    .filter(o => qn
+      ? [o.name, o.license, o.payout, ...(o.methods ?? [])]
+          .join(" ")
+          .toLowerCase()
+          .includes(qn)
+      : true
+    );
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-      <div>
-        <label className="block text-sm mb-1">License</label>
-        <LicenseSelect value={license} onChange={(v) => setLicense(v)} />
-      </div>
-
-      <div className="sm:ml-auto">
-        <label className="block text-sm mb-1">Search</label>
-        <input
-          className="border rounded-md px-3 py-2 min-w-[220px]"
-          placeholder="Casino, method…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-      </div>
-    </div>
+    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {list.map((o, i) => (
+        <li key={o.slug} className="neon-card p-4">
+          <div className="font-semibold">{o.name}</div>
+          <div className="text-sm text-[var(--text-dim)]">
+            {o.license} • {o.payout}{o.payoutHours ? ` (~${o.payoutHours}h)` : ""}
+          </div>
+        </li>
+      ))}
+      {!list.length && (
+        <li className="text-sm text-[var(--text-dim)]">Ничего не найдено</li>
+      )}
+    </ul>
   );
 }
