@@ -2,10 +2,16 @@ import { track } from "@/lib/analytics";
 
 export type LicenseFilter = "all" | "MGA" | "UKGC" | "Curaçao";
 
+// ВАЖНО: убираем value/onChange из DOM-пропов, чтобы не конфликтовали
+type SelectProps = Omit<
+  React.SelectHTMLAttributes<HTMLSelectElement>,
+  "value" | "onChange"
+>;
+
 type Props = {
   value: LicenseFilter;
   onChange: (v: LicenseFilter) => void;
-} & React.SelectHTMLAttributes<HTMLSelectElement>;
+} & SelectProps;
 
 export default function LicenseSelect({ value, onChange, ...rest }: Props) {
   return (
