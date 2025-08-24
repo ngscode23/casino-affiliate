@@ -129,6 +129,9 @@ export default function OfferPage() {
               aria-label={`Open ${offer.name}`}
            >
             {/** i18n: offer.cta */}
+            <p className="mt-2 text-xs text-[var(--text-dim)]">
+  Sponsored link. 18+ only. Please read <Link className="underline" to="/legal/affiliate-disclosure">our disclosure</Link> and operator’s T&amp;Cs.
+</p>
              Play now
            </AffiliateLink>
               {/* Избранное отдельной кнопкой */}

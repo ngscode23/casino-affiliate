@@ -1,13 +1,19 @@
 // src/components/OrgJsonLd.tsx
-import { useEffect } from "react";
-import { upsertJsonLd } from "@/lib/jsonld";
+import { SITE_NAME, SITE_URL, SITE_LOGO } from "@/config/site";
 
-type Props = { data: Record<string, unknown>; id?: string };
-
-export default function OrgJsonLd({ data, id = "jsonld-org" }: Props) {
-  useEffect(() => {
-    return upsertJsonLd(id, data); // вернём cleanup
-  }, [id, data]); // ← НИКАКИХ stringify здесь
-  return null;
+export default function OrgJsonLd() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+    ...(SITE_LOGO ? { logo: SITE_LOGO } : {}),
+  };
+  return (
+    <script
+      type="application/ld+json"
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
 }
-

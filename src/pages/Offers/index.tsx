@@ -4,7 +4,7 @@ import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Seo from "@/components/Seo";
 
-import OfferListFeature, { type OffersFilterState, type LicenseSelectValue } from "@/features/offers/components/OfferListFeature";
+import OfferListFeature, { type OffersFilterState } from "@/features/offers/components/OfferListFeature";
 import { OfferFiltersFeature } from "@/features/offers/components/OfferFiltersFeature";
 
 export default function OffersIndex() {

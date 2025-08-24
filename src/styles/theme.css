@@ -27,11 +27,20 @@
   .neon-hero h1, .neon-hero .title { font-size: clamp(28px,5vw,46px); line-height:1.05; letter-spacing:-.02em; margin:8px 0 14px; }
   .neon-hero p { color: var(--text-300); max-width: 800px; margin:0; }
   .neon-chip { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
-    border:1px solid rgba(255,255,255,.10);
+    
     background: linear-gradient(180deg, rgba(139,92,246,.18), rgba(139,92,246,.10) 70%, rgba(255,255,255,.02));
     box-shadow: 0 6px 16px rgba(139,92,246,.20); color:#fff; font-weight:600; font-size:13px; letter-spacing:.25px; }
   .neon-chip[data-glow] { box-shadow: 0 0 0 2px rgba(212,175,55,.15), 0 8px 24px rgba(212,175,55,.20);
     background: linear-gradient(180deg, rgba(212,175,55,.22), rgba(212,175,55,.10)); }
+    /* например в styles/theme.css */
+.neon-chip {
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.25rem .5rem;border-radius:9999px;
+  font-size:12px;line-height:1;
+  background:color-mix(in oklab, white 8%, transparent);
+  border:1px solid color-mix(in oklab, white 16%, transparent);
+  color: var(--text);
+}
   .btn { display:inline-flex; align-items:center; gap:10px; height:44px; padding:0 18px; border-radius:12px;
     border:1px solid rgba(255,255,255,.12);
     background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)),

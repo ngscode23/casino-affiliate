@@ -4,7 +4,7 @@ import Section from "@/components/common/section";
 export default function Privacy() {
   return (
     <>
-      <Seo title="Privacy Policy" description="How we collect and use data." />
+  <Seo title="Privacy Policy" description="How we collect and use data." noindex />
       <Section className="prose prose-invert max-w-none">
         <h1>Privacy Policy</h1>
         <p>We process minimum personal data and follow GDPR principles. See also Cookies page.</p>

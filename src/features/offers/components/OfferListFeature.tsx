@@ -1,38 +1,31 @@
-// src/features/offers/components/OfferListFeature.tsx
-import { offersNormalized } from "@/lib/offers";
+import { useMemo } from "react";
 import type { NormalizedOffer } from "@/lib/offers";
+import { offersNormalized } from "@/lib/offers";
+import OfferCard from "@/components/offers/OfferCard";
 
-type LicenseSelectValue = "all" | "MGA" | "UKGC" | "Curaçao";
+export type LicenseSelectValue = "all" | "MGA" | "UKGC" | "Curaçao";
+export type OffersFilterState = { license: LicenseSelectValue; q: string };
 
-export default function OfferListFeature({
-  license = "all",
-  q = "",
-}: { license?: LicenseSelectValue; q?: string }) {
-  const qn = q.trim().toLowerCase();
+export default function OfferListFeature({ filters }: { filters: OffersFilterState }) {
+  const list: NormalizedOffer[] = useMemo(() => {
+    const q = filters.q.trim().toLowerCase();
+    return offersNormalized.filter((o) => {
+      if (filters.license !== "all" && o.license !== filters.license) return false;
+      if (!q) return true;
+      const hay = [o.name, o.license, ...o.methods].join(" ").toLowerCase();
+      return hay.includes(q);
+    });
+  }, [filters]);
 
-  const list: NormalizedOffer[] = offersNormalized
-    .filter(o => license === "all" ? true : o.license === license)
-    .filter(o => qn
-      ? [o.name, o.license, o.payout, ...(o.methods ?? [])]
-          .join(" ")
-          .toLowerCase()
-          .includes(qn)
-      : true
-    );
+  if (!list.length) {
+    return <div className="text-[var(--text-dim)]">Ничего не найдено.</div>;
+  }
 
   return (
     <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {list.map((o) => (
-        <li key={o.slug} className="neon-card p-4">
-          <div className="font-semibold">{o.name}</div>
-          <div className="text-sm text-[var(--text-dim)]">
-            {o.license} • {o.payout}{o.payoutHours ? ` (~${o.payoutHours}h)` : ""}
-          </div>
-        </li>
+      {list.map((offer, i) => (
+        <OfferCard key={offer.slug} offer={offer} index={i} />
       ))}
-      {!list.length && (
-        <li className="text-sm text-[var(--text-dim)]">Ничего не найдено</li>
-      )}
     </ul>
   );
 }

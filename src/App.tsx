@@ -7,8 +7,10 @@ import { Routes, Route } from "react-router-dom";
 import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/layout/CompareBar";
 import Skeleton from "@/components/common/skeleton";
+// src/App.tsx (рядом с Header)
+import OrgJsonLd from "@/components/OrgJsonLd"; // если есть
+// ...
 
-// Ленивая подгрузка крупных кусков UI
 const Header       = lazy(() => import("@/components/layout/Header"));
 const Footer       = lazy(() => import("@/components/layout/Footer"));
 const CookieBar    = lazy(() => import("@/components/layout/CookieBar"));
@@ -52,7 +54,7 @@ export default function App() {
       >
         <CompareProvider>
           <Header />
-
+  <OrgJsonLd />
           <main id="main" className="min-h-[60vh]">
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -83,7 +85,6 @@ export default function App() {
     </div>
   );
 }
-
 
 
 

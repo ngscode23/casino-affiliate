@@ -1,59 +1,66 @@
-// src/pages/Home.tsx
+// src/pages/Home/index.tsx
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import OrgJsonLd from "@/components/OrgJsonLd";
-import SiteJsonLd from "@/components/SiteJsonLd";
+import Section from "@/components/common/section";
+import Seo from "@/components/Seo";
 import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/config/config";
 
-export default function HomePage() {
+export default function Home() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
 
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      // сюда можно вести на /compare или на /offers — выбери маршрут под свой поиск
-      navigate(`/compare?q=${encodeURIComponent(q.trim())}`);
+      const term = q.trim();
+      navigate(`/compare${term ? `?q=${encodeURIComponent(term)}` : ""}`);
     },
     [q, navigate]
   );
 
-  // JSON-LD данные
+  // JSON-LD: Organization
   const orgLd = useMemo(
     () => ({
       "@context": "https://schema.org",
       "@type": "Organization",
       name: BRAND_NAME ?? "CasinoHub",
-      url: SITE_URL,
+      url: SITE_URL || (typeof location !== "undefined" ? location.origin : ""),
       ...(BRAND_LOGO ? { logo: BRAND_LOGO } : {}),
     }),
     []
   );
 
+  // JSON-LD: WebSite + SearchAction
   const siteLd = useMemo(
-    () => ({
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      url: SITE_URL,
-      name: BRAND_NAME ?? "CasinoHub",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: `${SITE_URL}/search?q={search_term_string}`,
-        "query-input": "required name=search_term_string",
-      },
-    }),
+    () => {
+      const origin = SITE_URL || (typeof location !== "undefined" ? location.origin : "");
+      return {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        url: origin,
+        name: BRAND_NAME ?? "CasinoHub",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${origin}/search?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      };
+    },
     []
   );
 
   return (
     <>
-      {/* Вставляем JSON-LD */}
-      <OrgJsonLd data={orgLd} />
-      <SiteJsonLd data={siteLd} />
+      <Seo
+        title={`${BRAND_NAME ?? "CasinoHub"} — сравнение казино, выплаты и рейтинги`}
+        description="Сравнивайте казино по лицензии, скорости выплат и рейтингу. Ответственная игра 18+."
+        jsonLd={[orgLd, siteLd]}
+        canonical={SITE_URL}
+      />
 
       <section className="neon-hero">
-        <div className="neon-container">
+        <Section>
           {/* бейджи */}
           <div className="mb-4 flex items-center gap-2">
             <span className="neon-chip" data-glow>5000+ Offers</span>
@@ -68,7 +75,12 @@ export default function HomePage() {
             Compare top casinos, find exclusive bonuses, and withdraw faster.
           </p>
 
-          <form className="neon-search" onSubmit={onSubmit} role="search" aria-label="Site search">
+          <form
+            className="neon-search mt-4"
+            onSubmit={onSubmit}
+            role="search"
+            aria-label="Site search"
+          >
             <input
               type="search"
               className="neon-input"
@@ -76,13 +88,12 @@ export default function HomePage() {
               value={q}
               onChange={(e) => setQ(e.currentTarget.value)}
               autoComplete="off"
+              aria-label="Search"
             />
             <button className="neon-btn" type="submit">Compare now</button>
           </form>
-        </div>
+        </Section>
       </section>
     </>
   );
 }
-
-
