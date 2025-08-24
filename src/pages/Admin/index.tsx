@@ -8,6 +8,8 @@ const Login = lazy(() => import("./login"));
 const OffersList = lazy(() => import("./offers/List"));
 const OffersEdit = lazy(() => import("./offers/Edit"));
 
+
+
 export default function AdminApp() {
   return (
     <Suspense fallback={<div className="p-6"><Skeleton className="h-6 w-40" /></div>}>

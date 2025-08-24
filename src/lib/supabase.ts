@@ -1,37 +1,31 @@
-// src/lib/supabase.ts (проверь имена констант у себя)
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+// ЕДИНСТВЕННАЯ точка создания клиента
+import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, HAS_SUPABASE } from "@/config/config";
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-export const hasSupabase =
-  /^https?:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && !!SUPABASE_ANON_KEY;
-
-let _client: SupabaseClient | null = null;
-
-if (hasSupabase) {
-  _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: true },
-  });
-} else {
-  console.warn("[supabase] Missing/invalid env, using local fallback.");
-}
-if (HAS_SUPABASE) {
-  _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
-} else {
-  console.warn("[supabase] disabled (missing env)");
+declare global {
+  interface Window {
+    __supabase?: ReturnType<typeof createClient>;
+  }
 }
 
-export function getSupabase(): SupabaseClient | null {
-  if (!HAS_SUPABASE) return null;
-  if (_client) return _client;
-  _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  return _client;
+const storageKey = "sb-casino-affiliate-auth"; // свой ключ вместо дефолтного
+
+// В dev из-за HMR модуль может переоцениваться — кешируем на window.
+const client =
+  (typeof window !== "undefined" && window.__supabase) ||
+  (HAS_SUPABASE
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          // уникальный ключ — если вдруг всё же будет второй клиент, он не конфликтнёт
+          storageKey,
+        },
+      })
+    : undefined);
+
+if (typeof window !== "undefined" && client) {
+  window.__supabase = client;
 }
 
-
-
-
-
-
-
-
+export const supabase = client!;

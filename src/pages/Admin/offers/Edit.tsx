@@ -102,9 +102,9 @@ const {
       position: values.position ?? null,
     };
 
-    const { error } = await supabase.from("offers").upsert(payload, {
-      onConflict: "slug",
-    });
+ const { error } = await (supabase as any)
+  .from("offers")
+  .upsert(payload, { onConflict: "slug" });
 
     if (error) {
       alert("Save error: " + error.message);

@@ -28,6 +28,7 @@ const CookiesPage    = lazy(() => import("@/pages/Legal/Cookies"));
 const Responsible    = lazy(() => import("@/pages/Legal/ResponsibleGaming"));
 const AffiliateDisc  = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
 const OffersIndex = lazy(() => import("@/pages/Offers/index"));
+const AdminApp = lazy(() => import("@/pages/Admin"));
 // Если админка ещё не создана — оставь закомментированным:
 // const AdminApp   = lazy(() => import("@/pages/Admin"));
 
@@ -62,6 +63,11 @@ export default function App() {
             <Routes>
               {/* Если добавишь админку — раскомментируй */}
               {/* <Route path="/admin/*" element={<AdminApp />} /> */}
+
+
+
+              <Route path="/admin/*" element={<AdminApp />} />
+              <Route path="*" element={<NotFound />} />
 
               <Route path="/" element={<HomePage />} />
               <Route path="/offers" element={<OffersIndex />} />
