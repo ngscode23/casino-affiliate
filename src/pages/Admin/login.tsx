@@ -1,58 +1,71 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Button from "@/components/common/button";
+import { supabase } from "@/lib/supabase";
+import { AUTH_CALLBACK_URL, HAS_SUPABASE } from "@/config/config";
 
-export default function Login() {
+export default function AdminLogin() {
   const [email, setEmail] = useState("");
-  const [pwd, setPwd] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [params] = useSearchParams();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate(params.get("next") || "/admin", { replace: true });
-    });
-  }, [navigate, params]);
+  const [status, setStatus] = useState<"idle"|"sending"|"sent"|"error">("idle");
+  const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
-    setLoading(false);
-    if (error) {
-      alert(error.message);
-    } else {
-      navigate(params.get("next") || "/admin", { replace: true });
+    setStatus("sending");
+    setError(null);
+
+    if (!HAS_SUPABASE) {
+      setStatus("error");
+      setError("Supabase не сконфигурирован (VITE_SUPABASE_URL/KEY).");
+      return;
     }
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        emailRedirectTo: AUTH_CALLBACK_URL, // например https://твой-сайт/auth/callback
+      },
+    });
+
+    if (error) {
+      setStatus("error");
+      setError(error.message);
+      return;
+    }
+    setStatus("sent");
   }
 
   return (
-    <Section className="max-w-md p-6">
-      <Card className="p-6 space-y-4">
-        <h1 className="text-xl font-bold">Admin Login</h1>
-        <form onSubmit={onSubmit} className="space-y-3">
-          <input
-            className="border rounded px-3 py-2 w-full"
-            placeholder="Email"
-            type="email"
-            value={email}
-            onChange={(e)=>setEmail(e.target.value)}
-          />
-          <input
-            className="border rounded px-3 py-2 w-full"
-            placeholder="Password"
-            type="password"
-            value={pwd}
-            onChange={(e)=>setPwd(e.target.value)}
-          />
-          <Button disabled={loading} type="submit" className="w-full">
-            {loading ? "Logging in…" : "Login"}
-          </Button>
-        </form>
+    <Section className="space-y-6">
+      <h1 className="text-2xl font-bold">Admin — вход</h1>
+
+      <Card className="p-6 space-y-4 max-w-md">
+        {status !== "sent" ? (
+          <form onSubmit={onSubmit} className="space-y-3">
+            <label className="block text-sm">
+              Email (должен быть в whitelist)
+            </label>
+            <input
+              type="email"
+              required
+              className="w-full rounded-md border px-3 py-2"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+            />
+
+            <Button type="submit" disabled={status === "sending"}>
+              {status === "sending" ? "Отправляем ссылку…" : "Войти по magic link"}
+            </Button>
+
+            {error && <p className="text-sm text-red-500">{error}</p>}
+          </form>
+        ) : (
+          <p className="text-[var(--text-dim)]">
+            Ссылка для входа отправлена. Проверь почту и перейди по ссылке.
+          </p>
+        )}
       </Card>
     </Section>
   );
