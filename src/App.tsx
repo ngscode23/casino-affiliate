@@ -20,14 +20,14 @@ const ComparePage    = lazy(() => import("@/pages/Compare"));
 const FavoritesPage  = lazy(() => import("@/pages/Favorites"));
 const OfferPage      = lazy(() => import("@/pages/Offer"));
 const NotFound       = lazy(() => import("@/pages/NotFound"));
-const OffersIndex    = lazy(() => import("@/pages/Offers"));
+// const OffersIndex    = lazy(() => import("@/pages/Offers"));
 const ContactPage    = lazy(() => import("@/pages/Contact"));
 const PrivacyPage    = lazy(() => import("@/pages/Legal/Privacy"));
 const TermsPage      = lazy(() => import("@/pages/Legal/Terms"));
 const CookiesPage    = lazy(() => import("@/pages/Legal/Cookies"));
 const Responsible    = lazy(() => import("@/pages/Legal/ResponsibleGaming"));
 const AffiliateDisc  = lazy(() => import("@/pages/Legal/AffiliateDisclosure"));
-
+const OffersIndex = lazy(() => import("@/pages/Offers/index"));
 // Если админка ещё не создана — оставь закомментированным:
 // const AdminApp   = lazy(() => import("@/pages/Admin"));
 
