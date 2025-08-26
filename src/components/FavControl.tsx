@@ -10,6 +10,10 @@ export type FavControlProps = {
   titleOff?: string;
 };
 
+function normalizeKey(slug: any): string {
+  try { return String(slug ?? "").trim(); } catch { return ""; }
+}
+
 export function FavControl({
   id,
   className,
@@ -18,31 +22,32 @@ export function FavControl({
   titleOff = "В избранное",
 }: FavControlProps) {
   const { items, toggle } = useFavorites();
-  const active = items.includes(id);
+  const key = normalizeKey(id);
+  const active = items.includes(key);
 
   const handleClick = (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
-    // toggle возвращает boolean — новое состояние (должно быть так в useFavorites)
-    const next = toggle(id);
+    const next = toggle(key);
     onToggle?.(next);
   };
+
+  const base = className ?? "inline-flex h-10 w-10 items-center justify-center rounded";
+  const colorClass = active ? "text-amber-400" : "text-white/70 hover:text-white";
 
   return (
     <button
       type="button"
       aria-pressed={active}
-      aria-label={active ? titleOn : titleOff}
       title={active ? titleOn : titleOff}
       onClick={handleClick}
-      className={className ?? "inline-flex h-10 w-10 items-center justify-center rounded"}
+      className={`${base} ${colorClass}`}
+      style={{ WebkitTapHighlightColor: "transparent" }}
     >
-      <span aria-hidden style={{ lineHeight: 1 }}>
+      <span aria-hidden style={{ lineHeight: 1, fontSize: "1.15rem" }}>
         {active ? "★" : "☆"}
       </span>
     </button>
   );
 }
 
-// Provide both named and default export so old and new imports work
 export default FavControl;
-

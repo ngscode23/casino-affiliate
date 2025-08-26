@@ -20,10 +20,10 @@ export default function FavoritesPage() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   // Превращаем slug'и в объекты офферов (пока из локального списка)
-  const favOffers = useMemo(
-    () => offersNormalized.filter((o) => items.includes(o.slug)),
-    [items]
-  );
+const favOffers = useMemo<NormalizedOffer[]>(
+  () => offersNormalized.filter((o) => items.includes(o.slug)),
+  [items]
+);
 
   // Очистить всё избранное
   const clearAll = useCallback(async () => {

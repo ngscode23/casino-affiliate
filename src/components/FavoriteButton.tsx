@@ -1,5 +1,5 @@
 import { track } from "@/lib/analytics";
-import { FavControl } from "@/components/FavControl";
+
 
 
 export function FavoriteButton({
@@ -11,7 +11,7 @@ export function FavoriteButton({
   slug: string;
   isActive: boolean;
   toggleFavorite: (slug: string) => boolean;
-  className: string;
+  className?: string;
 }) {
   return (
     <button
@@ -28,6 +28,4 @@ export function FavoriteButton({
     </button>
   );
 }
-
-
 

@@ -3,9 +3,15 @@ import { slugify } from "./slug";
 import { offers as rawOffers } from "@/data/offers";
 import type { Offer as RawOffer } from "@/data/schema";
 
+/**
+ * Нормализуем значение лицензии в удобочитаемую форму.
+ * Возвращаем "Curaçao" для вариаций curacao/curaçao, иначе оставляем как есть.
+ */
 const normLicense = (s?: string) => {
   if (!s) return "Other";
-  return /^curacao$/i.test(s) || /^cura(c|ç)ao$/i.test(s) ? "Curaçao" : s;
+  if (/^curacao$/i.test(s) || /^cura(c|ç)ao$/i.test(s)) return "Curaçao";
+  // Обрезаем лишние пробелы и возвращаем исходную строку (в том числе "MGA", "UKGC" и т.п.)
+  return String(s).trim();
 };
 
 export type NormalizedOffer = Omit<RawOffer, "slug" | "methods" | "license"> & {
@@ -14,14 +20,29 @@ export type NormalizedOffer = Omit<RawOffer, "slug" | "methods" | "license"> & {
   license: "MGA" | "UKGC" | "Curaçao" | "Other" | string;
 };
 
+/**
+ * Приводим методы выплат к массиву строк: trim, filter empty, unique.
+ */
+function normalizeMethods(raw?: any): string[] {
+  const arr = (raw ?? []) as any[];
+  return Array.from(
+    new Set(
+      arr
+        .map((x) => (x == null ? "" : String(x).trim()))
+        .filter(Boolean)
+    )
+  );
+}
+
 export function normalizeOffer(o: RawOffer): NormalizedOffer {
-  const methods = (o.methods ?? (o as any).payments ?? []) as string[];
+  const methods = normalizeMethods(o.methods ?? (o as any).payments ?? []);
+  const slug = o.slug ? String(o.slug) : slugify(String(o.name ?? ""));
   return {
     ...o,
-    slug: o.slug ?? slugify(o.name),
+    slug,
     methods,
-    license: normLicense(o.license)
-  };
+    license: normLicense(o.license),
+  } as NormalizedOffer;
 }
 
 export const offersNormalized: NormalizedOffer[] = (rawOffers as RawOffer[])
@@ -29,4 +50,9 @@ export const offersNormalized: NormalizedOffer[] = (rawOffers as RawOffer[])
   .map(normalizeOffer);
 
 
-
+  // dev helper: expose normalized offers for quick debugging in the browser console
+// dev helper: expose normalized offers for debugging
+if (typeof window !== "undefined") {
+  // @ts-ignore
+  (window as any).__offersNormalized = offersNormalized;
+}

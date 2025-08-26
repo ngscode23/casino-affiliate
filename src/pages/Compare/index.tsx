@@ -45,10 +45,10 @@ export default function Compare() {
 
     if (search.trim()) {
       const q = normalizeStr(search.trim());
-      arr = arr.filter((o, i) => {
-        const hay = [o.name, o.license, ...o.methods].join(" ");
-        return normalizeStr(hay).includes(q);
-      });
+     arr = arr.filter((o,) => {
+  const hay = [o.name, o.license, ...o.methods].join(" ");
+  return normalizeStr(hay).includes(q);
+});
     }
     return arr;
   }, [offers, license, method, search]);

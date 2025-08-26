@@ -1,5 +1,8 @@
-import type { Offer } from "@/lib/offers";
+// src/data/offers.ts
+import type { Offer } from "@/types/offer";
 export type { Offer };
+
+
 
 export const offers: Offer[] = [
   {

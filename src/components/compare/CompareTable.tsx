@@ -9,7 +9,6 @@ import Table, { type Column } from "@/components/common/table";
 import { useCompare } from "@/ctx/CompareContext";
 import { FavControl } from "@/components/FavControl";
 
-// IMPORTANT: use the runtime type used across app — lib/offers
 import type { NormalizedOffer } from "@/lib/offers";
 
 export type SortKey = "rating" | "payoutHours";
@@ -70,6 +69,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
         );
       },
     },
+
     {
       key: "fav",
       title: "FAV",
@@ -81,6 +81,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
         return row.slug ? <FavControl id={row.slug} className="inline-flex h-10 w-10 items-center justify-center" /> : null;
       },
     },
+
     {
       key: "name",
       title: "FIRM",
@@ -91,13 +92,17 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
         const row = r as NormalizedOffer;
         return (
           <div className="font-semibold">
-            <Link className="hover:underline cursor-pointer" to={`/offers/${encodeURIComponent(row.slug ?? row.name.toLowerCase().replace(/\s+/g, "-"))}`}>
+            <Link
+              className="hover:underline cursor-pointer"
+              to={`/offers/${encodeURIComponent(row.slug ?? row.name.toLowerCase().replace(/\s+/g, "-"))}`}
+            >
               {row.name}
             </Link>
           </div>
         );
       },
     },
+
     {
       key: "rating",
       title: `RATING${ratingArrow}`,
@@ -109,6 +114,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
       cellProps: { className: "px-4 py-3" },
       render: (r: unknown) => <Rating value={(r as NormalizedOffer).rating ?? 0} />,
     },
+
     {
       key: "license",
       title: "LICENSE",
@@ -117,6 +123,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
       cellProps: { className: "px-4 py-3 text-[var(--text-dim)]" },
       render: (r: unknown) => <span>{(r as NormalizedOffer).license ?? "—"}</span>,
     },
+
     {
       key: "payout",
       title: `PAYOUT${payoutArrow}`,
@@ -128,6 +135,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
       cellProps: { className: "px-4 py-3" },
       render: (r: unknown) => <span>{(r as NormalizedOffer).payout ?? "—"}</span>,
     },
+
     {
       key: "methods",
       title: "METHODS",
@@ -143,6 +151,7 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
         );
       },
     },
+
     {
       key: "link",
       title: "ACTION",
@@ -152,7 +161,11 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
       render: (r: unknown) => {
         const row = r as NormalizedOffer;
         return (
-          <a href={row.link ?? "#"} className="inline-flex items-center justify-center h-9 px-3 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium transition" aria-label={`Open ${row.name}`}>
+          <a
+            href={row.link ?? "#"}
+            className="inline-flex items-center justify-center h-9 px-3 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium transition"
+            aria-label={`Open ${row.name}`}
+          >
             Play
           </a>
         );
@@ -175,4 +188,3 @@ export default function CompareTable({ offers, sortKey, sortDir, onSortChange }:
     </Card>
   );
 }
-
