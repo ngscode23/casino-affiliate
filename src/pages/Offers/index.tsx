@@ -7,8 +7,9 @@ import Card from "@/components/common/card";
 import Seo from "@/components/Seo";
 
 import OfferListFeature from "@/features/offers/components/OfferListFeature";
-import { OfferFiltersFeature, type OffersFilterState } from "@/features/offers/components/OfferFiltersFeature";
 import { useOffers } from "@/features/offers/api/useOffers";
+import OfferFiltersFeature, { type OffersFilterState } from "@/features/offers/components/OfferFiltersFeature";
+
 
 export default function OffersIndex() {
   const { offers, isLoading, error } = useOffers();

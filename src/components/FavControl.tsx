@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFavorites } from "@/lib/useFavorites";
 
 export type FavControlProps = {
@@ -13,20 +13,44 @@ function normalizeKey(slug: any): string {
   try { return String(slug ?? "").trim(); } catch { return ""; }
 }
 
-export function FavControl({
+export default function FavControl({
   id,
   className,
   onToggle,
   titleOn = "Убрать из избранного",
   titleOff = "В избранное",
 }: FavControlProps) {
+  // Подключаем хук и получаем items/toggle
   const { items, toggle } = useFavorites();
-  const key = normalizeKey(id);
-  const active = items.includes(key);
+
+  const key = useMemo(() => normalizeKey(id), [id]);
+
+  // authoritative state (из хука)
+  const authoritative = useMemo(() => items.includes(key), [items, key]);
+
+  // optimistic state: null = use authoritative, true/false = override
+  const [optimistic, setOptimistic] = useState<boolean | null>(null);
+
+  // дисплейное состояние — что показывать
+  const active = optimistic === null ? authoritative : optimistic;
+
+  // при смене authoritative (внешне) сбрасываем optimistic — позволяем "источнику правды" управлять
+  useEffect(() => {
+    // если authoritative совпадает с optimistic — очистим optimistic
+    if (optimistic !== null && authoritative === optimistic) {
+      setOptimistic(null);
+    }
+    // если authoritative отличается и optimistic === null — оставляем authoritative
+    // если authoritative меняется (например из-за синхронизации с сервером) — просто перерендерим
+  }, [authoritative, optimistic]);
 
   const handleClick = (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
+    // toggle возвращает новое состояние (true = в избранном, false = убрано)
     const next = toggle(key);
+    // optimistic: показываем результат сразу
+    setOptimistic(next);
+    // коллбек внешнему коду (трекинг)
     onToggle?.(next);
   };
 
@@ -48,5 +72,3 @@ export function FavControl({
     </button>
   );
 }
-
-export default FavControl;

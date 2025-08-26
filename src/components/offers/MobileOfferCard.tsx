@@ -5,7 +5,7 @@ import { ExternalLink } from "lucide-react";
 
 import Rating from "@/components/common/rating";
 import CompareInline from "@/components/compare/CompareInline";
-import { FavControl } from "@/components/FavControl";
+import FavControl  from "@/components/FavControl";
 import AffiliateLink from "@/components/AffiliateLink";
 import { t } from "@/lib/t";
 
@@ -49,17 +49,24 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
     <div
       className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}
     >
-  {/* шапка */}
-<div className="flex items-start justify-between gap-4">
-  <div className="space-y-1 min-w-0">
-    <div className="text-base font-semibold truncate">{offer.name}</div>
-    <div className="text-xs text-[var(--text-dim)]">{offer.license}</div>
-  </div>
-  <div className="shrink-0 flex items-center gap-2">
-    <Rating value={offer.rating ?? 0} />
-    <FavControl id={offer.slug} className="inline-flex h-10 w-10" />
-  </div>
-</div>
+      {/* шапка: название / лицензия слева, рейтинг + избранное справа */}
+
+
+      <div className="flex items-start justify-between gap-4">
+
+        <div className="space-y-1 min-w-0">
+          <div className="text-base font-semibold truncate">{offer.name}</div>
+          <div className="text-xs text-[var(--text-dim)]">{offer.license}</div>
+          
+
+        </div>
+
+        <div className="shrink-0 flex items-center gap-2">
+          <Rating value={offer.rating ?? 0} />
+          {/* Здесь добавлена кнопка избранного — компактная иконка */}
+     <FavControl id={offer.slug} className="inline-flex h-10 w-10" />
+        </div>
+      </div>
 
       {/* краткая инфа */}
       <div className="mt-3 text-sm">
@@ -78,10 +85,7 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
         </div>
       )}
 
-      {/* избранное */}
-      <div className="mt-3">
-        <FavControl id={offer.slug} />
-      </div>
+      {/* УДАЛЕНО: дублирующая кнопка избранного, чтобы не было двух на карточке */}
 
       {/* действия */}
       <div className="mt-4 grid grid-cols-3 gap-2">
@@ -150,10 +154,12 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
                       <Rating value={offer.rating ?? 0} />
                     </div>
                   </div>
+
                   <div>
                     <div className="text-[var(--text-dim)]">License</div>
                     <div className="mt-1">{offer.license}</div>
                   </div>
+
                   <div>
                     <div className="text-[var(--text-dim)]">Payout</div>
                     <div className="mt-1">
@@ -161,6 +167,7 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
                       {offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}
                     </div>
                   </div>
+
                   <div>
                     <div className="text-[var(--text-dim)]">Methods</div>
                     <div className="mt-1 flex flex-wrap gap-2">
@@ -177,7 +184,8 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
 
                 {/* actions в шите */}
                 <div className="mt-4 grid grid-cols-3 gap-2">
-                  <FavControl id={offer.slug} />
+                  {/* Оставляем FavControl в шите, чтобы пользователь мог добавить в избранное из деталей */}
+                  <FavControl id={offer.slug} className="inline-flex h-10 w-10" />
 
                   <AffiliateLink
                     offerSlug={offer.slug}
@@ -210,5 +218,3 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
     </div>
   );
 }
-
-

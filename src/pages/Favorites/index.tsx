@@ -1,6 +1,7 @@
 // src/pages/Favorites/index.tsx
 import { useMemo, useCallback, useState } from "react";
-import type { NormalizedOffer } from "@/lib/offers";
+// import { Link } from "react-router-dom";
+
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Button from "@/components/common/button";
@@ -12,22 +13,40 @@ import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import { offersNormalized } from "@/lib/offers";
 import { useFavorites } from "@/lib/useFavorites";
 
+import type { NormalizedOffer } from "@/lib/offers";
+
 export default function FavoritesPage() {
-  // Хук избранного: items — массив slug'ов
+  // Хук избранного
   const { items, isLoading, remove } = useFavorites();
 
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  // Превращаем slug'и в объекты офферов (пока из локального списка)
-const favOffers = useMemo<NormalizedOffer[]>(
-  () => offersNormalized.filter((o) => items.includes(o.slug)),
-  [items]
-);
+  // Превращаем slug'и в объекты офферов (сохранённый порядок)
+  const favOffers: NormalizedOffer[] = useMemo(() => {
+    const saved = Array.isArray(items) ? items : [];
+    return saved.map((slug) => {
+      const found = offersNormalized.find((o) => o.slug === slug);
+      if (found) return found;
+      // placeholder — соответствует типу NormalizedOffer
+      return {
+        slug,
+        name: `Unknown offer (${slug})`,
+        rating: 0,
+        payout: "—",
+        payoutHours: undefined,
+        license: "Other",
+        methods: [],
+        link: undefined,
+        enabled: false,
+        position: undefined,
+      } as NormalizedOffer;
+    });
+  }, [items]);
 
-  // Очистить всё избранное
+  // Удалить все (последовательно)
   const clearAll = useCallback(async () => {
-    for (const slug of items) {
+    for (const slug of items ?? []) {
       await remove(slug);
     }
   }, [items, remove]);
@@ -66,9 +85,7 @@ const favOffers = useMemo<NormalizedOffer[]>(
         {isLoading ? (
           <Card className="p-6">Загрузка…</Card>
         ) : favOffers.length === 0 ? (
-          <Card className="p-6 text-[var(--text-dim)]">
-            Вы ещё ничего не добавили.
-          </Card>
+          <Card className="p-6 text-[var(--text-dim)]">Вы ещё ничего не добавили.</Card>
         ) : (
           <>
             {/* Мобайл — карточки */}
@@ -96,5 +113,3 @@ const favOffers = useMemo<NormalizedOffer[]>(
     </>
   );
 }
-
-

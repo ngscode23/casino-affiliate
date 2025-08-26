@@ -10,8 +10,10 @@ import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import Seo from "@/components/Seo";
 
-import { useOffers } from "@/features/offers/api/useOffers";
 import type { NormalizedOffer } from "@/lib/offers";
+
+import { useOffers } from "@/features/offers/api/useOffers";
+import { useFavorites } from "@/lib/useFavorites";
 
 function normalizeStr(s: string) {
   return s.toLowerCase().normalize("NFKD");
@@ -37,6 +39,9 @@ export default function Compare() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
+  // получаем список slug'ов из избранного — используем его ниже, чтобы убирать офферы из выдачи
+  const { items: favItems } = useFavorites();
+
   const filtered: NormalizedOffer[] = useMemo(() => {
     let arr = [...offers];
 
@@ -45,13 +50,18 @@ export default function Compare() {
 
     if (search.trim()) {
       const q = normalizeStr(search.trim());
-     arr = arr.filter((o,) => {
-  const hay = [o.name, o.license, ...o.methods].join(" ");
-  return normalizeStr(hay).includes(q);
-});
+      arr = arr.filter((o) => {
+        const hay = [o.name, o.license, ...(o.methods ?? [])].join(" ");
+        return normalizeStr(hay).includes(q);
+      });
     }
+
+    // фильтруем из выдачи офферы, которые уже в избранном
+    arr = arr.filter((o) => !!o.slug && !favItems.includes(o.slug));
+
+    // сортировка сохраняется для вызывающего CompareTable
     return arr;
-  }, [offers, license, method, search]);
+  }, [offers, license, method, search, favItems]);
 
   return (
     <section className="neon-container space-y-6">
@@ -87,9 +97,7 @@ export default function Compare() {
 
       {/* заглушки/ошибки */}
       {error && (
-        <div className="neon-card p-3 text-red-400">
-          Ошибка загрузки офферов: {error}
-        </div>
+        <div className="neon-card p-3 text-red-400">Ошибка загрузки офферов: {error}</div>
       )}
 
       {/* Мобайл карточки */}
@@ -114,5 +122,3 @@ export default function Compare() {
     </section>
   );
 }
-
-

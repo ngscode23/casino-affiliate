@@ -50,9 +50,8 @@ export const offersNormalized: NormalizedOffer[] = (rawOffers as RawOffer[])
   .map(normalizeOffer);
 
 
-  // dev helper: expose normalized offers for quick debugging in the browser console
-// dev helper: expose normalized offers for debugging
-if (typeof window !== "undefined") {
-  // @ts-ignore
+// dev helper: expose normalized offers for quick debugging in browser console (dev only)
+if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
+ 
   (window as any).__offersNormalized = offersNormalized;
 }

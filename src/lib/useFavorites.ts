@@ -1,13 +1,24 @@
+// src/lib/useFavorites.ts
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { HAS_SUPABASE } from "@/config/config";
 
+/** Один общий ключ для LS */
 const LS_KEY = "fav:v1";
+
+/** Шина событий для синхронизации всех экземпляров хука */
 const bus = new EventTarget();
+
+/** Глобальный кэш (на уровне модуля), общий для всех компонентов */
 let cache: string[] = [];
 
+/* ----- helpers ----- */
 function normalizeKey(slug: any): string {
-  try { return String(slug ?? "").trim(); } catch { return ""; }
+  try {
+    return String(slug ?? "").trim();
+  } catch {
+    return "";
+  }
 }
 
 function readLocalRaw(): string[] {
@@ -20,21 +31,12 @@ function readLocalRaw(): string[] {
   }
 }
 
-/** Отфильтровать сохранённые slug'и по известным текущим offers (если доступны в window) */
-function filterKnown(list: string[]): string[] {
-  try {
-    if (typeof window !== "undefined" && Array.isArray((window as any).__offersNormalized)) {
-      const known = (window as any).__offersNormalized.map((o: any) => String(o.slug ?? "").trim());
-      if (known.length) return list.filter(s => known.includes(s));
-    }
-    return list;
-  } catch {
-    return list;
-  }
-}
-
 function writeLocal(list: string[]) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch {}
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(list));
+  } catch {
+    /* ignore */
+  }
 }
 
 function setCache(next: string[]) {
@@ -43,10 +45,10 @@ function setCache(next: string[]) {
   bus.dispatchEvent(new CustomEvent("fav:update", { detail: cache }));
 }
 
+/* Инициализация кэша и синк по событию браузера */
 if (typeof window !== "undefined") {
   if (cache.length === 0) {
-    const raw = readLocalRaw();
-    cache = filterKnown(raw);
+    cache = readLocalRaw();
     writeLocal(cache);
   }
   window.addEventListener("storage", (e) => {
@@ -70,6 +72,7 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
   const [isLoading, setIsLoading] = useState<boolean>(!!(HAS_SUPABASE && userId));
   const [error, setError] = useState<string | null>(null);
 
+  // подписка на глобальные обновления
   useEffect(() => {
     const onUpdate = (e: Event) => {
       const detail = (e as CustomEvent<string[]>).detail;
@@ -79,6 +82,7 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
     return () => bus.removeEventListener("fav:update", onUpdate);
   }, []);
 
+  // первичная загрузка с сервера (если userId есть)
   useEffect(() => {
     if (!HAS_SUPABASE || !userId) {
       setItems(cache);
@@ -94,73 +98,92 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
           .select("offer_id")
           .eq("user_id", userId)
           .order("created_at", { ascending: false });
+
         if (cancelled) return;
         if (error) {
           console.warn("[favorites] select error:", error);
           setError(error.message ?? "favorites select error");
-          setItems(cache);
+          setItems(cache); // оставляем локальные
         } else {
           const remote: string[] = (data ?? []).map((r: any) => String(r.offer_id || "").trim());
-          setCache(remote);
+          setCache(remote); // обновит и всех подписчиков
         }
       } finally {
         if (!cancelled) setIsLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   const isFavorite = useCallback((slug: string) => cache.includes(normalizeKey(slug)), []);
 
-  const add = useCallback((slug: string): boolean => {
-    const key = normalizeKey(slug);
-    if (!key) return false;
-    if (cache.includes(key)) return true;
-    const next = Array.from(new Set([...cache, key]));
-    setCache(next);
-    if (HAS_SUPABASE && userId) {
-      (async () => {
-        const { error } = await (supabase as any)
-          .from("favorites")
-          .upsert([{ user_id: userId, offer_id: key }], { onConflict: "user_id,offer_id" });
-        if (error) {
-          console.warn("[favorites] upsert error:", error);
-          setError(error.message ?? "favorites upsert error");
-        }
-      })();
-    }
-    return true;
-  }, [userId]);
+  const add = useCallback(
+    (slug: string): boolean => {
+      const key = normalizeKey(slug);
+      if (!key) return false;
+      if (cache.includes(key)) return true;
 
-  const remove = useCallback((slug: string): boolean => {
-    const key = normalizeKey(slug);
-    if (!key) return false;
-    if (!cache.includes(key)) return false;
-    const next = cache.filter(x => x !== key);
-    setCache(next);
-    if (HAS_SUPABASE && userId) {
-      (async () => {
-        const { error } = await (supabase as any)
-          .from("favorites")
-          .delete()
-          .eq("user_id", userId)
-          .eq("offer_id", key);
-        if (error) {
-          console.warn("[favorites] delete error:", error);
-          setError(error.message ?? "favorites delete error");
-        }
-      })();
-    }
-    return false;
-  }, [userId]);
+      const next = Array.from(new Set([...cache, key]));
+      setCache(next);
 
-  const toggle = useCallback((slug: string): boolean => {
-    const key = normalizeKey(slug);
-    if (!key) return false;
-    return cache.includes(key) ? remove(key) : add(key);
-  }, [add, remove]);
+      if (HAS_SUPABASE && userId) {
+        (async () => {
+          const { error } = await (supabase as any)
+            .from("favorites")
+            .upsert([{ user_id: userId, offer_id: key }], { onConflict: "user_id,offer_id" });
+          if (error) {
+            console.warn("[favorites] upsert error:", error);
+            setError(error.message ?? "favorites upsert error");
+          }
+        })();
+      }
+      return true;
+    },
+    [userId]
+  );
+
+  const remove = useCallback(
+    (slug: string): boolean => {
+      const key = normalizeKey(slug);
+      if (!key) return false;
+      if (!cache.includes(key)) return false;
+
+      const next = cache.filter((x) => x !== key);
+      setCache(next);
+
+      if (HAS_SUPABASE && userId) {
+        (async () => {
+          const { error } = await (supabase as any)
+            .from("favorites")
+            .delete()
+            .eq("user_id", userId)
+            .eq("offer_id", key);
+          if (error) {
+            console.warn("[favorites] delete error:", error);
+            setError(error.message ?? "favorites delete error");
+          }
+        })();
+      }
+      return false;
+    },
+    [userId]
+  );
+
+  const toggle = useCallback(
+    (slug: string): boolean => {
+      const key = normalizeKey(slug);
+      if (!key) return false;
+      return cache.includes(key) ? remove(key) : add(key);
+    },
+    [add, remove]
+  );
 
   const clear = useCallback(() => setCache([]), []);
 
-  return useMemo(() => ({ items, isFavorite, add, remove, toggle, clear, isLoading, error }), [items, isFavorite, add, remove, toggle, clear, isLoading, error]);
+  return useMemo(
+    () => ({ items, isFavorite, add, remove, toggle, clear, isLoading, error }),
+    [items, isFavorite, add, remove, toggle, clear, isLoading, error]
+  );
 }

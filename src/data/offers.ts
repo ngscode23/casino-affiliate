@@ -1,52 +1,29 @@
-// src/data/offers.ts
-import type { Offer } from "@/types/offer";
-export type { Offer };
-
-
-
-export const offers: Offer[] = [
+// файл: src/data/offers.ts  (или где у тебя лежит список offers)
+export const offers = [
+  // ...существующие элементы
   {
-    slug: "skyspin",
-    name: "SkySpin",
-    rating: 4.6,
+    slug: "lucky-star",
+    name: "Lucky Star",
+    rating: 4.2,
     payout: "1–2 дня",
     payoutHours: 36,
-    license: "MGA",
-    link: "https://partner.example/skyspin",
+    license: "Curaçao",
+    link: "https://partner.example/lucky-star",
     enabled: true,
-    position: 1,
-    methods: ["Cards", "SEPA"],
+    position: 10,
+    methods: ["Cards", "Crypto"]
   },
   {
-    slug: "novawin",
-    name: "NovaWin",
-    rating: 4.4,
+    slug: "golden-spin",
+    name: "Golden Spin",
+    rating: 4.5,
     payout: "до 48 ч",
     payoutHours: 48,
-    license: "Curaçao",
-    link: "https://partner.example/novawin",
+    license: "MGA",
+    link: "https://partner.example/golden-spin",
     enabled: true,
-    position: 2,
-    methods: ["Cards", "Crypto"],
-  }
+    position: 11,
+    methods: ["Cards", "SEPA"]
+  },
+  // ...
 ];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

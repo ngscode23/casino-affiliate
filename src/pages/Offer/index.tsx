@@ -9,7 +9,7 @@ import Seo from "@/components/Seo";
 import AffiliateLink from "@/components/AffiliateLink";
 
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
-import { FavControl } from "@/components/FavControl";
+import FavControl from "@/components/FavControl";
 import { track } from "@/lib/analytics";
 
 export default function OfferPage() {
