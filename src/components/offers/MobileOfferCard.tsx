@@ -1,4 +1,4 @@
-// src/components/MobileOfferCard.tsx
+// src/components/offers/MobileOfferCard.tsx
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
@@ -15,7 +15,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription
+  SheetDescription,
 } from "@/components/common/sheet";
 
 import { useCompare } from "@/ctx/CompareContext";
@@ -30,7 +30,7 @@ type Props = {
 
 export default function MobileOfferCard({ offer, className = "", index }: Props) {
   const { toggle: toggleCompare, isSelected } = useCompare();
-  const id = offer.slug;
+  const id = offer.slug; // гарантирован
   const selected = isSelected(id);
 
   const methods = useMemo(() => offer.methods ?? [], [offer.methods]);
@@ -46,17 +46,20 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
   const position = index != null ? index + 1 : undefined;
 
   return (
-    <div className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}>
-      {/* шапка */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1 min-w-0">
-          <div className="text-base font-semibold truncate">{offer.name}</div>
-          <div className="text-xs text-[var(--text-dim)]">{offer.license}</div>
-        </div>
-        <div className="shrink-0">
-          <Rating value={offer.rating ?? 0} />
-        </div>
-      </div>
+    <div
+      className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}
+    >
+  {/* шапка */}
+<div className="flex items-start justify-between gap-4">
+  <div className="space-y-1 min-w-0">
+    <div className="text-base font-semibold truncate">{offer.name}</div>
+    <div className="text-xs text-[var(--text-dim)]">{offer.license}</div>
+  </div>
+  <div className="shrink-0 flex items-center gap-2">
+    <Rating value={offer.rating ?? 0} />
+    <FavControl id={offer.slug} className="inline-flex h-10 w-10" />
+  </div>
+</div>
 
       {/* краткая инфа */}
       <div className="mt-3 text-sm">
@@ -77,12 +80,12 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
 
       {/* избранное */}
       <div className="mt-3">
-        <FavControl id={id} />
+        <FavControl id={offer.slug} />
       </div>
 
       {/* действия */}
       <div className="mt-4 grid grid-cols-3 gap-2">
-        {/* CTA: НЕ оборачиваем в Button, сразу AffiliateLink с нужными классами */}
+        {/* CTA */}
         <AffiliateLink
           offerSlug={offer.slug}
           position={position}
@@ -174,7 +177,7 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
 
                 {/* actions в шите */}
                 <div className="mt-4 grid grid-cols-3 gap-2">
-                  <FavControl id={id} />
+                  <FavControl id={offer.slug} />
 
                   <AffiliateLink
                     offerSlug={offer.slug}
@@ -207,6 +210,5 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
     </div>
   );
 }
-
 
 

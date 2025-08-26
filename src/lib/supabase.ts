@@ -29,3 +29,5 @@ if (typeof window !== "undefined" && client) {
 }
 
 export const supabase = client!;
+
+

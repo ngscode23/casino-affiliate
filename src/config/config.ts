@@ -22,3 +22,5 @@ if (!HAS_SUPABASE) {
   console.warn("[config] VITE_SUPABASE_URL/KEY не заданы или некорректны — Supabase-фичи будут отключены.");
 }
 
+
+

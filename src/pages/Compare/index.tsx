@@ -1,8 +1,7 @@
-// src/pages/Compare.tsx
+// src/pages/Compare/index.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { useOffers } from "@/features/offers/api/useOffers";
 import CompareFilters, {
   type LicenseFilter,
   type MethodFilter,
@@ -10,14 +9,16 @@ import CompareFilters, {
 import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import Seo from "@/components/Seo";
-import type { NormalizedOffer } from "@/types/offer"; // если у тебя тип в другом месте — поправь импорт
+
+import { useOffers } from "@/features/offers/api/useOffers";
+import type { NormalizedOffer } from "@/lib/offers";
 
 function normalizeStr(s: string) {
   return s.toLowerCase().normalize("NFKD");
 }
 
 export default function Compare() {
-  const { offers, isLoading, error } = useOffers(); // ⬅️ хук вызываем ТОЛЬКО внутри компонента
+  const { offers, isLoading, error } = useOffers();
 
   const [params, setParams] = useSearchParams();
   const initialQ = params.get("q") ?? "";
@@ -28,7 +29,6 @@ export default function Compare() {
   const [method, setMethod] = useState<MethodFilter>("all");
   const [search, setSearch] = useState<string>(initialQ);
 
-  // синхронизируем ?q= в адресной строке
   useEffect(() => {
     const next = new URLSearchParams(params);
     if (search) next.set("q", search);
@@ -37,7 +37,6 @@ export default function Compare() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  // фильтрация
   const filtered: NormalizedOffer[] = useMemo(() => {
     let arr = [...offers];
 
@@ -46,13 +45,13 @@ export default function Compare() {
 
     if (search.trim()) {
       const q = normalizeStr(search.trim());
-      arr = arr.filter((o) => {
+      arr = arr.filter((o, i) => {
         const hay = [o.name, o.license, ...o.methods].join(" ");
         return normalizeStr(hay).includes(q);
       });
     }
     return arr;
-  }, [offers, license, method, search]); // ⬅️ обязательно зависеть от offers
+  }, [offers, license, method, search]);
 
   return (
     <section className="neon-container space-y-6">
@@ -86,38 +85,34 @@ export default function Compare() {
         />
       </div>
 
-      {/* состояние загрузки / ошибка */}
-      {isLoading ? (
-        <div className="neon-card p-6">Загрузка…</div>
-      ) : error ? (
-        <div className="neon-card p-6 text-red-400">
+      {/* заглушки/ошибки */}
+      {error && (
+        <div className="neon-card p-3 text-red-400">
           Ошибка загрузки офферов: {error}
         </div>
-      ) : (
-        <>
-          {/* Мобильные карточки */}
-          <div className="grid gap-3 sm:gap-4 md:hidden">
-            {filtered.map((o) => (
-              <MobileOfferCard key={o.slug} offer={o} />
-            ))}
-          </div>
-
-          {/* Десктоп-таблица */}
-          <div className="neon-card p-0 hidden md:block">
-            <CompareTable
-              offers={filtered}
-              sortKey={sortKey}
-              sortDir={sortDir}
-              onSortChange={(k, d) => {
-                if (k !== sortKey || d !== sortDir) {
-                  setSortKey(k);
-                  setSortDir(d);
-                }
-              }}
-            />
-          </div>
-        </>
       )}
+
+      {/* Мобайл карточки */}
+      <div className="grid gap-3 sm:gap-4 md:hidden">
+        {(isLoading ? [] : filtered).map((o) => (
+          <MobileOfferCard key={o.slug} offer={o} />
+        ))}
+      </div>
+
+      {/* Десктоп таблица */}
+      <div className="neon-card p-0 hidden md:block">
+        <CompareTable
+          offers={filtered}
+          sortKey={sortKey}
+          sortDir={sortDir}
+          onSortChange={(k, d) => {
+            setSortKey(k);
+            setSortDir(d);
+          }}
+        />
+      </div>
     </section>
   );
 }
+
+

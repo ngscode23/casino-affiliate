@@ -1,4 +1,4 @@
-import type { Offer } from "@/types/offer";
+import type { Offer } from "@/lib/offers";
 export type { Offer };
 
 export const offers: Offer[] = [
@@ -27,6 +27,8 @@ export const offers: Offer[] = [
     methods: ["Cards", "Crypto"],
   }
 ];
+
+
 
 
 

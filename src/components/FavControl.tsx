@@ -1,30 +1,48 @@
 // src/components/FavControl.tsx
+import React from "react";
 import { useFavorites } from "@/lib/useFavorites";
-import Button from "@/components/common/button";
-import { Heart, HeartOff } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
-export function FavControl({ id }: { id: string }) {
-  const { has, toggle } = useFavorites();
-  const active = has(id);
+export type FavControlProps = {
+  id: string;
+  className?: string;
+  onToggle?: (active: boolean) => void;
+  titleOn?: string;
+  titleOff?: string;
+};
 
-  const onClick = async () => {
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) {
-      alert("Чтобы синхронизировать избранное между устройствами — войдите через e-mail");
-    }
-    await toggle(id);
+export function FavControl({
+  id,
+  className,
+  onToggle,
+  titleOn = "Убрать из избранного",
+  titleOff = "В избранное",
+}: FavControlProps) {
+  const { items, toggle } = useFavorites();
+  const active = items.includes(id);
+
+  const handleClick = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.stopPropagation();
+    // toggle возвращает boolean — новое состояние (должно быть так в useFavorites)
+    const next = toggle(id);
+    onToggle?.(next);
   };
 
   return (
-    <Button
-      variant={active ? "secondary" : "ghost"}
-      onClick={onClick}                     
+    <button
+      type="button"
       aria-pressed={active}
-      title={active ? "Remove from favorites" : "Add to favorites"}
+      aria-label={active ? titleOn : titleOff}
+      title={active ? titleOn : titleOff}
+      onClick={handleClick}
+      className={className ?? "inline-flex h-10 w-10 items-center justify-center rounded"}
     >
-      {active ? <HeartOff className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-    </Button>
+      <span aria-hidden style={{ lineHeight: 1 }}>
+        {active ? "★" : "☆"}
+      </span>
+    </button>
   );
 }
+
+// Provide both named and default export so old and new imports work
+export default FavControl;
 

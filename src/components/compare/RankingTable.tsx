@@ -32,3 +32,5 @@ export default function RankingTable({ total, filteredCount }: { total: number; 
 
 
 
+
+

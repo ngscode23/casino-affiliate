@@ -78,3 +78,5 @@ export default function OfferCard({ offer, index }: Props) {
     </li>
   );
 }
+
+

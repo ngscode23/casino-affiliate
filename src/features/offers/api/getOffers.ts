@@ -4,7 +4,7 @@ import { offersNormalized } from "@/lib/offers"; // только данные, �
 import { HAS_SUPABASE } from "@/config/config";
 
 // каноничные типы берем отсюда
-import type { NormalizedOffer } from "@/types/offer";
+import type { NormalizedOffer } from "@/lib/offers";
 
 // Если тип License отдельно не экспортируется, оставь локально:
 type License = "MGA" | "UKGC" | "Curaçao" | "Other";
@@ -98,3 +98,5 @@ export async function getOfferBySlug(slug: string): Promise<NormalizedOffer | nu
   const list = await getOffers();
   return list.find((o) => o.slug === slug) ?? null;
 }
+
+

@@ -1,6 +1,6 @@
 // src/features/offers/api/useOffers.ts
 import { useEffect, useState } from "react";
-import type { NormalizedOffer } from "@/types/offer";
+import type { NormalizedOffer } from "@/lib/offers";
 import { getOffers } from "./getOffers";
 
 export function useOffers() {
@@ -34,3 +34,5 @@ export function useOffers() {
 
 // опционально реэкспорт типа, удобно в потребителях
 export type { NormalizedOffer };
+
+

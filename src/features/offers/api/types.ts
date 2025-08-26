@@ -9,3 +9,5 @@ export type OfferDTO = {
   methods: string[];
   link?: string | null;
 };
+
+

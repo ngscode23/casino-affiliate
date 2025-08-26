@@ -48,3 +48,5 @@ export default function Table<T>({ columns, rows, rowKey, className = "" }: Tabl
   );
 }
 
+
+

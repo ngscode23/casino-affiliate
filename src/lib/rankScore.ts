@@ -1,5 +1,5 @@
 // src/lib/rankScore.ts
-import type { Offer } from "@/types/offer";
+import type { Offer } from "@/lib/offers";
 export function rankScore(o: Offer) {
   const r = o.rating ?? 0; // 0..5
   const speed = o.payoutHours != null ? Math.max(0, 72 - o.payoutHours) / 72 : 0.5; // 0..1
@@ -7,6 +7,8 @@ export function rankScore(o: Offer) {
   // веса: рейтинг 60%, скорость 25%, лицензия 15%
   return r/5 * 0.6 + speed * 0.25 + lic * 0.15;
 }
+
+
 
 
 

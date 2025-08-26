@@ -118,3 +118,5 @@ export default function CookieBar({ className = "" }: { className?: string }) {
   );
 }
 
+
+

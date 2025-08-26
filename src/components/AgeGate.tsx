@@ -35,3 +35,5 @@ export function AgeGate({ onAccept }: AgeGateProps) {
 
 
 
+
+

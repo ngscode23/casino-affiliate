@@ -28,3 +28,5 @@ export const offersNormalized: NormalizedOffer[] = (rawOffers as RawOffer[])
   .filter(Boolean)
   .map(normalizeOffer);
 
+
+

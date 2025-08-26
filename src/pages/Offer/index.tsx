@@ -1,4 +1,4 @@
-// src/pages/Offer.tsx
+// src/pages/Offer/index.tsx
 import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 
@@ -7,10 +7,10 @@ import Card from "@/components/common/card";
 import Rating from "@/components/common/rating";
 import Seo from "@/components/Seo";
 import AffiliateLink from "@/components/AffiliateLink";
-import { FavoriteButton } from "@/components/FavoriteButton";
 
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
-import { isFavorite, toggleFavorite } from "@/lib/favorites";
+import { FavControl } from "@/components/FavControl";
+import { track } from "@/lib/analytics";
 
 export default function OfferPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -28,7 +28,6 @@ export default function OfferPage() {
           <div className="text-lg font-semibold mb-2">Not found</div>
           <p className="text-[var(--text-dim)]">Мы не нашли такой оффер.</p>
           <div className="mt-4">
-            {/* TODO: t('compare.back') */}
             <Link to="/compare" className="btn">Back to compare</Link>
           </div>
         </Card>
@@ -119,29 +118,36 @@ export default function OfferPage() {
             </div>
 
             {/* Правая колонка — действия */}
-            <div className="space-y-3">
-              {/* CTA: трекинг внутри AffiliateLink */}
-           <AffiliateLink
-             offerSlug={offer.slug}
-             position={1}
-              href={offer.link ?? "#"}
-             className="btn w-full inline-flex items-center justify-center"
-              aria-label={`Open ${offer.name}`}
-           >
-            {/** i18n: offer.cta */}
-            <p className="mt-2 text-xs text-[var(--text-dim)]">
-  Sponsored link. 18+ only. Please read <Link className="underline" to="/legal/affiliate-disclosure">our disclosure</Link> and operator’s T&amp;Cs.
-</p>
-             Play now
-           </AffiliateLink>
-              {/* Избранное отдельной кнопкой */}
-              <FavoriteButton
-                slug={offer.slug}
-                isActive={isFavorite(offer.slug)}
-                toggleFavorite={(slug) => toggleFavorite(slug)}
-                className="w-full"
-              />
-            </div>
+          {/* Правая колонка — действия */}
+<div className="space-y-3">
+  {/* CTA */}
+  <AffiliateLink
+    offerSlug={offer.slug}
+    position={1}
+    href={offer.link ?? "#"}
+    className="btn w-full inline-flex items-center justify-center"
+    aria-label={`Open ${offer.name}`}
+  >
+    Play now
+  </AffiliateLink>
+
+  <p className="mt-2 text-xs text-[var(--text-dim)]">
+    Sponsored link. 18+ only. Please read{" "}
+    <Link className="underline" to="/legal/affiliate-disclosure">
+      our disclosure
+    </Link>{" "}
+    and operator’s T&amp;Cs.
+  </p>
+
+  {/* Кнопка избранного */}
+  <FavControl
+    id={offer.slug}
+    className="btn w-full"
+    onToggle={(active: boolean) => {
+      track({ name: "favorite_toggle", params: { offer_slug: offer.slug, active } });
+    }}
+  />
+</div>
           </div>
         </Card>
       </Section>

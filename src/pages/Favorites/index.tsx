@@ -1,6 +1,6 @@
 // src/pages/Favorites/index.tsx
 import { useMemo, useCallback, useState } from "react";
-
+import type { NormalizedOffer } from "@/lib/offers";
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Button from "@/components/common/button";
@@ -96,3 +96,5 @@ export default function FavoritesPage() {
     </>
   );
 }
+
+

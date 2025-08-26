@@ -6,3 +6,5 @@ export const SITE_LOGO = "/logo.png"; // либо абсолютный URL
 // если где-то ждут объект — удобный дефолтный экспорт
 const site = { SITE_NAME, SITE_URL, SITE_LOGO };
 export default site;
+
+

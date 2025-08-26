@@ -1,51 +1,60 @@
 // src/features/offers/components/OfferListFeature.tsx
-import { useMemo } from "react";
-import Card from "@/components/common/card";
-import MobileOfferCard from "@/components/offers/MobileOfferCard";
-import OfferCard from "@/components/offers/OfferCard";
-import type { NormalizedOffer } from "@/types/offer";
-import type { OffersFilterState } from "./OfferFiltersFeature";
+import type { NormalizedOffer } from "@/lib/offers";
+
+// 👇 этот тип нужен странице Offers — экспортируем явно
+export type OffersFilterState = {
+  license: "all" | "MGA" | "UKGC" | "Curaçao";
+  q: string;
+};
+
+type Props = {
+  offers: NormalizedOffer[];
+  filters: OffersFilterState;
+  // 👇 сделаем опциональными, чтобы не ломать вызовы
+  isLoading?: boolean;
+  error?: string | null;
+};
 
 export default function OfferListFeature({
   offers,
   filters,
-}: {
-  offers: NormalizedOffer[];
-  filters: OffersFilterState;
-}) {
-  const filtered = useMemo(() => {
-    const q = filters.q.trim().toLowerCase();
-    return offers.filter((o) => {
-      if (filters.license !== "all" && o.license !== filters.license) return false;
-      if (q) {
-        const hay = `${o.name} ${o.license} ${(o.methods ?? []).join(" ")}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [offers, filters]);
-
-  if (!offers.length) {
-    return <Card className="p-6 text-[var(--text-dim)]">Пока нет офферов.</Card>;
+  isLoading,
+  error,
+}: Props) {
+  if (isLoading) {
+    return <div className="neon-card p-4">Загрузка…</div>;
   }
-  if (!filtered.length) {
-    return <Card className="p-6 text-[var(--text-dim)]">Ничего не найдено по текущим фильтрам.</Card>;
+  if (error) {
+    return <div className="neon-card p-4 text-red-400">Ошибка: {error}</div>;
+  }
+
+  const filtered = offers.filter((o) => {
+    if (filters.license !== "all" && o.license !== filters.license) return false;
+
+    if (filters.q.trim()) {
+      const q = filters.q.toLowerCase();
+      const hay = [o.name, o.license, ...o.methods].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    return <div className="neon-card p-4">Ничего не найдено.</div>;
   }
 
   return (
-    <>
-      {/* Мобайл */}
-      <div className="grid gap-3 sm:gap-4 md:hidden">
-        {filtered.map((o) => (
-          <MobileOfferCard key={o.slug} offer={o} />
-        ))}
-      </div>
-      {/* Десктоп */}
-      <ul className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((o, i) => (
-          <OfferCard key={o.slug} offer={o} index={i} />
-        ))}
-      </ul>
-    </>
+    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {filtered.map((o) => (
+        <li key={o.slug} className="neon-card p-4 rounded-xl">
+          <div className="font-semibold">{o.name}</div>
+          <div className="text-sm text-[var(--text-dim)]">
+            {o.license} • {o.rating.toFixed(1)}★
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
+
+
