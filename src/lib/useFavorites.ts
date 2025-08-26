@@ -1,4 +1,3 @@
-// src/lib/useFavorites.ts
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { HAS_SUPABASE } from "@/config/config";
@@ -21,15 +20,14 @@ function readLocalRaw(): string[] {
   }
 }
 
-/** Попробовать отфильтровать список по известным slug'ам (offersNormalized) */
+/** Отфильтровать сохранённые slug'и по известным текущим offers (если доступны в window) */
 function filterKnown(list: string[]): string[] {
   try {
-    // require runtime module to avoid static cycles in TS
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const offersLib = require("@/lib/offers") as any;
-    const known = Array.isArray(offersLib.offersNormalized) ? offersLib.offersNormalized.map((o:any) => String(o.slug||"").trim()) : [];
-    if (!known.length) return list;
-    return list.filter(s => known.includes(s));
+    if (typeof window !== "undefined" && Array.isArray((window as any).__offersNormalized)) {
+      const known = (window as any).__offersNormalized.map((o: any) => String(o.slug ?? "").trim());
+      if (known.length) return list.filter(s => known.includes(s));
+    }
+    return list;
   } catch {
     return list;
   }

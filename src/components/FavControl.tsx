@@ -1,4 +1,3 @@
-// src/components/FavControl.tsx
 import React from "react";
 import { useFavorites } from "@/lib/useFavorites";
 
