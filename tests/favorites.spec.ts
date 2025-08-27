@@ -6,7 +6,7 @@ test("favorites lifecycle", async ({ page }) => {
   await page.goto(`${base}/compare`, { waitUntil: "networkidle" });
   await page.evaluate(() => localStorage.setItem("fav:v1", JSON.stringify([])));
 
-  const favVisible = '[data-testid^="fav-btn:"]:visible';
+  const favVisible = '[data-testid^="fav-btn:"]';
 
   // кликаем по первой ВИДИМОЙ звезде (Playwright сам дождётся видимости)
   await page.locator(favVisible).first().click();

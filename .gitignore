@@ -76,3 +76,12 @@ test-results/
 playwright-report/
 playwright/.cache/
 *.zip
+# junk
+node_modules
+dist
+build
+.vite
+.cache
+.next
+coverage
+_archive
