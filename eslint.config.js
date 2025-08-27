@@ -14,10 +14,19 @@ export default [
       'public/**',
       'backup_before_cleanup_*/**',
       'backup_before_restore/**',
+       "_archive/**",
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      "playwright-report/**",
+      "test-results/**",
+      "node_modules/**"
       // если надо — добавь ещё ваши служебные папки
     ],
   },
 
+
+  
   // 2) Базовые рекомендации
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -45,3 +54,4 @@ export default [
     },
   },
 ]
+

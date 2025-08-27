@@ -50,8 +50,17 @@ export const offersNormalized: NormalizedOffer[] = (rawOffers as RawOffer[])
   .map(normalizeOffer);
 
 
+
+  // добавь один раз в файле (или в d.ts), чтобы не нужны были ts-ignore
+declare global {
+  interface Window {
+    __offersNormalized?: NormalizedOffer[];
+    __clearFavs?: () => void;
+  }
+}
+export {};
 // dev helper: expose normalized offers for quick debugging in browser console (dev only)
-if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
- 
+if (import.meta.env?.DEV && typeof window !== "undefined") {
+  
   (window as any).__offersNormalized = offersNormalized;
 }

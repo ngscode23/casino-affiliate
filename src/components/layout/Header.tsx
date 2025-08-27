@@ -3,12 +3,12 @@ import { Link, NavLink } from "react-router-dom";
 import Section from "@/components/common/section";
 import cn from "@/lib/cn";
 import MobileNav from "./MobileNav";
-import AuthButton from "@/components/AuthButton"; // если не нужен — удаляй импорт и блок
+import HeaderFavLink from "@/components/layout/HeaderFavLink";
 
+// Навигация без Favorites (его рендерим отдельным компонентом с бейджем)
 const nav = [
   { to: "/offers", label: "Offers" },
   { to: "/compare", label: "Compare" },
-  { to: "/favorites", label: "Favorites" },
   { to: "/contact", label: "Contact" },
 ];
 
@@ -44,15 +44,13 @@ export default function Header() {
             </NavLink>
           ))}
 
-          {/* Auth (если используешь) */}
-          <div className="ml-2">
-            <AuthButton />
-          </div>
+          {/* Favorites c бейджем количества */}
+          <HeaderFavLink />
 
-          {/* Пример CTA как Link, не <a> */}
+          {/* CTA как нормальный Link, а не <a> */}
           <Link
             to="/compare"
-            className="ml-1 inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-600"
+            className="ml-2 inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-600"
           >
             Start Compare
           </Link>
@@ -66,5 +64,3 @@ export default function Header() {
     </header>
   );
 }
-
-

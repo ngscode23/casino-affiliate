@@ -1,3 +1,6 @@
+// @ts-nocheck
+/// <reference types="vite/client" />
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/common/button";

@@ -72,3 +72,7 @@ node_modules/
 
 # local audit reports
 /audit-*.txt
+test-results/
+playwright-report/
+playwright/.cache/
+*.zip

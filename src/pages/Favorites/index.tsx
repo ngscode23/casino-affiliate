@@ -1,34 +1,46 @@
 // src/pages/Favorites/index.tsx
 import { useMemo, useCallback, useState } from "react";
-// import { Link } from "react-router-dom";
-
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Button from "@/components/common/button";
 import Seo from "@/components/Seo";
-
 import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
-
-import { offersNormalized } from "@/lib/offers";
+import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
 import { useFavorites } from "@/lib/useFavorites";
-
-import type { NormalizedOffer } from "@/lib/offers";
+import { useSearchParams } from "react-router-dom";
+import { track } from "@/lib/analytics"; // опционально
 
 export default function FavoritesPage() {
-  // Хук избранного
-  const { items, isLoading, remove } = useFavorites();
+  // 1) Избранное
+  const { items, isLoading, add, remove } = useFavorites();
 
+  // 2) Фильтры сортировки для таблицы
   const [sortKey, setSortKey] = useState<SortKey>("rating");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  // Превращаем slug'и в объекты офферов (сохранённый порядок)
+  // 3) Импорт по URL: /favorites?list=slug1,slug2
+  const [params, setParams] = useSearchParams();
+  const incomingList = useMemo(() => {
+    const raw = params.get("list") || "";
+    return raw
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean);
+  }, [params]);
+
+  const missing = useMemo(
+    () => incomingList.filter(slug => !items.includes(slug)),
+    [incomingList, items]
+  );
+
+  // 4) Нормализованный список офферов по текущему состоянию избранного
   const favOffers: NormalizedOffer[] = useMemo(() => {
     const saved = Array.isArray(items) ? items : [];
-    return saved.map((slug) => {
-      const found = offersNormalized.find((o) => o.slug === slug);
+    return saved.map(slug => {
+      const found = offersNormalized.find(o => o.slug === slug);
       if (found) return found;
-      // placeholder — соответствует типу NormalizedOffer
+      // безопасный placeholder, чтобы не падать, если в LS мусор
       return {
         slug,
         name: `Unknown offer (${slug})`,
@@ -39,17 +51,43 @@ export default function FavoritesPage() {
         methods: [],
         link: undefined,
         enabled: false,
-        position: undefined,
+        position: undefined
       } as NormalizedOffer;
     });
   }, [items]);
 
-  // Удалить все (последовательно)
+  // 5) Очистка
   const clearAll = useCallback(async () => {
     for (const slug of items ?? []) {
       await remove(slug);
     }
   }, [items, remove]);
+
+  // 6) Импорт списка из URL
+  const importMissing = useCallback(async () => {
+    for (const slug of missing) {
+      await add(slug);
+    }
+    try {
+      track?.({ name: "favorites_import", params: { count: missing.length } });
+    } catch {}
+    const next = new URLSearchParams(params);
+    next.delete("list");
+    setParams(next, { replace: true });
+  }, [missing, add, params, setParams]);
+
+  // 7) Шеринг списка
+  const shareList = useCallback(async () => {
+    const url = `${location.origin}/favorites?list=${items.join(",")}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      track?.({ name: "favorites_share", params: { count: items.length } });
+      alert("Ссылка скопирована в буфер обмена.");
+    } catch {
+      // fallback
+      prompt("Скопируйте ссылку вручную:", url);
+    }
+  }, [items]);
 
   return (
     <>
@@ -64,7 +102,7 @@ export default function FavoritesPage() {
             style={{
               fontWeight: 800,
               letterSpacing: "-0.02em",
-              fontSize: "clamp(28px,4.5vw,46px)",
+              fontSize: "clamp(28px,4.5vw,46px)"
             }}
           >
             Избранное
@@ -72,9 +110,12 @@ export default function FavoritesPage() {
           <p className="neon-subline mt-2">Ваши сохранённые офферы.</p>
 
           {favOffers.length > 0 && (
-            <div className="mt-4">
+            <div className="mt-4 flex gap-2">
               <Button variant="secondary" onClick={clearAll}>
                 Очистить избранное
+              </Button>
+              <Button variant="soft" onClick={shareList}>
+                Поделиться списком
               </Button>
             </div>
           )}
@@ -82,15 +123,43 @@ export default function FavoritesPage() {
       </section>
 
       <Section className="space-y-6">
+        {/* Баннер импорта из URL */}
+        {missing.length > 0 && (
+          <Card className="p-4 border border-yellow-600/40 bg-yellow-500/10">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm">
+                Найден список к импорту: <b>{missing.length}</b> элементов
+              </div>
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={importMissing}>
+                  Импортировать
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    const next = new URLSearchParams(params);
+                    next.delete("list");
+                    setParams(next, { replace: true });
+                  }}
+                >
+                  Скрыть
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {isLoading ? (
           <Card className="p-6">Загрузка…</Card>
         ) : favOffers.length === 0 ? (
-          <Card className="p-6 text-[var(--text-dim)]">Вы ещё ничего не добавили.</Card>
+          <Card className="p-6 text-[var(--text-dim)]">
+            Вы ещё ничего не добавили.
+          </Card>
         ) : (
           <>
             {/* Мобайл — карточки */}
             <div className="grid gap-3 sm:gap-4 md:hidden">
-              {favOffers.map((o) => (
+              {favOffers.map(o => (
                 <MobileOfferCard key={o.slug} offer={o} />
               ))}
             </div>

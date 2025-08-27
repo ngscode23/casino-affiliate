@@ -7,7 +7,7 @@ import Rating from "@/components/common/rating";
 import Table, { type Column } from "@/components/common/table";
 
 import { useCompare } from "@/ctx/CompareContext";
-import FavControl from "@/components/FavControl";
+import { FavControl } from "@/components/FavControl";
 
 import type { NormalizedOffer } from "@/lib/offers";
 

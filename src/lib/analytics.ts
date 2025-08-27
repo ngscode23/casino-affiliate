@@ -18,10 +18,17 @@ export type AnalyticsEvent =
   | { name: "view_page"; params: { path: string } }
   | { name: "click_affiliate_link"; params: { offer_slug: string; position?: number } }
   | { name: "toggle_filter"; params: { filter: string; value: string } }
-  | { name: "add_to_compare"; params: { offer_slug: string; position?: number } } // ← добавили
+  | { name: "add_to_compare"; params: { offer_slug: string; position?: number } }
   | { name: "favorite_toggle"; params: { offer_slug: string; active: boolean } }
-  | { name: "submit_lead"; params: { source: "contact_form" | "other" } };
+  | { name: "submit_lead"; params: { source: string } }
+  // ↓↓↓ добавь это
+  | { name: "favorites_import"; params: { count: number } }
+  | { name: "favorites_share"; params: { count: number } };
+
+
+
 type Channel = "analytics" | "marketing";
+
 
 const eventChannel: Record<AnalyticsEvent["name"], Channel> = {
   view_page: "analytics",
@@ -29,7 +36,10 @@ const eventChannel: Record<AnalyticsEvent["name"], Channel> = {
   add_to_compare: "analytics",
   favorite_toggle: "analytics",
   submit_lead: "analytics",
-  click_affiliate_link: "marketing"
+  click_affiliate_link: "marketing",
+  // новые события:
+  favorites_import: "analytics",
+  favorites_share:  "analytics",
 };
 
 const queue: AnalyticsEvent[] = [];

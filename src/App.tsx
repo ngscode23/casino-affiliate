@@ -8,6 +8,9 @@ import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/layout/CompareBar";
 import Skeleton from "@/components/common/skeleton";
 import OrgJsonLd from "@/components/OrgJsonLd"; // JSON-LD Organization — один раз на всё приложение
+import ErrorBoundary from "@/components/common/ErrorBoundary";
+
+// ...
 
 // ── Ленивые компоненты каркаса
 const Header     = lazy(() => import("@/components/layout/Header"));
@@ -35,6 +38,7 @@ const AuthCallback = lazy(() => import("@/pages/AuthCallback"));
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <div className="min-h-screen bg-[var(--bg-0)] text-[var(--text)]">
       {/* Skip link для клавиатуры */}
       <a
@@ -95,6 +99,7 @@ export default function App() {
         </CompareProvider>
       </Suspense>
     </div>
+    </ErrorBoundary>
   );
 }
 

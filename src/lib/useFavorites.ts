@@ -3,17 +3,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { HAS_SUPABASE } from "@/config/config";
 
-/** Один общий ключ для LS */
+/** Ключ в localStorage */
 const LS_KEY = "fav:v1";
 
-/** Шина событий для синхронизации всех экземпляров хука */
+/** Шина событий для синхронизации экземпляров хука и вкладок */
 const bus = new EventTarget();
 
-/** Глобальный кэш (на уровне модуля), общий для всех компонентов */
+/** Глобальный кэш (на уровне модуля) */
 let cache: string[] = [];
 
-/* ----- helpers ----- */
-function normalizeKey(slug: any): string {
+/* ---------------- helpers ---------------- */
+
+function normalizeKey(slug: unknown): string {
   try {
     return String(slug ?? "").trim();
   } catch {
@@ -21,7 +22,7 @@ function normalizeKey(slug: any): string {
   }
 }
 
-function readLocalRaw(): string[] {
+function readLocal(): string[] {
   try {
     const raw = localStorage.getItem(LS_KEY);
     const arr = raw ? JSON.parse(raw) : [];
@@ -35,7 +36,7 @@ function writeLocal(list: string[]) {
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(list));
   } catch {
-    /* ignore */
+    /* ignore quota errors */
   }
 }
 
@@ -45,23 +46,27 @@ function setCache(next: string[]) {
   bus.dispatchEvent(new CustomEvent("fav:update", { detail: cache }));
 }
 
-/* Инициализация кэша и синк по событию браузера */
+/** Инициализация кэша и синк между вкладками */
 if (typeof window !== "undefined") {
   if (cache.length === 0) {
-    cache = readLocalRaw();
+    cache = readLocal();
     writeLocal(cache);
   }
   window.addEventListener("storage", (e) => {
-    if (e.key === LS_KEY) setCache(readLocalRaw());
+    if (e.key === LS_KEY) setCache(readLocal());
   });
 }
+
+/* --------------- types & hook --------------- */
 
 export type UseFavoritesReturn = {
   items: string[];
   isFavorite: (slug: string) => boolean;
+  /** Возвращают новое состояние для данного slug */
   add: (slug: string) => boolean;
   remove: (slug: string) => boolean;
   toggle: (slug: string) => boolean;
+
   clear: () => void;
   isLoading: boolean;
   error: string | null;
@@ -82,7 +87,7 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
     return () => bus.removeEventListener("fav:update", onUpdate);
   }, []);
 
-  // первичная загрузка с сервера (если userId есть)
+  // первичная загрузка из Supabase (опционально)
   useEffect(() => {
     if (!HAS_SUPABASE || !userId) {
       setItems(cache);
@@ -100,18 +105,20 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
           .order("created_at", { ascending: false });
 
         if (cancelled) return;
+
         if (error) {
           console.warn("[favorites] select error:", error);
           setError(error.message ?? "favorites select error");
-          setItems(cache); // оставляем локальные
+          setItems(cache);
         } else {
-          const remote: string[] = (data ?? []).map((r: any) => String(r.offer_id || "").trim());
-          setCache(remote); // обновит и всех подписчиков
+          const remote: string[] = (data ?? []).map((r: any) => normalizeKey(r.offer_id));
+          setCache(remote); // синхронизирует и setItems через шину
         }
       } finally {
         if (!cancelled) setIsLoading(false);
       }
     })();
+
     return () => {
       cancelled = true;
     };
@@ -125,8 +132,7 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
       if (!key) return false;
       if (cache.includes(key)) return true;
 
-      const next = Array.from(new Set([...cache, key]));
-      setCache(next);
+      setCache([...cache, key]);
 
       if (HAS_SUPABASE && userId) {
         (async () => {
@@ -139,6 +145,7 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
           }
         })();
       }
+
       return true;
     },
     [userId]
@@ -150,8 +157,7 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
       if (!key) return false;
       if (!cache.includes(key)) return false;
 
-      const next = cache.filter((x) => x !== key);
-      setCache(next);
+      setCache(cache.filter((x) => x !== key));
 
       if (HAS_SUPABASE && userId) {
         (async () => {
@@ -166,6 +172,7 @@ export function useFavorites(userId?: string): UseFavoritesReturn {
           }
         })();
       }
+
       return false;
     },
     [userId]
