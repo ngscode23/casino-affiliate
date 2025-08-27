@@ -1,111 +1,196 @@
 // src/lib/useFavorites.ts
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { HAS_SUPABASE } from "@/config/config";
 
-const LS = "fav:v1";
+/** Ключ в localStorage */
+const LS_KEY = "fav:v1";
 
-export function useFavorites() {
-  const [ids, setIds] = useState<string[]>(() => {
-    try {
-      const raw = localStorage.getItem(LS);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed)
-        ? parsed.filter((x): x is string => typeof x === "string")
-        : [];
-    } catch {
-      return [];
-    }
+/** Шина событий для синхронизации экземпляров хука и вкладок */
+const bus = new EventTarget();
+
+/** Глобальный кэш (на уровне модуля) */
+let cache: string[] = [];
+
+/* ---------------- helpers ---------------- */
+
+function normalizeKey(slug: unknown): string {
+  try {
+    return String(slug ?? "").trim();
+  } catch {
+    return "";
+  }
+}
+
+function readLocal(): string[] {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.map(normalizeKey).filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocal(list: string[]) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(list));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+function setCache(next: string[]) {
+  cache = Array.from(new Set(next.map(normalizeKey).filter(Boolean)));
+  writeLocal(cache);
+  bus.dispatchEvent(new CustomEvent("fav:update", { detail: cache }));
+}
+
+/** Инициализация кэша и синк между вкладками */
+if (typeof window !== "undefined") {
+  if (cache.length === 0) {
+    cache = readLocal();
+    writeLocal(cache);
+  }
+  window.addEventListener("storage", (e) => {
+    if (e.key === LS_KEY) setCache(readLocal());
   });
+}
 
-  // локальный кэш
+/* --------------- types & hook --------------- */
+
+export type UseFavoritesReturn = {
+  items: string[];
+  isFavorite: (slug: string) => boolean;
+  /** Возвращают новое состояние для данного slug */
+  add: (slug: string) => boolean;
+  remove: (slug: string) => boolean;
+  toggle: (slug: string) => boolean;
+
+  clear: () => void;
+  isLoading: boolean;
+  error: string | null;
+};
+
+export function useFavorites(userId?: string): UseFavoritesReturn {
+  const [items, setItems] = useState<string[]>(cache);
+  const [isLoading, setIsLoading] = useState<boolean>(!!(HAS_SUPABASE && userId));
+  const [error, setError] = useState<string | null>(null);
+
+  // подписка на глобальные обновления
   useEffect(() => {
-    try {
-      localStorage.setItem(LS, JSON.stringify(ids));
-    } catch {
-      /* noop */
+    const onUpdate = (e: Event) => {
+      const detail = (e as CustomEvent<string[]>).detail;
+      if (Array.isArray(detail)) setItems(detail);
+    };
+    bus.addEventListener("fav:update", onUpdate);
+    return () => bus.removeEventListener("fav:update", onUpdate);
+  }, []);
+
+  // первичная загрузка из Supabase (опционально)
+  useEffect(() => {
+    if (!HAS_SUPABASE || !userId) {
+      setItems(cache);
+      setIsLoading(false);
+      return;
     }
-  }, [ids]);
-
-  // однократно при маунте: ensure profile + загрузка и merge избранного
-  useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const { data: auth } = await supabase.auth.getUser();
-        const user = auth.user;
-        if (!user || cancelled) return;
-
-        // гарантируем профиль без 409
-        await supabase
-          .from("profiles")
-          .upsert({ id: user.id }, { onConflict: "id", ignoreDuplicates: true });
-
-        const { data, error } = await supabase
+        setIsLoading(true);
+        const { data, error } = await (supabase as any)
           .from("favorites")
           .select("offer_id")
-          .eq("user_id", user.id);
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
 
-        if (error || cancelled) return;
+        if (cancelled) return;
 
-        const remote = (data ?? []).map((r: { offer_id: string }) => r.offer_id);
-        const merged = Array.from(new Set([...ids, ...remote]));
-        setIds(merged);
-
-        // докидываем недостающие на сервер
-        const toPush = merged
-          .filter((id) => !remote.includes(id))
-          .map((offer_id) => ({ user_id: user.id, offer_id }));
-
-        if (toPush.length) {
-          await supabase.from("favorites").insert(toPush);
+        if (error) {
+          console.warn("[favorites] select error:", error);
+          setError(error.message ?? "favorites select error");
+          setItems(cache);
+        } else {
+          const remote: string[] = (data ?? []).map((r: any) => normalizeKey(r.offer_id));
+          setCache(remote); // синхронизирует и setItems через шину
         }
-      } catch {
-        // оффлайн — живём на локалсторадже
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId]);
 
-  const has = useCallback((id: string) => ids.includes(id), [ids]);
+  const isFavorite = useCallback((slug: string) => cache.includes(normalizeKey(slug)), []);
 
-  const toggle = useCallback(
-    async (id: string) => {
-      const next = ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
-      setIds(next);
+  const add = useCallback(
+    (slug: string): boolean => {
+      const key = normalizeKey(slug);
+      if (!key) return false;
+      if (cache.includes(key)) return true;
 
-      try {
-        const { data: auth } = await supabase.auth.getUser();
-        const user = auth.user;
-        if (!user) return;
+      setCache([...cache, key]);
 
-        if (next.includes(id)) {
-          await supabase.from("favorites").insert({ user_id: user.id, offer_id: id });
-        } else {
-          await supabase.from("favorites").delete().match({ user_id: user.id, offer_id: id });
-        }
-      } catch {
-        // локально уже обновили; при следующем онлайне синкнется
+      if (HAS_SUPABASE && userId) {
+        (async () => {
+          const { error } = await (supabase as any)
+            .from("favorites")
+            .upsert([{ user_id: userId, offer_id: key }], { onConflict: "user_id,offer_id" });
+          if (error) {
+            console.warn("[favorites] upsert error:", error);
+            setError(error.message ?? "favorites upsert error");
+          }
+        })();
       }
+
+      return true;
     },
-    [ids]
+    [userId]
   );
 
-  const clear = useCallback(async () => {
-    setIds([]);
-    try {
-      const { data: auth } = await supabase.auth.getUser();
-      const user = auth.user;
-      if (user) {
-        await supabase.from("favorites").delete().eq("user_id", user.id);
-      }
-    } catch {
-      /* noop */
-    }
-  }, []);
+  const remove = useCallback(
+    (slug: string): boolean => {
+      const key = normalizeKey(slug);
+      if (!key) return false;
+      if (!cache.includes(key)) return false;
 
-  return { ids, has, toggle, clear };
+      setCache(cache.filter((x) => x !== key));
+
+      if (HAS_SUPABASE && userId) {
+        (async () => {
+          const { error } = await (supabase as any)
+            .from("favorites")
+            .delete()
+            .eq("user_id", userId)
+            .eq("offer_id", key);
+          if (error) {
+            console.warn("[favorites] delete error:", error);
+            setError(error.message ?? "favorites delete error");
+          }
+        })();
+      }
+
+      return false;
+    },
+    [userId]
+  );
+
+  const toggle = useCallback(
+    (slug: string): boolean => {
+      const key = normalizeKey(slug);
+      if (!key) return false;
+      return cache.includes(key) ? remove(key) : add(key);
+    },
+    [add, remove]
+  );
+
+  const clear = useCallback(() => setCache([]), []);
+
+  return useMemo(
+    () => ({ items, isFavorite, add, remove, toggle, clear, isLoading, error }),
+    [items, isFavorite, add, remove, toggle, clear, isLoading, error]
+  );
 }

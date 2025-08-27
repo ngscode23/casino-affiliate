@@ -1,19 +1,18 @@
-import Section from "@/components/ui/section";
-import Card from "@/components/ui/card";
 import Seo from "@/components/Seo";
+import Section from "@/components/common/section";
 
-export default function TermsPage() {
+export default function Terms() {
   return (
     <>
-      <Seo title="Terms of Service — CasinoHub" description="Пользовательское соглашение CasinoHub." />
-      <section className="neon-hero">
-        <Section><h1 className="font-extrabold" style={{fontSize:"clamp(28px,4.5vw,46px)"}}>Terms of Service</h1></Section>
-      </section>
-      <Section>
-        <Card className="p-6 space-y-4 text-sm text-[var(--text-dim)]">
-          <p>[TODO] Условия пользования, ограничения, ответственность, изменения условий.</p>
-        </Card>
+     <Seo title="Terms & Conditions" description="Website terms of use." noindex />
+      <Section className="prose prose-invert max-w-none">
+        <h1>Terms &amp; Conditions</h1>
+        <p>By using this site you accept these Terms. All offers are subject to partners&apos; T&amp;Cs.</p>
+        <h2>Eligibility</h2>
+        <p>18+ only. Please gamble responsibly.</p>
       </Section>
     </>
   );
 }
+
+

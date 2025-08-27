@@ -1,19 +1,22 @@
-import Section from "@/components/ui/section";
-import Card from "@/components/ui/card";
 import Seo from "@/components/Seo";
+import Section from "@/components/common/section";
 
-export default function PrivacyPage() {
+export default function Privacy() {
   return (
     <>
-      <Seo title="Privacy Policy — CasinoHub" description="Политика конфиденциальности CasinoHub." />
-      <section className="neon-hero">
-        <Section><h1 className="font-extrabold" style={{fontSize:"clamp(28px,4.5vw,46px)"}}>Privacy Policy</h1></Section>
-      </section>
-      <Section>
-        <Card className="p-6 space-y-4 text-sm text-[var(--text-dim)]">
-          <p>[TODO] Описание сбора данных, правовые основания (GDPR/DSGVO), хранение, права субъекта, cookies, контакты.</p>
-        </Card>
+  <Seo title="Privacy Policy" description="How we collect and use data." noindex />
+      <Section className="prose prose-invert max-w-none">
+        <h1>Privacy Policy</h1>
+        <p>We process minimum personal data and follow GDPR principles. See also Cookies page.</p>
+        <h2>Data we collect</h2>
+        <ul>
+          <li>Anonymous analytics (only after consent)</li>
+          <li>Contact form submissions (voluntary)</li>
+        </ul>
+        <p>Contact: privacy@site.example</p>
       </Section>
     </>
   );
 }
+
+

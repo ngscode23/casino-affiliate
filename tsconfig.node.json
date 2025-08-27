@@ -5,5 +5,15 @@
     "moduleResolution": "bundler",
     "types": ["node"]
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts"],
+  
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "playwright-report",
+    "test-results",
+    "_archive"
+  ]
 }
+

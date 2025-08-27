@@ -9,3 +9,6 @@ export default function SiteJsonLd({ data, id = "jsonld-site" }: Props) {
   }, [id, data]);
   return null;
 }
+
+
+

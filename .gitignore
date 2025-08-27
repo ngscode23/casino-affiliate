@@ -57,3 +57,31 @@ node_modules/
 backup_before_cleanup_*/
 dist/
 node_modules/
+
+# local audit reports
+/audit-*.txt
+
+# local audit reports
+/audit-*.txt
+
+# local audit reports
+/audit-*.txt
+
+# local audit reports
+/audit-*.txt
+
+# local audit reports
+/audit-*.txt
+test-results/
+playwright-report/
+playwright/.cache/
+*.zip
+# junk
+node_modules
+dist
+build
+.vite
+.cache
+.next
+coverage
+_archive

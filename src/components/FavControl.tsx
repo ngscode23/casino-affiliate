@@ -1,29 +1,55 @@
-// src/components/FavControl.tsx
+import React from "react";
 import { useFavorites } from "@/lib/useFavorites";
-import Button from "@/components/ui/button";
-import { Heart, HeartOff } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
-export function FavControl({ id }: { id: string }) {
-  const { has, toggle } = useFavorites();
-  const active = has(id);
+export type FavControlProps = {
+  id: string;
+  className?: string;
+  onToggle?: (active: boolean) => void;
+  titleOn?: string;
+  titleOff?: string;
+};
 
-  const onClick = async () => {
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) {
-      alert("Чтобы синхронизировать избранное между устройствами — войдите через e-mail");
-    }
-    await toggle(id);
+function normalizeKey(slug: any): string {
+  try { return String(slug ?? "").trim(); } catch { return ""; }
+}
+
+export function FavControl({ id, className, onToggle, titleOn = "Убрать из избранного", titleOff = "В избранное" }: FavControlProps) {
+  const { items, toggle } = useFavorites();
+  const key = String(id ?? "").trim();
+  const active = items.includes(key);
+
+
+  const handleClick = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.stopPropagation();
+    const next = toggle(key);
+    onToggle?.(next);
   };
 
+  const base = className ?? "inline-flex h-10 w-10 items-center justify-center rounded";
+  const colorClass = active ? "text-amber-400" : "text-white/70 hover:text-white";
+
   return (
-    <Button
-      variant={active ? "secondary" : "ghost"}
-      onClick={onClick}                     
+    <button
+      type="button"
       aria-pressed={active}
-      title={active ? "Remove from favorites" : "Add to favorites"}
+      title={active ? titleOn : titleOff}
+      onClick={handleClick}
+      className={`${base} ${colorClass}`}
+      data-testid={`fav-btn:${key}`}     
+      aria-label={active ? "Remove from favorites" : "Add to favorites"}
+      style={{ WebkitTapHighlightColor: "transparent" }}
     >
-      {active ? <HeartOff className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-    </Button>
+      <span aria-hidden style={{ lineHeight: 1, fontSize: "1.15rem" }}>
+        {active ? "★" : "☆"}
+      </span>
+    </button>
   );
 }
+
+
+
+
+
+
+
+

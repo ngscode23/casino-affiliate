@@ -17,6 +17,22 @@ export type Offer = {
   position?: number;
 };
 
+export type License = "MGA" | "UKGC" | "Curaçao" | "Other";
+
+export type NormalizedOffer = {
+  slug: string;
+  name: string;
+  license: License;
+  rating: number;
+  payout: string;
+  payoutHours?: number;
+  methods: string[];
+  link?: string;        // обратите внимание: undefined, а не null
+  enabled?: boolean;
+  position?: number;
+};
+
+
 
 
 
