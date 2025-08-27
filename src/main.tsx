@@ -5,6 +5,8 @@ import App from "./App";
 import AnalyticsGateGA from "@/components/AnalyticsGateGA";
 import { PageViewTracker } from "@/components/PageViewTracker";
 
+
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>

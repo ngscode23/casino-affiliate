@@ -1,14 +1,14 @@
 // src/App.tsx
 import "./index.css";
-
 import { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
-
 import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/layout/CompareBar";
 import Skeleton from "@/components/common/skeleton";
 import OrgJsonLd from "@/components/OrgJsonLd"; // JSON-LD Organization — один раз на всё приложение
 import ErrorBoundary from "@/components/common/ErrorBoundary";
+import { Routes, Route } from "react-router-dom";
+import GoRedirect from "@/pages/GoRedirect";
+
 
 // ...
 
@@ -80,7 +80,7 @@ export default function App() {
               <Route path="/compare" element={<ComparePage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/contact" element={<ContactPage />} />
-
+              <Route path="/go/:slug" element={<GoRedirect />} />
               {/* Legal */}
               <Route path="/legal/privacy" element={<PrivacyPage />} />
               <Route path="/legal/terms" element={<TermsPage />} />

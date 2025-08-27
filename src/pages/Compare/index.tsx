@@ -11,7 +11,6 @@ import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import Seo from "@/components/Seo";
 
 import type { NormalizedOffer } from "@/lib/offers";
-
 import { useOffers } from "@/features/offers/api/useOffers";
 import { useFavorites } from "@/lib/useFavorites";
 
@@ -19,7 +18,15 @@ function normalizeStr(s: string) {
   return s.toLowerCase().normalize("NFKD");
 }
 
-export default function Compare() {
+function safeOrigin(): string | undefined {
+  try {
+    return typeof location !== "undefined" ? location.origin : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export default function ComparePage() {
   const { offers, isLoading, error } = useOffers();
 
   const [params, setParams] = useSearchParams();
@@ -31,6 +38,7 @@ export default function Compare() {
   const [method, setMethod] = useState<MethodFilter>("all");
   const [search, setSearch] = useState<string>(initialQ);
 
+  // отражаем поиск в URL ?q=
   useEffect(() => {
     const next = new URLSearchParams(params);
     if (search) next.set("q", search);
@@ -39,7 +47,7 @@ export default function Compare() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  // получаем список slug'ов из избранного — используем его ниже, чтобы убирать офферы из выдачи
+  // избранное — убираем их из выдачи сравнения
   const { items: favItems } = useFavorites();
 
   const filtered: NormalizedOffer[] = useMemo(() => {
@@ -56,25 +64,31 @@ export default function Compare() {
       });
     }
 
-    // фильтруем из выдачи офферы, которые уже в избранном
+    // уходим от офферов, которые уже в избранном
     arr = arr.filter((o) => !!o.slug && !favItems.includes(o.slug));
 
-    // сортировка сохраняется для вызывающего CompareTable
     return arr;
   }, [offers, license, method, search, favItems]);
+
+  const origin = safeOrigin();
+  const errText =
+    typeof error === "string" ? error : (error as any)?.message ?? "";
 
   return (
     <section className="neon-container space-y-6">
       <Seo
-        title="Compare Casinos — Fast Payouts, Ratings"
-        description="Сравните казино по рейтингу, лицензии, методам выплат и скорости вывода."
+        title="Сравнение казино — выплаты, бонусы, лицензии"
+        description="Сравните казино по рейтингу, лицензиям, методам пополнения и скорости вывода."
+        canonical={origin ? `${origin}/compare` : undefined}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "ItemList",
           itemListElement: filtered.map((o, i) => ({
             "@type": "ListItem",
             position: i + 1,
-            url: `${location.origin}/offers/${encodeURIComponent(o.slug)}`,
+            url: origin
+              ? `${origin}/offers/${encodeURIComponent(o.slug)}`
+              : `/offers/${encodeURIComponent(o.slug)}`,
             name: o.name,
           })),
         }}
@@ -96,18 +110,20 @@ export default function Compare() {
       </div>
 
       {/* заглушки/ошибки */}
-      {error && (
-        <div className="neon-card p-3 text-red-400">Ошибка загрузки офферов: {error}</div>
+      {errText && (
+        <div className="neon-card p-3 text-red-400">
+          Ошибка загрузки офферов: {errText}
+        </div>
       )}
 
-      {/* Мобайл карточки */}
+      {/* мобайл карточки */}
       <div className="grid gap-3 sm:gap-4 md:hidden">
         {(isLoading ? [] : filtered).map((o) => (
           <MobileOfferCard key={o.slug} offer={o} />
         ))}
       </div>
 
-      {/* Десктоп таблица */}
+      {/* десктоп таблица */}
       <div className="neon-card p-0 hidden md:block">
         <CompareTable
           offers={filtered}
