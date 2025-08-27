@@ -18,7 +18,11 @@ export function FavControl({ id, className, onToggle, titleOn = "Убрать и
   const key = String(id ?? "").trim();
   const active = items.includes(key);
 
-
+ if (!items.length) {
+   return <section className="container mx-auto max-w-5xl py-10 text-sm opacity-80">
+    Избранного пока нет. Добавь сайты на странице сравнения.
+  </section>;
+ }
   const handleClick = (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
     const next = toggle(key);
@@ -45,6 +49,12 @@ export function FavControl({ id, className, onToggle, titleOn = "Убрать и
     </button>
   );
 }
+
+
+
+
+
+
 
 
 

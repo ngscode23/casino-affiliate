@@ -85,3 +85,7 @@ build
 .next
 coverage
 _archive
+
+.netlify/
+playwright-report/
+coverage/
