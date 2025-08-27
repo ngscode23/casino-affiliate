@@ -7,9 +7,9 @@ import Card from "@/components/common/card";
 import Rating from "@/components/common/rating";
 import Seo from "@/components/Seo";
 import AffiliateLink from "@/components/AffiliateLink";
+import { FavControl } from "@/components/FavControl";
 
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
-import { FavControl } from "@/components/FavControl";
 import { track } from "@/lib/analytics";
 
 export default function OfferPage() {
@@ -18,7 +18,7 @@ export default function OfferPage() {
   const offer: NormalizedOffer | null = useMemo(() => {
     if (!slug) return null;
     const s = decodeURIComponent(slug);
-    return offersNormalized.find(o => o.slug === s) ?? null;
+    return offersNormalized.find((o) => o.slug === s) ?? null;
   }, [slug]);
 
   if (!offer) {
@@ -35,35 +35,58 @@ export default function OfferPage() {
     );
   }
 
+  // FAQ для JSON-LD и, при желании, для визуального блока
+  const faq = [
+    { q: "Как быстро выводят средства?", a: "Обычно в течение 1–24 часов, зависит от метода." },
+    { q: "Есть ли вейджер на бонусы?", a: "Да, условия зависят от акции — проверяйте правила." },
+  ];
+
+  const canonical = `${location.origin}/offers/${encodeURIComponent(offer.slug)}`;
+
+  // Собираем массив JSON-LD (каждый объект — отдельный <script type="application/ld+json">)
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: offer.name,
+      brand: { "@type": "Organization", name: offer.name },
+      aggregateRating: offer.rating
+        ? { "@type": "AggregateRating", ratingValue: offer.rating, reviewCount: 1 }
+        : undefined,
+      offers: {
+        "@type": "Offer",
+        url: canonical,
+        priceCurrency: "USD",
+        price: "0",
+        availability: "https://schema.org/InStock",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Offers", item: `${location.origin}/offers` },
+        { "@type": "ListItem", position: 2, name: offer.name, item: canonical },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faq.map(({ q, a }) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
+    },
+  ];
+
   return (
     <>
       <Seo
         title={`${offer.name} — рейтинг, лицензия, выплаты`}
-        description={`Детали по ${offer.name}: лицензия ${offer.license ?? "—"}, скорость выплат ${offer.payout}.`}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "Product",
-          name: offer.name,
-          brand: { "@type": "Organization", name: offer.name },
-          aggregateRating: offer.rating
-            ? { "@type": "AggregateRating", ratingValue: offer.rating, reviewCount: 1 }
-            : undefined,
-          offers: {
-            "@type": "Offer",
-            url: `${location.origin}/offers/${encodeURIComponent(offer.slug)}`,
-            priceCurrency: "USD",
-            price: "0",
-            availability: "https://schema.org/InStock"
-          },
-          breadcrumb: {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Offers", item: `${location.origin}/offers` },
-              { "@type": "ListItem", position: 2, name: offer.name, item: `${location.origin}/offers/${encodeURIComponent(offer.slug)}` }
-            ]
-          }
-        }}
+        description={`Детали по ${offer.name}: лицензия ${offer.license ?? "—"}, скорость выплат ${offer.payout}${offer.payoutHours ? ` (~${offer.payoutHours}ч)` : ""}.`}
+        canonical={canonical}
+        jsonLd={jsonLd}
       />
 
       <section className="neon-hero">
@@ -72,13 +95,13 @@ export default function OfferPage() {
             style={{
               fontWeight: 800,
               letterSpacing: "-0.02em",
-              fontSize: "clamp(28px,4.5vw,46px)"
+              fontSize: "clamp(28px,4.5vw,46px)",
             }}
           >
             {offer.name}
           </h1>
+
           <p className="neon-subline mt-2">
-            {/* TODO: i18n */}
             License: {offer.license ?? "—"} • Payout: {offer.payout}
             {offer.payoutHours ? ` (~${offer.payoutHours}h)` : ""}
           </p>
@@ -118,40 +141,51 @@ export default function OfferPage() {
             </div>
 
             {/* Правая колонка — действия */}
-          {/* Правая колонка — действия */}
-<div className="space-y-3">
-  {/* CTA */}
-  <AffiliateLink
-    offerSlug={offer.slug}
-    position={1}
-    href={offer.link ?? "#"}
-    className="btn w-full inline-flex items-center justify-center"
-    aria-label={`Open ${offer.name}`}
-  >
-    Play now
-  </AffiliateLink>
+            <div className="space-y-3">
+              {/* CTA */}
+              <AffiliateLink
+                offerSlug={offer.slug}
+                position={1}
+                href={offer.link ?? "#"}
+                className="btn w-full inline-flex items-center justify-center"
+                aria-label={`Open ${offer.name}`}
+              >
+                Play now
+              </AffiliateLink>
 
-  <p className="mt-2 text-xs text-[var(--text-dim)]">
-    Sponsored link. 18+ only. Please read{" "}
-    <Link className="underline" to="/legal/affiliate-disclosure">
-      our disclosure
-    </Link>{" "}
-    and operator’s T&amp;Cs.
-  </p>
+              <p className="mt-2 text-xs text-[var(--text-dim)]">
+                Sponsored link. 18+ only. Please read{" "}
+                <Link className="underline" to="/legal/affiliate-disclosure">
+                  our disclosure
+                </Link>{" "}
+                and operator’s T&amp;Cs.
+              </p>
 
-  {/* Кнопка избранного */}
-  <FavControl
-    id={offer.slug}
-    className="btn w-full"
-    onToggle={(active: boolean) => {
-      track({ name: "favorite_toggle", params: { offer_slug: offer.slug, active } });
-    }}
-  />
-</div>
+              {/* Кнопка избранного */}
+              <FavControl
+                id={offer.slug}
+                className="btn w-full"
+                onToggle={(active: boolean) => {
+                  track({ name: "favorite_toggle", params: { offer_slug: offer.slug, active } });
+                }}
+              />
+            </div>
           </div>
         </Card>
+
+        {/* (опционально) визуальный FAQ под карточкой */}
+        {/* <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-3">FAQ</h2>
+          <div className="space-y-3">
+            {faq.map(({ q, a }, i) => (
+              <div key={i}>
+                <div className="font-medium">{q}</div>
+                <div className="text-[var(--text-dim)]">{a}</div>
+              </div>
+            ))}
+          </div>
+        </Card> */}
       </Section>
     </>
   );
 }
-

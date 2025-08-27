@@ -9,10 +9,10 @@ import CompareFilters, {
 import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import Seo from "@/components/Seo";
-
 import type { NormalizedOffer } from "@/lib/offers";
 import { useOffers } from "@/features/offers/api/useOffers";
 import { useFavorites } from "@/lib/useFavorites";
+import Faq, { type FaqItem } from "@/components/faq/FAQ";
 
 function normalizeStr(s: string) {
   return s.toLowerCase().normalize("NFKD");
@@ -74,9 +74,27 @@ export default function ComparePage() {
   const errText =
     typeof error === "string" ? error : (error as any)?.message ?? "";
 
+
+  const faqCompare: FaqItem[] = [
+  { q: "Как пользоваться сравнением?", a: "Выберите фильтры по лицензии и методам, отсортируйте таблицу по нужному параметру." },
+  { q: "Что означает рейтинг?", a: "Комплексная оценка: выплаты, удобство, поддержка и условия бонусов." },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqCompare.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
+
   return (
     <section className="neon-container space-y-6">
-      <Seo
+    <Seo jsonLd={faqJsonLd} />
+
         title="Сравнение казино — выплаты, бонусы, лицензии"
         description="Сравните казино по рейтингу, лицензиям, методам пополнения и скорости вывода."
         canonical={origin ? `${origin}/compare` : undefined}
@@ -92,8 +110,7 @@ export default function ComparePage() {
             name: o.name,
           })),
         }}
-      />
-
+      <Faq items={faqCompare} className="neon-card p-4 mt-6" />
       <div className="neon-card p-4">
         <CompareFilters
           total={offers.length}
