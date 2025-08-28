@@ -59,10 +59,9 @@ export default function AnalyticsGateGA() {
 /* ---------------- helpers ---------------- */
 
 function bootstrapGtag() {
-  // dataLayer/gtag bootstrap (без авто-отправки page_view)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   (window as any).dataLayer = (window as any).dataLayer || [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   (window as any).gtag = function gtag() {
     // eslint-disable-next-line prefer-rest-params
     (window as any).dataLayer.push(arguments);

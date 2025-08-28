@@ -7,10 +7,9 @@ import * as Sentry from "@sentry/react";
 import posthog from "posthog-js";
 
 // src/main.tsx или src/index.tsx
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './index.css';;
-import { PostHogProvider } from 'posthog-js/react';
+
+import './index.css';
+
 
 
 
@@ -22,6 +21,9 @@ const SENTRY_RELEASE = import.meta.env.VITE_SENTRY_RELEASE as string | undefined
 const options = {
   api_host: import.meta.env.VITE_POSTHOG_HOST, // не PUBLIC, можно без PUBLIC
 };
+
+
+
 
 if (SENTRY_DSN) {
   Sentry.init({
@@ -44,11 +46,11 @@ const POSTHOG_HOST =
 
 if (POSTHOG_KEY) {
   posthog.init(POSTHOG_KEY, {
-    api_host: POSTHOG_HOST,
-    capture_pageview: false,
-    autocapture: true,
-    persistence: "localStorage",
-  });
+ api_host: options.api_host,
+   capture_pageview: false,
+   autocapture: true,
+   persistence: "localStorage",
+});
 } else if (import.meta.env.DEV) {
   console.warn("[PostHog] VITE_POSTHOG_KEY не задан — PostHog выключен");
 }
