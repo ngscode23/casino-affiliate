@@ -65,7 +65,6 @@ export default tseslint.config([
       // other options...
       
     },cp .env.example .env
-# заполнить ключи
   },
 ])
 ```

@@ -35,6 +35,7 @@ export function AffiliateLink({ offerSlug, position, href = "#", onClick, classN
     
   );
 }
+
 export default AffiliateLink;
 
 

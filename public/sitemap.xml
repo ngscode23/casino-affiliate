@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/compare</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app//offers</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/favorites</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/contact</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/privacy</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/terms</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/cookies</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/responsible</loc></url>
-  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/affiliate-disclosure</loc></url>
+  <url><loc>http://localhost:5173/</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/offers</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/compare</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/favorites</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/contact</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/legal/privacy</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/legal/terms</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/legal/cookies</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/legal/responsible</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>http://localhost:5173/legal/affiliate-disclosure</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>

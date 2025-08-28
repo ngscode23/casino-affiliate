@@ -1,10 +1,19 @@
-import { usePageView } from "@/lib/usePageView";
+// src/components/PageViewTracker.tsx
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { trackPageview } from "@/lib/analytics";
 
-// Отдельный компонент, чтобы вызываться внутри Router
 export function PageViewTracker() {
-  usePageView();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    try {
+      trackPageview(pathname);
+    } catch (e) {
+      if (import.meta.env.DEV) console.warn("[PageViewTracker] pageview failed:", e);
+    }
+  }, [pathname]);
+
   return null;
 }
-
-
-
+export default PageViewTracker;

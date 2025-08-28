@@ -25,24 +25,12 @@ export function FavControl({
 
   const handleClick = (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
-
     const toggled = toggle(key); // может вернуть boolean, а может ничего
     const nextActive = typeof toggled === "boolean" ? toggled : !active;
 
-    // колбэк вверх
     onToggle?.(nextActive);
-
-    // безопасный трекинг — поддержим оба возможных сигнатуры
-    try {
-      // объектная сигнатура
-      // @ts-ignore – если трекер принимает объект
-      track?.({ name: "favorite_toggle", params: { offer_slug: key, active: nextActive } });
-    } catch {}
-    try {
-      // строковая сигнатура
-      // @ts-ignore – если трекер принимает (name, payload)
-      track?.("favorite_toggle", { offer_slug: key, active: nextActive });
-    } catch {}
+    // Без try/catch: наш track внутри сам безопасен
+    track("favorite_toggle", { offer_slug: key, active: nextActive });
   };
 
   const base = className ?? "inline-flex h-10 w-10 items-center justify-center rounded";

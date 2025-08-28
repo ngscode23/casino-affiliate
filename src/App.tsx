@@ -30,9 +30,22 @@ import ComparePage from "@/pages/Compare";
 
 import Health from "./pages/Health";
 
-import posthog from 'posthog-js';
+// import posthog from 'posthog-js';
+// src/App.tsx
+import { usePageView } from "@/lib/usePageView";
 
-posthog.capture('test_event', { foo: 'bar' });
+
+// import TestButton from "./components/TestButton";
+
+// // ...
+
+
+// posthog.capture("test_click");
+
+// posthog.capture('test_event', { foo: 'bar' });
+
+
+
 
 // ── LAZY (всё остальное — чанками по требованию)
 const Header              = lazy(() => import("@/components/layout/Header"));
@@ -56,6 +69,11 @@ const AuthCallback        = lazy(() => import("@/pages/AuthCallback"));
 const GoRedirect          = lazy(() => import("@/pages/GoRedirect"));
 const NotFound            = lazy(() => import("@/pages/NotFound"));
 
+// Пример в App.tsx
+
+
+// и т.д.
+
 // ── Админка целиком в отдельном чанке
 const AdminApp            = lazy(() => import("@/pages/Admin"));
 
@@ -73,8 +91,11 @@ function PageFallback() {
 }
 
 export default function App() {
+   usePageView();
   // Небольшой prefetch самых частых страниц при простое
   useEffect(() => {
+
+    
     const id = (window as any).requestIdleCallback?.(() => {
       import("@/pages/Offers");
       import("@/pages/Offer");
@@ -86,6 +107,7 @@ export default function App() {
 
 setTimeout(() => { import("@/pages/Offer"); }, 3000);
   return (
+    
     <ErrorBoundary>
       <div className="min-h-screen bg-[var(--bg-0)] text-[var(--text)]">
         {/* Skip link для a11y */}
@@ -102,9 +124,10 @@ setTimeout(() => { import("@/pages/Offer"); }, 3000);
             <Header />
             <OrgJsonLd />
               <AnalyticsRouteListener />
+              
             <main id="main" className="min-h-[60vh]">
               <Suspense fallback={<PageFallback />}>
-                <Routes>
+             <Routes>
                   {/* Публичные */}
                   <Route path="/" element={<HomePage />} />
                   <Route path="/compare" element={<ComparePage />} />

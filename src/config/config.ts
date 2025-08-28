@@ -13,6 +13,7 @@ const RAW_SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL ?? "").trim();
 export const SUPABASE_URL = RAW_SUPABASE_URL.replace(/\/+$/, "");
 export const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? "").trim();
 
+
 export const AUTH_CALLBACK_URL = `${SITE_URL}/auth/callback`;
 
 export const HAS_SUPABASE =
@@ -23,4 +24,5 @@ if (!HAS_SUPABASE) {
 }
 
 
+// src/config/config.ts
 

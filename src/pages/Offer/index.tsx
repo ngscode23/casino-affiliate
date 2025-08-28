@@ -1,5 +1,4 @@
 // src/pages/Offer/index.tsx
-
 import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 
@@ -13,21 +12,95 @@ import { FavControl } from "@/components/FavControl";
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
 import { track } from "@/lib/analytics";
 import { pushRecent, getRecent } from "@/lib/recent";
-// добавь импорт (вверху файла с остальными)
-
-
-
-
 
 export default function OfferPage() {
   const { slug } = useParams<{ slug: string }>();
 
+  // Ищем оффер по slug
   const offer: NormalizedOffer | null = useMemo(() => {
     if (!slug) return null;
     const s = decodeURIComponent(slug);
     return offersNormalized.find((o) => o.slug === s) ?? null;
   }, [slug]);
 
+  // Пишем текущий оффер в «Недавно смотрели»
+  useEffect(() => {
+    if (offer?.slug) pushRecent(offer.slug);
+  }, [offer?.slug]);
+
+  // Недавно смотрели (без текущего), максимум 6
+  const recentOffers: NormalizedOffer[] = useMemo(() => {
+    const recents = getRecent()
+      .filter((s) => s !== offer?.slug)
+      .slice(0, 6);
+    const bySlug = new Map(offersNormalized.map((o) => [o.slug, o]));
+    return recents
+      .map((s) => bySlug.get(s))
+      .filter(Boolean) as NormalizedOffer[];
+  }, [offer?.slug]);
+
+  // Частые вопросы (для JSON-LD и, при желании, визуального блока)
+  const faq = useMemo(
+    () => [
+      {
+        q: "Как быстро выводят средства?",
+        a: "Обычно в течение 1–24 часов, зависит от метода.",
+      },
+      {
+        q: "Есть ли вейджер на бонусы?",
+        a: "Да, условия зависят от акции — проверяйте правила.",
+      },
+    ],
+    []
+  );
+
+  // Canonical
+  const canonical = useMemo(() => {
+    if (!offer) return `${location.origin}/offers`;
+    return `${location.origin}/offers/${encodeURIComponent(offer.slug)}`;
+  }, [offer]);
+
+  // JSON-LD: Product + BreadcrumbList + FAQPage
+  const jsonLd = useMemo(() => {
+    if (!offer) return [];
+    return [
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: offer.name,
+        brand: { "@type": "Organization", name: offer.name },
+        aggregateRating: offer.rating
+          ? { "@type": "AggregateRating", ratingValue: offer.rating, reviewCount: 1 }
+          : undefined,
+        offers: {
+          "@type": "Offer",
+          url: canonical,
+          priceCurrency: "USD",
+          price: "0",
+          availability: "https://schema.org/InStock",
+        },
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Offers", item: `${location.origin}/offers` },
+          { "@type": "ListItem", position: 2, name: offer.name, item: canonical },
+        ],
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faq.map(({ q, a }) => ({
+          "@type": "Question",
+          name: q,
+          acceptedAnswer: { "@type": "Answer", text: a },
+        })),
+      },
+    ];
+  }, [offer, canonical, faq]);
+
+  // Заглушка, если оффер не найден
   if (!offer) {
     return (
       <Section>
@@ -41,65 +114,6 @@ export default function OfferPage() {
       </Section>
     );
   }
-
-  // FAQ для JSON-LD
-  const faq = [
-    { q: "Как быстро выводят средства?", a: "Обычно в течение 1–24 часов, зависит от метода." },
-    { q: "Есть ли вейджер на бонусы?", a: "Да, условия зависят от акции — проверяйте правила." },
-  ];
-
-  const canonical = `${location.origin}/offers/${encodeURIComponent(offer.slug)}`;
-
-  // JSON-LD: Product + BreadcrumbList + FAQPage
-  const jsonLd = [
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      name: offer.name,
-      brand: { "@type": "Organization", name: offer.name },
-      aggregateRating: offer.rating
-        ? { "@type": "AggregateRating", ratingValue: offer.rating, reviewCount: 1 }
-        : undefined,
-      offers: {
-        "@type": "Offer",
-        url: canonical,
-        priceCurrency: "USD",
-        price: "0",
-        availability: "https://schema.org/InStock",
-      },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Offers", item: `${location.origin}/offers` },
-        { "@type": "ListItem", position: 2, name: offer.name, item: canonical },
-      ],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: faq.map(({ q, a }) => ({
-        "@type": "Question",
-        name: q,
-        acceptedAnswer: { "@type": "Answer", text: a },
-      })),
-    },
-  ];
-
-  // Пишем текущий оффер в историю (не плодит дубликаты)
-useEffect(() => {
-  if (offer?.slug) pushRecent(offer.slug);
-}, [offer?.slug]);
-
-  // Собираем «Недавно смотрели» (без текущего)
-  const recentOffers: NormalizedOffer[] = useMemo(() => {
-    const recents = getRecent().filter((s) => s !== offer.slug).slice(0, 6);
-    const bySlug = new Map(offersNormalized.map((o) => [o.slug, o]));
-    return recents
-      .map((s) => bySlug.get(s))
-      .filter(Boolean) as NormalizedOffer[];
-  }, [offer.slug]);
 
   return (
     <>
@@ -163,7 +177,6 @@ useEffect(() => {
 
             {/* Правая колонка — действия */}
             <div className="space-y-3">
-              {/* CTA */}
               <AffiliateLink
                 offerSlug={offer.slug}
                 position={1}
@@ -182,15 +195,18 @@ useEffect(() => {
                 and operator’s T&amp;Cs.
               </p>
 
-              {/* Кнопка избранного */}
               <FavControl
                 id={offer.slug}
                 className="btn w-full"
                 onToggle={(active: boolean) => {
-                  track({
-                    name: "favorite_toggle",
-                    params: { offer_slug: offer.slug, active },
-                  });
+                  try {
+                    // если твой track принимает (name, payload)
+                    track("favorite_toggle", { offer_slug: offer.slug, active });
+                  } catch {
+                    // если у тебя остался старый адаптер { name, params }
+                  
+                    track?.({ name: "favorite_toggle", params: { offer_slug: offer.slug, active } });
+                  }
                 }}
               />
             </div>

@@ -1,132 +1,183 @@
 // src/lib/analytics.ts
 import posthog from "posthog-js";
 
-// --- Google Analytics ID из env
-export const GA_ID: string = (import.meta.env.VITE_GA_ID as string) ?? "";
+/* ------------------ Window typings ------------------ */
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 
-// --- Consent helpers (через <html> data-атрибуты)
+/* ------------------ Flags & consts ------------------ */
+let inited = false;
+let _analyticsEnabled = false;
+let _gaReady = false;
+
+export const GA_ID: string = (import.meta.env.VITE_GA_ID as string) ?? "";
+const PH_KEY = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+const PH_HOST = (import.meta.env.VITE_POSTHOG_HOST as string | undefined) || "https://app.posthog.com";
+
 export type ConsentState = { analytics: boolean; marketing: boolean };
 
 const A_ATTR = "data-analytics-consent";
 const M_ATTR = "data-marketing-consent";
 const EVENT_NAME = "cookie-consent-changed";
 
-export const trackPageView = pageview; // ← ИМЕННО ЭТОГО НЕ ХВАТАЛО
+/* ------------------ Init / enable ------------------ */
+
+/** Одноразовая инициализация PostHog (без автотрекинга страниц) */
+export function initAnalytics(): void {
+  if (inited) return;
+  if (!PH_KEY) {
+    if (import.meta.env.DEV) console.warn("[analytics] VITE_POSTHOG_KEY not set");
+    inited = true; // считаем инициализированным, чтобы не дёргать каждый раз
+    return;
+  }
+
+  try {
+    posthog.init(PH_KEY, {
+      api_host: PH_HOST,
+      autocapture: true,
+      capture_pageview: false,
+      persistence: "localStorage"
+    });
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[analytics.init] posthog init failed:", e);
+  }
+  inited = true;
+}
+
+/** Включить аналитику после согласия пользователя (CookieBar) */
+export function enableAnalytics(): void {
+  if (_analyticsEnabled) return;
+  _analyticsEnabled = true;
+
+  try {
+    // Инициализируем PostHog лениво
+    if (!inited) initAnalytics();
+
+    // Обновим GA consent, если подключён gtag
+    if (typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("consent", "update", { analytics_storage: "granted" });
+    }
+
+    if (import.meta.env.DEV) console.info("[analytics] Analytics enabled");
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[enableAnalytics] error:", e);
+  }
+}
+
+export function isAnalyticsEnabled(): boolean {
+  return _analyticsEnabled;
+}
+
+/* ------------------ Consent helpers ------------------ */
 
 export function getConsent(): ConsentState {
   try {
     const a = document.documentElement.getAttribute(A_ATTR);
     const m = document.documentElement.getAttribute(M_ATTR);
-    return {
-      analytics: a === "granted",
-      marketing: m === "granted",
-    };
+    return { analytics: a === "granted", marketing: m === "granted" };
   } catch {
     return { analytics: false, marketing: false };
   }
 }
 
-export function setConsent(analytics: boolean, marketing: boolean) {
+export function setConsent(analytics: boolean, marketing: boolean): void {
   try {
     document.documentElement.setAttribute(A_ATTR, analytics ? "granted" : "denied");
     document.documentElement.setAttribute(M_ATTR, marketing ? "granted" : "denied");
     window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: { analytics, marketing } }));
-  } catch {}
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[analytics.setConsent] error:", e);
+  }
 }
 
-// --- GA ready flag
-let _gaReady = false;
-export function setGaReady(v: boolean) {
+/** Подписка на изменение consent из CookieBar */
+export function onConsentChanged(cb: (state: ConsentState) => void): () => void {
+  const handler = () => cb(getConsent());
+  window.addEventListener(EVENT_NAME, handler as EventListener);
+  return () => window.removeEventListener(EVENT_NAME, handler as EventListener);
+}
+
+/* ------------------ GA readiness ------------------ */
+
+export function setGaReady(v: boolean): void {
   _gaReady = v;
 }
-export function isGaReady() {
+export function isGaReady(): boolean {
   return _gaReady;
 }
-export function onConsentChanged(): void {
-  /* no-op пока */
-}
 
-// --- PostHog init
-let phInited = false;
-export function initPosthog() {
-  if (phInited) return;
+/* ------------------ Tracking ------------------ */
 
-  const key = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
-  if (!key) {
-    if (import.meta.env.DEV) {
-      console.warn("[analytics] VITE_POSTHOG_KEY не задан — PostHog отключён");
-    }
-    return;
-  }
-
-  const host =
-    (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ||
-    "https://app.posthog.com";
-
-  posthog.init(key, {
-    api_host: host,
-    autocapture: true,
-    capture_pageview: false, // SPA: шлём вручную
-    persistence: "localStorage",
-  });
-
-  phInited = true;
-}
-
-// --- Track event (объединяем GA + PostHog)
-export function track(name: string, params?: Record<string, any>) {
-  // GA
-  try {
-    if (_gaReady && typeof window !== "undefined" && typeof window.gtag === "function") {
-      window.gtag("event", name, params ?? {});
-    }
-  } catch {}
-
-  // PostHog
-  try {
-    if (!phInited) initPosthog();
-    posthog.capture(name, params ?? {});
-  } catch {}
-}
-
-// --- Pageview
-export function pageview(path?: string) {
-  // GA
-  try {
-    if (_gaReady && typeof window !== "undefined" && typeof window.gtag === "function" && GA_ID) {
-      window.gtag("config", GA_ID, {
-        page_path: path ?? location.pathname,
-      });
-    }
-  } catch {}
-
-  // PostHog
-  try {
-    if (!phInited) initPosthog();
-    posthog.capture("$pageview", { path: path ?? location.pathname });
-  } catch {}
-}
-
-// --- Enable / disable PostHog по согласию
-let started = false;
-export function enableAnalytics() {
-  if (started) return;
-  started = true;
-  initPosthog();
-}
-
-export function disableAnalytics() {
-  try {
-    posthog.opt_out_capturing();
-  } catch {}
-}
-
-// --- Legacy adapter: track?.({ name, params })
-export const legacyTrack = (payload?: { name?: string; params?: Record<string, unknown> }) => {
-  if (!payload?.name) return;
-  track(payload.name, payload.params);
+export type TrackPayload = {
+  name: string;
+  params?: Record<string, unknown>;
 };
 
-export const initAnalytics = initPosthog;
-export const trackPageview = pageview;
-// legacy aliases so other modules keep working
+// Перегрузки для удобства типов
+export function track(name: string, params?: Record<string, unknown>): void;
+export function track(payload: TrackPayload): void;
+export function track(nameOrPayload: string | TrackPayload, params?: Record<string, unknown>): void {
+  try {
+    const name = typeof nameOrPayload === "string" ? nameOrPayload : nameOrPayload?.name;
+    const payload = typeof nameOrPayload === "string" ? (params ?? {}) : (nameOrPayload?.params ?? {});
+    if (!name) return;
+
+    // Если пользователь не дал согласие/мы не включены — тихо выходим
+    if (!_analyticsEnabled) {
+      if (import.meta.env.DEV) console.debug("[track:skipped(disabled)]", name, payload);
+      return;
+    }
+
+    // GA
+    try {
+      if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        window.gtag("event", name, payload);
+      }
+    } catch (e) {
+      if (import.meta.env.DEV) console.warn("[analytics.gtag] error:", e);
+    }
+
+    // PostHog
+    try {
+      posthog?.capture?.(name, payload);
+    } catch (e) {
+      if (import.meta.env.DEV) console.warn("[analytics.posthog] error:", e);
+    }
+
+    if (import.meta.env.DEV) console.debug("[track]", name, payload);
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[analytics.track] error:", e);
+  }
+}
+
+export function trackPageview(path?: string): void {
+  if (!inited) initAnalytics();
+  if (!_analyticsEnabled) {
+    if (import.meta.env.DEV) console.debug("[pageview:skipped(disabled)]", path ?? location.pathname);
+    return;
+  }
+  try {
+    posthog.capture("$pageview", { path: path ?? location.pathname });
+    // Дублируем в GA для симметрии (если кто-то ещё любит отчёты в GA)
+    if (typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("event", "page_view", { page_path: path ?? location.pathname });
+    }
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[analytics.pageview] error:", e);
+  }
+}
+
+/* ------------------ Convenience ------------------ */
+
+/** Быстрое событие клика по афф. ссылке */
+export function trackAffiliateClick(offer_slug: string, position?: number): void {
+  track("click_affiliate_link", { offer_slug, position });
+}
+
+/** Добавление к сравнению */
+export function trackAddToCompare(offer_slug: string, position?: number): void {
+  track("add_to_compare", { offer_slug, position });
+}

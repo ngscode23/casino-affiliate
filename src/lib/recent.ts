@@ -11,7 +11,8 @@ function readRecent(): string[] {
     const arr = JSON.parse(raw);
     if (!Array.isArray(arr)) return [];
     return arr.filter((x) => typeof x === "string");
-  } catch {
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[recent] read failed:", e);
     return [];
   }
 }
@@ -20,8 +21,8 @@ function readRecent(): string[] {
 function writeRecent(list: string[]) {
   try {
     localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, RECENT_MAX)));
-  } catch {
-    // игнор — storage может быть недоступен (Safari Private и т.п.)
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[recent] persist failed:", e);
   }
 }
 
@@ -34,6 +35,7 @@ export function getRecent(): string[] {
 /** Кладём slug в начало, убираем дубликаты, режем по лимиту. */
 export function pushRecent(slug: string | null | undefined) {
   if (typeof window === "undefined") return;
+
   const key = String(slug ?? "").trim();
   if (!key) return;
 
@@ -47,5 +49,7 @@ export function clearRecent() {
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(RECENT_KEY);
-  } catch {}
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn("[recent] clear failed:", e);
+  }
 }

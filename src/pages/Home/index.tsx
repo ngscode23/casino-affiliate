@@ -120,9 +120,9 @@ export default function Home() {
             />
             <button className="neon-btn" type="submit">Compare now</button>
           </form>
-<button className="neon-btn mt-3" onClick={() => posthog.capture("debug_click", { page: "home" })}>
+{/* <button className="neon-btn mt-3" onClick={() => posthog.capture("debug_click", { page: "home" })}>
   Send PostHog event
-</button>
+</button> */}
           {/* Кнопки для отладки показываем только в dev */}
           {import.meta.env.DEV && (
             <>

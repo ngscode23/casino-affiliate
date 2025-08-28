@@ -16,7 +16,7 @@ type NavItem = {
 const nav: NavItem[] = [
   { to: "/offers", label: "Offers", preload: () => { import("@/pages/Offers"); } },
   { to: "/compare", label: "Compare" }, // Compare грузим eager — прелоад не нужен
-  { to: "/favorites", label: "Favorites", preload: () => { import("@/pages/Favorites"); } },
+
   { to: "/contact", label: "Contact" },
 ];
 
