@@ -46,11 +46,11 @@ const POSTHOG_HOST =
 
 if (POSTHOG_KEY) {
   posthog.init(POSTHOG_KEY, {
- api_host: options.api_host,
-   capture_pageview: false,
-   autocapture: true,
-   persistence: "localStorage",
-});
+    api_host: POSTHOG_HOST,
+    capture_pageview: false,
+    autocapture: true,
+    persistence: "localStorage",
+  });
 } else if (import.meta.env.DEV) {
   console.warn("[PostHog] VITE_POSTHOG_KEY не задан — PostHog выключен");
 }
