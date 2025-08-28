@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://your-domain.example/</loc>
-    <changefreq>weekly</changefreq>
-  </url>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/compare</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app//offers</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/favorites</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/contact</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/privacy</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/terms</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/cookies</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/responsible</loc></url>
+  <url><loc>https://lucky-macaron-c3c96c.netlify.app/legal/affiliate-disclosure</loc></url>
 </urlset>

@@ -1,10 +1,40 @@
 // src/pages/Home/index.tsx
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import posthog from "posthog-js";
 
 import Section from "@/components/common/section";
 import Seo from "@/components/Seo";
-import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/config/config";
+import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/lib/config";
+
+// Кнопка для проверки Sentry (если нужно тестить ошибки)
+function ErrorButton() {
+  return (
+    <button
+      onClick={() => {
+        throw new Error("This is your first error!");
+      }}
+      className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
+    >
+      Break the world
+    </button>
+  );
+}
+
+// Кнопка для проверки PostHog
+function TestButton() {
+  return (
+    <button
+      className="neon-btn mt-3"
+      onClick={() => posthog.capture("debug_click", { page: "home" })}
+    >
+      Send PostHog event
+    </button>
+  );
+}
+
+// ...
+
 
 export default function Home() {
   const navigate = useNavigate();
@@ -32,25 +62,23 @@ export default function Home() {
   );
 
   // JSON-LD: WebSite + SearchAction
-  const siteLd = useMemo(
-    () => {
-      const origin = SITE_URL || (typeof location !== "undefined" ? location.origin : "");
-      return {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        url: origin,
-        name: BRAND_NAME ?? "CasinoHub",
-        potentialAction: {
-          "@type": "SearchAction",
-          target: `${origin}/search?q={search_term_string}`,
-          "query-input": "required name=search_term_string",
-        },
-      };
-    },
-    []
-  );
+  const siteLd = useMemo(() => {
+    const origin = SITE_URL || (typeof location !== "undefined" ? location.origin : "");
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      url: origin,
+      name: BRAND_NAME ?? "CasinoHub",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${origin}/search?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    };
+  }, []);
 
   return (
+    
     <>
       <Seo
         title={`${BRAND_NAME ?? "CasinoHub"} — сравнение казино, выплаты и рейтинги`}
@@ -92,10 +120,30 @@ export default function Home() {
             />
             <button className="neon-btn" type="submit">Compare now</button>
           </form>
+<button className="neon-btn mt-3" onClick={() => posthog.capture("debug_click", { page: "home" })}>
+  Send PostHog event
+</button>
+          {/* Кнопки для отладки показываем только в dev */}
+          {import.meta.env.DEV && (
+            <>
+              <TestButton />
+              <ErrorButton />
+            </>
+          )}
         </Section>
+      </section>
+
+      <section className="neon-container mt-6">
+        <div className="neon-card p-4 flex items-center gap-3">
+          <img src="/logo192.png" alt="Brand" className="w-10 h-10 rounded" />
+          <div>
+            <div className="font-semibold">Проверенная витрина казино</div>
+            <div className="text-sm text-[var(--text-dim)]">
+              Обновления офферов, прозрачные рейтинги, быстрые выплаты.
+            </div>
+          </div>
+        </div>
       </section>
     </>
   );
 }
-
-

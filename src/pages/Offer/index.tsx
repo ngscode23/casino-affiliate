@@ -1,5 +1,6 @@
 // src/pages/Offer/index.tsx
-import { useMemo } from "react";
+
+import { useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 
 import Section from "@/components/common/section";
@@ -11,6 +12,12 @@ import { FavControl } from "@/components/FavControl";
 
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
 import { track } from "@/lib/analytics";
+import { pushRecent, getRecent } from "@/lib/recent";
+// добавь импорт (вверху файла с остальными)
+
+
+
+
 
 export default function OfferPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -35,7 +42,7 @@ export default function OfferPage() {
     );
   }
 
-  // FAQ для JSON-LD и, при желании, для визуального блока
+  // FAQ для JSON-LD
   const faq = [
     { q: "Как быстро выводят средства?", a: "Обычно в течение 1–24 часов, зависит от метода." },
     { q: "Есть ли вейджер на бонусы?", a: "Да, условия зависят от акции — проверяйте правила." },
@@ -43,7 +50,7 @@ export default function OfferPage() {
 
   const canonical = `${location.origin}/offers/${encodeURIComponent(offer.slug)}`;
 
-  // Собираем массив JSON-LD (каждый объект — отдельный <script type="application/ld+json">)
+  // JSON-LD: Product + BreadcrumbList + FAQPage
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -79,6 +86,20 @@ export default function OfferPage() {
       })),
     },
   ];
+
+  // Пишем текущий оффер в историю (не плодит дубликаты)
+useEffect(() => {
+  if (offer?.slug) pushRecent(offer.slug);
+}, [offer?.slug]);
+
+  // Собираем «Недавно смотрели» (без текущего)
+  const recentOffers: NormalizedOffer[] = useMemo(() => {
+    const recents = getRecent().filter((s) => s !== offer.slug).slice(0, 6);
+    const bySlug = new Map(offersNormalized.map((o) => [o.slug, o]));
+    return recents
+      .map((s) => bySlug.get(s))
+      .filter(Boolean) as NormalizedOffer[];
+  }, [offer.slug]);
 
   return (
     <>
@@ -166,25 +187,37 @@ export default function OfferPage() {
                 id={offer.slug}
                 className="btn w-full"
                 onToggle={(active: boolean) => {
-                  track({ name: "favorite_toggle", params: { offer_slug: offer.slug, active } });
+                  track({
+                    name: "favorite_toggle",
+                    params: { offer_slug: offer.slug, active },
+                  });
                 }}
               />
             </div>
           </div>
         </Card>
 
-        {/* (опционально) визуальный FAQ под карточкой */}
-        {/* <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-3">FAQ</h2>
-          <div className="space-y-3">
-            {faq.map(({ q, a }, i) => (
-              <div key={i}>
-                <div className="font-medium">{q}</div>
-                <div className="text-[var(--text-dim)]">{a}</div>
-              </div>
-            ))}
-          </div>
-        </Card> */}
+        {/* Недавно смотрели */}
+        {recentOffers.length > 0 && (
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-3">Недавно смотрели</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {recentOffers.map((o) => (
+                <Link
+                  key={o.slug}
+                  to={`/offers/${encodeURIComponent(o.slug)}`}
+                  className="neon-card p-4 hover:opacity-90"
+                >
+                  <div className="font-medium">{o.name}</div>
+                  <div className="text-sm text-[var(--text-dim)]">
+                    Лицензия: {o.license ?? "—"} • Выплаты: {o.payout}
+                    {o.payoutHours ? ` (~${o.payoutHours}ч)` : ""}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </Card>
+        )}
       </Section>
     </>
   );

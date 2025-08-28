@@ -78,6 +78,7 @@ export default function FavoritesPage() {
       await navigator.clipboard.writeText(url);
       alert("Ссылка скопирована в буфер обмена.");
     } catch {
+  
       prompt("Скопируйте ссылку вручную:", url);
     }
   }, [items]);

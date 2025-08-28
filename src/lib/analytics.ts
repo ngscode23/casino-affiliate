@@ -1,113 +1,132 @@
 // src/lib/analytics.ts
-// Единая точка входа для аналитики. Разделяет analytics/marketing по consent.
-// Не лезет в DOM без нужды, не падает, когда GA не загружен.
+import posthog from "posthog-js";
 
-type ConsentMap = { analytics: boolean; marketing: boolean };
+// --- Google Analytics ID из env
+export const GA_ID: string = (import.meta.env.VITE_GA_ID as string) ?? "";
 
-declare global {
-  interface Window {
-    dataLayer?: any[];
-    gtag?: (...args: any[]) => void;
-    __cookieConsent?: ConsentMap;
-  }
-}
+// --- Consent helpers (через <html> data-атрибуты)
+export type ConsentState = { analytics: boolean; marketing: boolean };
 
-export const GA_ID = import.meta.env.VITE_GA_ID as string | undefined;
+const A_ATTR = "data-analytics-consent";
+const M_ATTR = "data-marketing-consent";
+const EVENT_NAME = "cookie-consent-changed";
 
-export type AnalyticsEvent =
-  | { name: "view_page"; params: { path: string } }
-  | { name: "click_affiliate_link"; params: { offer_slug: string; position?: number } }
-  | { name: "toggle_filter"; params: { filter: string; value: string } }
-  | { name: "add_to_compare"; params: { offer_slug: string; position?: number } }
-  | { name: "favorite_toggle"; params: { offer_slug: string; active: boolean } }
-  | { name: "submit_lead"; params: { source: string } }
-  // ↓↓↓ добавь это
-  | { name: "favorites_import"; params: { count: number } }
-  | { name: "favorites_share"; params: { count: number } };
+export const trackPageView = pageview; // ← ИМЕННО ЭТОГО НЕ ХВАТАЛО
 
-
-
-type Channel = "analytics" | "marketing";
-
-
-const eventChannel: Record<AnalyticsEvent["name"], Channel> = {
-  view_page: "analytics",
-  toggle_filter: "analytics",
-  add_to_compare: "analytics",
-  favorite_toggle: "analytics",
-  submit_lead: "analytics",
-  click_affiliate_link: "marketing",
-  // новые события:
-  favorites_import: "analytics",
-  favorites_share:  "analytics",
-};
-
-const queue: AnalyticsEvent[] = [];
-let gaReady = false;
-
-export function setGaReady(ready: boolean) {
-  gaReady = ready;
-  if (gaReady) flushQueue();
-}
-
-export function getConsent(): ConsentMap {
-  // Источник — CookieBar. При необходимости замените на ваш стор.
-  const fallback: ConsentMap = { analytics: false, marketing: false };
+export function getConsent(): ConsentState {
   try {
-    return window.__cookieConsent ?? fallback;
+    const a = document.documentElement.getAttribute(A_ATTR);
+    const m = document.documentElement.getAttribute(M_ATTR);
+    return {
+      analytics: a === "granted",
+      marketing: m === "granted",
+    };
   } catch {
-    return fallback;
+    return { analytics: false, marketing: false };
   }
 }
 
-function allowedByConsent(evt: AnalyticsEvent): boolean {
-  const ch = eventChannel[evt.name];
-  const c = getConsent();
-  return ch === "marketing" ? !!c.marketing : !!c.analytics;
+export function setConsent(analytics: boolean, marketing: boolean) {
+  try {
+    document.documentElement.setAttribute(A_ATTR, analytics ? "granted" : "denied");
+    document.documentElement.setAttribute(M_ATTR, marketing ? "granted" : "denied");
+    window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: { analytics, marketing } }));
+  } catch {}
 }
 
-function sendToGa(evt: AnalyticsEvent) {
-  if (!GA_ID || !window.gtag) return;
-  // Отправляем custom event в GA4
-  window.gtag("event", evt.name, evt.params);
+// --- GA ready flag
+let _gaReady = false;
+export function setGaReady(v: boolean) {
+  _gaReady = v;
+}
+export function isGaReady() {
+  return _gaReady;
+}
+export function onConsentChanged(): void {
+  /* no-op пока */
 }
 
-function flushQueue() {
-  // Отправляем, только если теперь и GA готов, и consent подходит
-  let i = 0;
-  while (i < queue.length) {
-    const evt = queue[i];
-    if (allowedByConsent(evt) && gaReady) {
-      sendToGa(evt);
-      queue.splice(i, 1);
-    } else {
-      i++;
+// --- PostHog init
+let phInited = false;
+export function initPosthog() {
+  if (phInited) return;
+
+  const key = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+  if (!key) {
+    if (import.meta.env.DEV) {
+      console.warn("[analytics] VITE_POSTHOG_KEY не задан — PostHog отключён");
     }
-  }
-}
-
-/** Публичный API */
-export function track(evt: AnalyticsEvent) {
-  // Если нет consent сейчас — оставляем в очереди, вдруг юзер согласится позже.
-  if (!allowedByConsent(evt) || !gaReady) {
-    queue.push(evt);
     return;
   }
-  sendToGa(evt);
+
+  const host =
+    (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ||
+    "https://app.posthog.com";
+
+  posthog.init(key, {
+    api_host: host,
+    autocapture: true,
+    capture_pageview: false, // SPA: шлём вручную
+    persistence: "localStorage",
+  });
+
+  phInited = true;
 }
 
-/** Хелпер для pageview: отправляем и стандартный 'page_view', и наш 'view_page'. */
-export function trackPageView(path: string, title?: string) {
-  if (GA_ID && window.gtag && getConsent().analytics) {
-    window.gtag("event", "page_view", { page_title: title, page_location: location.href, page_path: path });
-  }
-  track({ name: "view_page", params: { path } });
+// --- Track event (объединяем GA + PostHog)
+export function track(name: string, params?: Record<string, any>) {
+  // GA
+  try {
+    if (_gaReady && typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("event", name, params ?? {});
+    }
+  } catch {}
+
+  // PostHog
+  try {
+    if (!phInited) initPosthog();
+    posthog.capture(name, params ?? {});
+  } catch {}
 }
 
-/** Позвать при изменении consent из CookieBar */
-export function onConsentChanged() {
-  flushQueue();
+// --- Pageview
+export function pageview(path?: string) {
+  // GA
+  try {
+    if (_gaReady && typeof window !== "undefined" && typeof window.gtag === "function" && GA_ID) {
+      window.gtag("config", GA_ID, {
+        page_path: path ?? location.pathname,
+      });
+    }
+  } catch {}
+
+  // PostHog
+  try {
+    if (!phInited) initPosthog();
+    posthog.capture("$pageview", { path: path ?? location.pathname });
+  } catch {}
 }
 
+// --- Enable / disable PostHog по согласию
+let started = false;
+export function enableAnalytics() {
+  if (started) return;
+  started = true;
+  initPosthog();
+}
 
+export function disableAnalytics() {
+  try {
+    posthog.opt_out_capturing();
+  } catch {}
+}
 
+// --- Legacy adapter: track?.({ name, params })
+export const legacyTrack = (payload?: { name?: string; params?: Record<string, unknown> }) => {
+  if (!payload?.name) return;
+  track(payload.name, payload.params);
+};
+
+export const initAnalytics = initPosthog;
+export const trackPageview = pageview;
+// legacy aliases so other modules keep working

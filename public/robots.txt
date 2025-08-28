@@ -3,5 +3,5 @@ Allow: /
 Sitemap: /sitemap.xml
 
 User-agent: *
-Allow: /
-Sitemap: https://example.com/sitemap.xml
+Disallow: /admin
+Sitemap: https://your-domain.com/sitemap.xml

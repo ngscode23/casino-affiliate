@@ -63,7 +63,9 @@ export default tseslint.config([
         tsconfigRootDir: import.meta.dirname,
       },
       // other options...
-    },
+      
+    },cp .env.example .env
+# заполнить ключи
   },
 ])
 ```

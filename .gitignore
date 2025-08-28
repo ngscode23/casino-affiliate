@@ -89,3 +89,7 @@ _archive
 .netlify/
 playwright-report/
 coverage/
+# env
+.env
+.env.local
+.env.production

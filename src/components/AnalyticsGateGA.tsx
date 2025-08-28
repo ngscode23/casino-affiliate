@@ -2,6 +2,8 @@
 import { useEffect } from "react";
 import { GA_ID, setGaReady, getConsent, onConsentChanged } from "@/lib/analytics";
 
+
+
 export function AnalyticsGateGA() {
   useEffect(() => {
     function initGa() {

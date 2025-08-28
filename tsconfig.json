@@ -22,7 +22,7 @@
     },
     "types": ["vite/client", "node", "@netlify/functions"]
   },
-  "include": ["src", "netlify/**/*.ts"],
+  "include": ["src", "netlify/**/*.ts", "vite.vonfig.ts"],
   "exclude": [
     "node_modules",
     "dist",

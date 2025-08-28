@@ -1,46 +1,88 @@
 // src/components/CookieBar.tsx
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import Section from "@/components/common/section";
 import Button from "@/components/common/button";
 import { getCookie, setCookie } from "@/lib/cookies";
+import { enableAnalytics } from "@/lib/analytics";
 
 const CK_ANALYTICS = "cc_analytics";
 const CK_MARKETING = "cc_marketing";
-const CK_VER = "cc_version"; // на случай будущих изменений политики
+const CK_VER = "cc_version";
+const POLICY_VER = "1";
+
+function applyAttributes(analytics: boolean, marketing: boolean) {
+  try {
+    document.documentElement.setAttribute(
+      "data-analytics-consent",
+      analytics ? "granted" : "denied"
+    );
+    document.documentElement.setAttribute(
+      "data-marketing-consent",
+      marketing ? "granted" : "denied"
+    );
+    window.dispatchEvent(
+      new CustomEvent("cookie-consent", { detail: { analytics, marketing } })
+    );
+  } catch {}
+}
+
+function persist(analytics: boolean, marketing: boolean) {
+  setCookie(CK_ANALYTICS, analytics ? "1" : "0", { maxAgeDays: 365 });
+  setCookie(CK_MARKETING, marketing ? "1" : "0", { maxAgeDays: 365 });
+  setCookie(CK_VER, POLICY_VER, { maxAgeDays: 365 });
+  applyAttributes(analytics, marketing);
+
+  // включаем аналитику только при согласии
+  if (analytics) {
+    try {
+      enableAnalytics();
+    } catch {}
+  }
+}
 
 export default function CookieBar({ className = "" }: { className?: string }) {
-  const [visible, setVisible] = React.useState(false);
-  const [expanded, setExpanded] = React.useState(false);
-  const [analytics, setAnalytics] = React.useState(true);
-  const [marketing, setMarketing] = React.useState(false);
+  const [visible, setVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [analytics, setAnalytics] = useState(true);
+  const [marketing, setMarketing] = useState(false);
 
-  React.useEffect(() => {
+  // при загрузке читаем сохранённое согласие
+  useEffect(() => {
+    const v = getCookie(CK_VER);
     const a = getCookie(CK_ANALYTICS);
     const m = getCookie(CK_MARKETING);
-    if (a !== null || m !== null) {
-      applyAttributes(a === "1", m === "1");
+
+    if (v === POLICY_VER && (a !== null || m !== null)) {
+      const aOk = a === "1";
+      const mOk = m === "1";
+      applyAttributes(aOk, mOk);
+      if (aOk) {
+        try {
+          enableAnalytics();
+        } catch {}
+      }
       setVisible(false);
     } else {
       setVisible(true);
     }
   }, []);
 
-  const applyAttributes = (a: boolean, m: boolean) => {
-    document.documentElement.setAttribute("data-analytics-consent", a ? "granted" : "denied");
-    document.documentElement.setAttribute("data-marketing-consent", m ? "granted" : "denied");
-    window.dispatchEvent(new CustomEvent("cookie-consent", { detail: { analytics: a, marketing: m } }));
-  };
+  if (!visible) return null;
 
-  const persist = (a: boolean, m: boolean) => {
-    // год жизни, secure/samesite=Lax
-    setCookie(CK_ANALYTICS, a ? "1" : "0", { maxAgeDays: 365 });
-    setCookie(CK_MARKETING, m ? "1" : "0", { maxAgeDays: 365 });
-    setCookie(CK_VER, "1", { maxAgeDays: 365 });
-    applyAttributes(a, m);
+  const onOnlyNecessary = () => {
+    persist(false, false);
     setVisible(false);
   };
 
-  if (!visible) return null;
+  const onAcceptAll = () => {
+    persist(true, true);
+    setVisible(false);
+  };
+
+  const onSaveSelection = () => {
+    persist(analytics, marketing);
+    setVisible(false);
+  };
 
   return (
     <div className={`fixed inset-x-0 bottom-0 z-[70] ${className}`}>
@@ -49,16 +91,21 @@ export default function CookieBar({ className = "" }: { className?: string }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="text-sm leading-relaxed">
               Мы используем cookies для работы сайта и аналитики.
-              Нажимая <b>Accept all</b>, вы соглашаетесь на аналитические и маркетинговые cookies. Или откройте{" "}
-              <button className="underline cursor-pointer" onClick={() => setExpanded((v) => !v)}>
+              Нажимая <b>Accept all</b>, вы соглашаетесь на аналитические и
+              маркетинговые cookies. Или откройте{" "}
+              <button
+                className="underline cursor-pointer"
+                onClick={() => setExpanded((v) => !v)}
+              >
                 Settings
-              </button>.
+              </button>
+              .
             </div>
             <div className="flex gap-2 shrink-0 mt-2 sm:mt-0">
-              <Button variant="soft" onClick={() => persist(false, false)} aria-label="Only necessary">
+              <Button variant="soft" onClick={onOnlyNecessary} aria-label="Only necessary">
                 Only necessary
               </Button>
-              <Button onClick={() => persist(true, true)} aria-label="Accept all">
+              <Button onClick={onAcceptAll} aria-label="Accept all">
                 Accept all
               </Button>
             </div>
@@ -71,7 +118,9 @@ export default function CookieBar({ className = "" }: { className?: string }) {
                   <input type="checkbox" checked disabled className="mt-1" />
                   <div>
                     <div className="font-medium">Necessary</div>
-                    <div className="text-xs text-[var(--text-dim)]">Нужны для базовой работы сайта. Всегда включены.</div>
+                    <div className="text-xs text-[var(--text-dim)]">
+                      Нужны для базовой работы сайта. Всегда включены.
+                    </div>
                   </div>
                 </label>
 
@@ -84,7 +133,9 @@ export default function CookieBar({ className = "" }: { className?: string }) {
                   />
                   <div>
                     <div className="font-medium">Analytics</div>
-                    <div className="text-xs text-[var(--text-dim)]">Помогают понять поведение пользователей.</div>
+                    <div className="text-xs text-[var(--text-dim)]">
+                      Помогают понять поведение пользователей.
+                    </div>
                   </div>
                 </label>
 
@@ -97,7 +148,9 @@ export default function CookieBar({ className = "" }: { className?: string }) {
                   />
                   <div>
                     <div className="font-medium">Marketing</div>
-                    <div className="text-xs text-[var(--text-dim)]">Ретаргетинг, персональные офферы.</div>
+                    <div className="text-xs text-[var(--text-dim)]">
+                      Ретаргетинг, персональные офферы.
+                    </div>
                   </div>
                 </label>
               </div>
@@ -106,7 +159,7 @@ export default function CookieBar({ className = "" }: { className?: string }) {
                 <Button variant="soft" onClick={() => setExpanded(false)} aria-label="Hide settings">
                   Cancel
                 </Button>
-                <Button onClick={() => persist(analytics, marketing)} aria-label="Save selection">
+                <Button onClick={onSaveSelection} aria-label="Save selection">
                   Save selection
                 </Button>
               </div>
@@ -117,6 +170,3 @@ export default function CookieBar({ className = "" }: { className?: string }) {
     </div>
   );
 }
-
-
-

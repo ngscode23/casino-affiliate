@@ -9,6 +9,9 @@ declare global {
 }
 
 const storageKey = "sb-casino-affiliate-auth"; // свой ключ вместо дефолтного
+const url  = import.meta.env.VITE_SUPABASE_URL!;
+const key  = import.meta.env.VITE_SUPABASE_ANON_KEY!;
+
 
 // В dev из-за HMR модуль может переоцениваться — кешируем на window.
 const client =
@@ -28,6 +31,6 @@ if (typeof window !== "undefined" && client) {
   window.__supabase = client;
 }
 
-export const supabase = client!;
+export const supabase = createClient(url, key);
 
 
