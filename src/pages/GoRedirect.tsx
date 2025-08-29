@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import { supabase } from "@/lib/supabase";
-import { offersNormalized } from "@/lib/offers";
+import { getOfferBySlug } from "@/features/offers/api/getOffers";
 
 export default function GoRedirect() {
   const { slug } = useParams<{ slug: string }>();
@@ -15,7 +15,7 @@ export default function GoRedirect() {
         if (!slug) throw new Error("No slug");
 
         // 1) найдём URL оффера (из твоего справочника; при желании — из API)
-        const offer = offersNormalized.find(o => o.slug === slug);
+        const offer = await getOfferBySlug(slug);
         const target = offer?.link;
         if (!target) throw new Error("Offer link not found");
 

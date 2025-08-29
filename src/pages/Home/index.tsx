@@ -1,7 +1,7 @@
 // src/pages/Home/index.tsx
 import { useMemo } from "react";
 import Seo from "@/components/Seo";
-import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/lib/config";
+import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/config";
 import { AffiliateHome } from "@/pages/AffiliateHome";
 
 export default function Home() {
@@ -27,7 +27,8 @@ export default function Home() {
       name: BRAND_NAME ?? "CasinoHub",
       potentialAction: {
         "@type": "SearchAction",
-        target: `${origin}/search?q={search_term_string}`,
+        // Use existing offers listing search param as on-site search target
+        target: `${origin}/offers?q={search_term_string}`,
         "query-input": "required name=search_term_string",
       },
     };
@@ -39,10 +40,10 @@ export default function Home() {
         title={`${BRAND_NAME ?? "CasinoHub"} — сравнение казино, выплаты и рейтинги`}
         description="Сравнивайте казино по лицензии, скорости выплат и рейтингу. Ответственная игра 18+."
         jsonLd={[orgLd, siteLd]}
+        ogImage="/og.svg"
         canonical={SITE_URL}
       />
       <AffiliateHome />
     </>
   );
 }
-

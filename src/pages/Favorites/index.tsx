@@ -7,7 +7,9 @@ import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
 import { useFavorites } from "@/lib/useFavorites";
+import { toast } from "@/components/common/toast";
 import { useSearchParams } from "react-router-dom";
+import { SITE_URL } from "@/config";
 
 export default function FavoritesPage() {
   // избранное
@@ -54,8 +56,32 @@ export default function FavoritesPage() {
     });
   }, [items]);
 
+  // SEO
+  const origin = (SITE_URL || "").replace(/\/$/, "");
+  const jsonLd = useMemo(() => {
+    const webPage = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Избранное",
+      url: origin ? `${origin}/favorites` : undefined,
+    };
+    const itemList = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      itemListElement: favOffers.map((o, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: origin ? `${origin}/offers/${encodeURIComponent(o.slug)}` : undefined,
+        name: o.name,
+      })),
+    };
+    return [webPage, itemList];
+  }, [favOffers, origin]);
+
   // очистка избранного
   const clearAll = useCallback(async () => {
+    if (!items?.length) return;
+    if (!confirm("Очистить весь список избранного?")) return;
     for (const slug of items ?? []) {
       await remove(slug);
     }
@@ -73,7 +99,8 @@ export default function FavoritesPage() {
 
   // поделиться списком
   const shareList = useCallback(async () => {
-    const url = `${location.origin}/favorites?list=${items.join(",")}`;
+    const origin = (SITE_URL || location.origin || "").replace(/\/$/, "");
+    const url = `${origin}/favorites?list=${items.join(",")}`;
     try {
       await navigator.clipboard.writeText(url);
       alert("Ссылка скопирована в буфер обмена.");
@@ -168,6 +195,7 @@ export default function FavoritesPage() {
           </>
         )}
       </Section>
+      <Seo title="????????? - ???? ??????????? ??????" description="??????? ?????? ? ??????????? ??????." canonical={origin ? `${origin}/favorites` : undefined} jsonLd={jsonLd} ogImage="/og.svg" />
     </>
   );
 }

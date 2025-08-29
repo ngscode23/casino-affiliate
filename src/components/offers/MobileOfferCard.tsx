@@ -48,7 +48,7 @@ export default function MobileOfferCard({ offer, className = "", index }: Props)
 
   return (
     <div
-      className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow ${className}`}
+      className={`rounded-2xl border border-white/10 bg-[var(--bg-1)] p-4 shadow-[0_6px_24px_rgba(0,0,0,.35)] hover:shadow-[0_12px_36px_rgba(0,0,0,.45)] transition-shadow transition-transform transform-gpu hover:translate-y-[-1px] hover:scale-[1.01] active:scale-[0.995] ${className}`}
     >
       {/* шапка: название / лицензия слева, рейтинг + избранное справа */}
 

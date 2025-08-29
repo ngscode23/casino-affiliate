@@ -23,6 +23,7 @@ import Skeleton from "@/components/common/skeleton";
 import OrgJsonLd from "@/components/OrgJsonLd";
 import { CompareProvider } from "@/ctx/CompareContext";
 import CompareBar from "@/components/layout/CompareBar";
+import { ToastContainer } from "@/components/common/toast";
 
 // ── EAGER (критичные, часто посещаемые, важны для SEO)
 import HomePage from "@/pages/Home";
@@ -174,6 +175,7 @@ setTimeout(() => { import("@/pages/Offer"); }, 3000);
             <CompareBar />
             <Footer />
             <CookieBar />
+            <ToastContainer />
           </Suspense>
         </CompareProvider>
       </div>

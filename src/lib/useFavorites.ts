@@ -1,7 +1,7 @@
 // src/lib/useFavorites.ts
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { HAS_SUPABASE } from "@/config/config";
+import { HAS_SUPABASE } from "@/config";
 
 /** Ключ в localStorage */
 const LS_KEY = "fav:v1";

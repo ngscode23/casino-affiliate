@@ -30,6 +30,10 @@
 
     --shadow-soft: 0 10px 30px rgba(0,0,0,.35);
     --shadow-ring: 0 0 0 1px rgba(255,255,255,.06) inset;
+    /* Motion tokens */
+    --dur-fast: .15s;
+    --dur-normal: .2s;
+    --ease-standard: cubic-bezier(.2, 0, 0, 1);
   }
 
   html, body, #root {
@@ -59,6 +63,10 @@
     border: 1px solid rgba(255,255,255,.06);
     border-radius: 1rem;
     box-shadow: var(--shadow-soft);
+    transition:
+      border-color var(--dur-normal) var(--ease-standard),
+      box-shadow var(--dur-normal) var(--ease-standard),
+      transform var(--dur-fast) var(--ease-standard);
   }
 
   /* Альтернативная карточка в стиле «металл/стекло» */
@@ -133,11 +141,16 @@
     font-weight: 700;
     letter-spacing: .2px;
     cursor: pointer;
-    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    transition:
+      transform var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-normal) var(--ease-standard),
+      filter var(--dur-fast) var(--ease-standard),
+      background var(--dur-fast) var(--ease-standard),
+      border-color var(--dur-fast) var(--ease-standard);
     box-shadow: 0 10px 20px rgba(212,175,55,.20);
   }
-  .btn:hover   { transform: translateY(-1px); filter: brightness(1.05); }
-  .btn:active  { transform: translateY(0);    filter: brightness(.98);  }
+  .btn:hover   { transform: translateY(-1px) scale(1.01); filter: brightness(1.05); }
+  .btn:active  { transform: translateY(0) scale(.995);    filter: brightness(.98);  }
 
   .btn.secondary {
     background:
@@ -153,9 +166,12 @@
     border-radius: .75rem;
     padding: .75rem 1rem;
     box-shadow: 0 10px 30px rgba(15,176,255,.25);
-    transition: transform .15s ease, background .15s ease, box-shadow .2s ease;
+    transition:
+      transform var(--dur-fast) var(--ease-standard),
+      background var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-normal) var(--ease-standard);
   }
-  .neon-btn:hover  { background: #008fe5; transform: translateY(-1px); }
+  .neon-btn:hover  { background: #008fe5; transform: translateY(-1px) scale(1.01); }
   .neon-btn:active { transform: translateY(0); }
 
   /* Таблица */

@@ -18,7 +18,7 @@
     "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --report-unused-disable-directives --fix",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
-    "sitemap": "tsx scripts/gen-sitemap.ts"
+    "sitemap": "ts-node scripts/generate-sitemap.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.6",

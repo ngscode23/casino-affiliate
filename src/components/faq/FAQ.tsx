@@ -1,14 +1,16 @@
 // src/components/faq/Faq.tsx
-import { useId, useMemo } from "react";
+import { useEffect, useId, useMemo } from "react";
 
 export type FaqItem = { q: string; a: string };
 type Props = {
   items: FaqItem[];
   className?: string;
   title?: string;
+  /** When true, injects FAQPage JSON-LD for these items into <head> */
+  jsonLd?: boolean;
 };
 
-export default function Faq({ items, className, title = "FAQ" }: Props) {
+export default function Faq({ items, className, title = "FAQ", jsonLd = false }: Props) {
   const baseId = useId();
   const list = useMemo(
     () => items.filter(i => i.q?.trim() && i.a?.trim()),
@@ -16,6 +18,29 @@ export default function Faq({ items, className, title = "FAQ" }: Props) {
   );
 
   if (!list.length) return null;
+
+  // Optional JSON-LD injection
+  useEffect(() => {
+    if (!jsonLd || !list.length || typeof document === "undefined") return;
+    const scriptId = `faq-jsonld-${baseId}`;
+    const el = document.createElement("script");
+    el.type = "application/ld+json";
+    el.setAttribute("data-faq-jsonld", scriptId);
+    el.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: list.map(({ q, a }) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
+    });
+    document.head.appendChild(el);
+    return () => {
+      const prev = document.querySelectorAll(`script[data-faq-jsonld="${scriptId}"]`);
+      prev.forEach((n) => n.parentElement?.removeChild(n));
+    };
+  }, [jsonLd, list, baseId]);
 
   return (
     <section className={className ?? "neon-card p-4"}>

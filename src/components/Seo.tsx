@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { SITE_URL, SITE_NAME } from "@/config";
 
 type JsonLd = Record<string, unknown>;
 
@@ -79,11 +80,16 @@ export default function Seo(props: Props) {
     upsertMeta("name", "description", description ?? null);
     upsertMeta("name", "robots", robots);
 
-    const origin = typeof location !== "undefined" ? location.origin : "";
+    const origin = (SITE_URL || "").replace(/\/$/, "");
+    const pathname = typeof location !== "undefined" ? location.pathname : "";
+    const search = typeof location !== "undefined" ? location.search : "";
+    const canonicalHref = canonical ?? (origin && pathname ? `${origin}${pathname}` : undefined);
     const fallbackOg = ogImage ?? (origin ? `${origin}/og.png` : undefined);
-    const urlForOg = ogUrl ?? (typeof location !== "undefined" ? location.href : undefined);
+    const urlForOg = ogUrl ?? (canonicalHref ?? (origin && pathname ? `${origin}${pathname}${search}` : undefined));
 
     // Open Graph
+    upsertMeta("property", "og:site_name", SITE_NAME || null);
+    upsertMeta("property", "og:type", "website");
     upsertMeta("property", "og:title", title ?? null);
     upsertMeta("property", "og:description", description ?? null);
     upsertMeta("property", "og:url", urlForOg ?? null);
@@ -96,7 +102,7 @@ export default function Seo(props: Props) {
     upsertMeta("name", "twitter:image", fallbackOg ?? null);
 
     // Canonical
-    upsertCanonical(canonical ?? null);
+    upsertCanonical(canonicalHref ?? null);
   }, [title, description, robots, ogImage, ogUrl, canonical]);
 
   // JSON-LD

@@ -1,15 +1,17 @@
 // src/pages/Offer/index.tsx
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
 import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Rating from "@/components/common/rating";
 import Seo from "@/components/Seo";
+import { SITE_URL } from "@/config";
 import AffiliateLink from "@/components/misc/AffiliateLink";
 import { FavControl } from "@/components/FavControl";
 
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
+import { getOfferBySlug } from "@/features/offers/api/getOffers";
 import { track } from "@/lib/analytics";
 import { pushRecent, getRecent } from "@/lib/recent";
 
@@ -17,10 +19,22 @@ export default function OfferPage() {
   const { slug } = useParams<{ slug: string }>();
 
   // Ищем оффер по slug
-  const offer: NormalizedOffer | null = useMemo(() => {
-    if (!slug) return null;
-    const s = decodeURIComponent(slug);
-    return offersNormalized.find((o) => o.slug === s) ?? null;
+  const [offer, setOffer] = useState<NormalizedOffer | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (!slug) { setOffer(null); return; }
+        setLoading(true);
+        const s = decodeURIComponent(slug);
+        const o = await getOfferBySlug(s);
+        if (!cancelled) setOffer(o);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [slug]);
 
   // Пишем текущий оффер в «Недавно смотрели»
@@ -56,8 +70,9 @@ export default function OfferPage() {
 
   // Canonical
   const canonical = useMemo(() => {
-    if (!offer) return `${location.origin}/offers`;
-    return `${location.origin}/offers/${encodeURIComponent(offer.slug)}`;
+    const origin = SITE_URL.replace(/\/$/, "");
+    if (!offer) return `${origin}/offers`;
+    return `${origin}/offers/${encodeURIComponent(offer.slug)}`;
   }, [offer]);
 
   // JSON-LD: Product + BreadcrumbList + FAQPage
@@ -84,7 +99,7 @@ export default function OfferPage() {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Offers", item: `${location.origin}/offers` },
+          { "@type": "ListItem", position: 1, name: "Offers", item: `${SITE_URL.replace(/\/$/, "")}/offers` },
           { "@type": "ListItem", position: 2, name: offer.name, item: canonical },
         ],
       },
@@ -99,6 +114,15 @@ export default function OfferPage() {
       },
     ];
   }, [offer, canonical, faq]);
+
+  // loading guard
+  if (loading) {
+    return (
+      <Section>
+        <Card className="p-6">Loading...</Card>
+      </Section>
+    );
+  }
 
   // Заглушка, если оффер не найден
   if (!offer) {
@@ -120,6 +144,7 @@ export default function OfferPage() {
       <Seo
         title={`${offer.name} — рейтинг, лицензия, выплаты`}
         description={`Детали по ${offer.name}: лицензия ${offer.license ?? "—"}, скорость выплат ${offer.payout}${offer.payoutHours ? ` (~${offer.payoutHours}ч)` : ""}.`}
+        ogImage="/og.svg"
         canonical={canonical}
         jsonLd={jsonLd}
       />

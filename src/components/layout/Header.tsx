@@ -29,7 +29,7 @@ export default function Header() {
   bg-[rgb(var(--bg-0)/.72)] backdrop-blur supports-[backdrop-filter]:bg-[rgb(var(--bg-0)/.55)]
   shadow-[0_8px_30px_rgba(0,0,0,.35)]
 ">
-        <Section className="flex h-14 md:h-16 items-center gap-3">
+        <Section className="py-0 flex h-14 md:h-16 items-center gap-3">
           {/* Logo */}
           <div className="min-w-0">
             <Link
@@ -42,7 +42,7 @@ export default function Header() {
           </div>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-2" aria-label="Main navigation">
+          <nav className="hidden md:flex ml-auto items-center gap-2" aria-label="Main navigation">
             {nav.map((item) => (
               <NavLink
                 key={item.to}
@@ -65,6 +65,7 @@ export default function Header() {
             {/* CTA */}
             <Link
               to="/compare"
+              hidden
           className="group inline-flex items-center justify-center h-10 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold
              shadow-[0_10px_24px_rgba(139,92,246,.28)] transition"
 >

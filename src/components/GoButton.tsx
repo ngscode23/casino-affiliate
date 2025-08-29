@@ -1,10 +1,10 @@
 type Props = {
-  href: string;        // базовая партнёрская ссылка
+  href: string;        // целевая ссылка
   label?: string;
-  campaign?: string;   // например slug оффера
+  campaign?: string;   // опциональный slug кампании
   className?: string;
 };
-export default function GoButton({ href, label="Играть", campaign, className }: Props) {
+export default function GoButton({ href, label = "Играть", campaign, className }: Props) {
   const url = new URL(href);
   url.searchParams.set("utm_source", "affiliate");
   if (campaign) url.searchParams.set("utm_campaign", campaign);
@@ -21,3 +21,4 @@ export default function GoButton({ href, label="Играть", campaign, classNa
     </a>
   );
 }
+

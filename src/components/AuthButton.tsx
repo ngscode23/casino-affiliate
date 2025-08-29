@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/common/button";
-import { AUTH_CALLBACK_URL } from "@/config/config";
+import { AUTH_CALLBACK_URL } from "@/config";
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
@@ -13,8 +13,8 @@ export default function AuthButton() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
+    supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => setUser(data.user ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_: AuthChangeEvent, session: Session | null) =>
       setUser(session?.user ?? null)
     );
     return () => sub.subscription.unsubscribe();

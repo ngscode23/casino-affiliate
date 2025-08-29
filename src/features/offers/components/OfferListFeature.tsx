@@ -1,16 +1,16 @@
 // src/features/offers/components/OfferListFeature.tsx
+import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import type { NormalizedOffer } from "@/lib/offers";
+import type { LicenseFilter } from "@/components/compare/LicenseSelect";
 
-// 👇 этот тип нужен странице Offers — экспортируем явно
 export type OffersFilterState = {
-  license: "all" | "MGA" | "UKGC" | "Curaçao";
+  license: LicenseFilter;
   q: string;
 };
 
 type Props = {
   offers: NormalizedOffer[];
   filters: OffersFilterState;
-  // 👇 сделаем опциональными, чтобы не ломать вызовы
   isLoading?: boolean;
   error?: string | null;
 };
@@ -22,10 +22,10 @@ export default function OfferListFeature({
   error,
 }: Props) {
   if (isLoading) {
-    return <div className="neon-card p-4">Загрузка…</div>;
+    return <div className="neon-card p-4">Loading...</div>;
   }
   if (error) {
-    return <div className="neon-card p-4 text-red-400">Ошибка: {error}</div>;
+    return <div className="neon-card p-4 text-red-400">Error: {error}</div>;
   }
 
   const filtered = offers.filter((o) => {
@@ -33,28 +33,22 @@ export default function OfferListFeature({
 
     if (filters.q.trim()) {
       const q = filters.q.toLowerCase();
-      const hay = [o.name, o.license, ...o.methods].join(" ").toLowerCase();
+      const hay = [o.name, o.license, ...(o.methods ?? [])].join(" ").toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
   });
 
   if (filtered.length === 0) {
-    return <div className="neon-card p-4">Ничего не найдено.</div>;
+    return <div className="neon-card p-4">No offers match the filters.</div>;
   }
 
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {filtered.map((o) => (
-        <li key={o.slug} className="neon-card p-4 rounded-xl">
-          <div className="font-semibold">{o.name}</div>
-          <div className="text-sm text-[var(--text-dim)]">
-            {o.license} • {o.rating.toFixed(1)}★
-          </div>
-        </li>
+        <MobileOfferCard key={o.slug} offer={o} />
       ))}
-    </ul>
+    </div>
   );
 }
-
 

@@ -9,6 +9,7 @@ import CompareFilters, {
 import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import Seo from "@/components/Seo";
+import { SITE_URL } from "@/config";
 import type { NormalizedOffer } from "@/lib/offers";
 import { useOffers } from "@/features/offers/api/useOffers";
 import { useFavorites } from "@/lib/useFavorites";
@@ -20,12 +21,8 @@ function normalizeStr(s: string) {
   return s.toLowerCase().normalize("NFKD");
 }
 
-function safeOrigin(): string | undefined {
-  try {
-    return typeof location !== "undefined" ? location.origin : undefined;
-  } catch {
-    return undefined;
-  }
+function safeOrigin(): string {
+  return SITE_URL.replace(/\/$/, "");
 }
 
 export default function ComparePage() {
@@ -123,7 +120,7 @@ export default function ComparePage() {
       "@context": "https://schema.org",
       "@type": "WebPage",
       name: "Сравнение казино",
-      url: origin ? `${origin}/compare` : "/compare",
+      url: `${origin}/compare`,
     };
 
     const itemList = {
@@ -132,9 +129,7 @@ export default function ComparePage() {
       itemListElement: filtered.map((o, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: origin
-          ? `${origin}/offers/${encodeURIComponent(o.slug)}`
-          : `/offers/${encodeURIComponent(o.slug)}`,
+        url: `${origin}/offers/${encodeURIComponent(o.slug)}`,
         name: o.name,
       })),
     };
@@ -182,7 +177,8 @@ export default function ComparePage() {
       <Seo
         title="Сравнение казино — выплаты, бонусы, лицензии"
         description="Сравните казино по рейтингу, лицензиям, методам пополнения и скорости вывода."
-        canonical={origin ? `${origin}/compare` : undefined}
+        ogImage="/og.svg"
+        canonical={`${origin}/compare`}
         jsonLd={jsonLd}
       />
 

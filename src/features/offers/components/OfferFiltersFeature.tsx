@@ -16,17 +16,20 @@ export type OffersFilterState = {
 type Props = {
   // делаем offers опциональным — если родитель не передал, берем пустой массив
   offers?: NormalizedOffer[];
+  // Optional initial values supplied by parent
+  initialLicense?: LicenseFilter;
+  initialQ?: string;
   /**
    * optional callback to notify parent about filter state changes
    */
   onChange?: (state: OffersFilterState) => void;
 };
 
-export function OfferFiltersFeature({ offers = [], onChange }: Props) {
+export function OfferFiltersFeature({ offers, initialLicense, initialQ, onChange }: Props) {
   const { items: favItems } = useFavorites();
 
-  const [license, setLicense] = useState<LicenseFilter>("all");
-  const [q, setQ] = useState("");
+  const [license, setLicense] = useState<LicenseFilter>(initialLicense ?? "all");
+  const [q, setQ] = useState(initialQ ?? "");
 
   // visible — офферы, которые НЕ в избранном
   const visible = useMemo(() => {
@@ -76,14 +79,16 @@ export function OfferFiltersFeature({ offers = [], onChange }: Props) {
         </div>
       </div>
 
-      {/* Visible offers grid */}
-      <div className="grid gap-4">
-        {visible.length === 0 ? (
-          <div className="text-[var(--text-dim)] p-4">No offers match the filters.</div>
-        ) : (
-          visible.map((o) => <MobileOfferCard key={o.slug} offer={o} />)
-        )}
-      </div>
+      {/* Visible offers grid - only when offers are provided */}
+      {Array.isArray(offers) && offers.length > 0 && (
+        <div className="grid gap-4">
+          {visible.length === 0 ? (
+            <div className="text-[var(--text-dim)] p-4">No offers match the filters.</div>
+          ) : (
+            visible.map((o) => <MobileOfferCard key={o.slug} offer={o} />)
+          )}
+        </div>
+      )}
     </div>
   );
 }

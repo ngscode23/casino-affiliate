@@ -34,7 +34,7 @@ export default function MobileNav() {
                 animate={{ rotate: 0, opacity: 1 }}
                 exit={{ rotate: 90, opacity: 0 }}
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" aria-hidden="true" />
               </motion.span>
             ) : (
               <motion.span
@@ -43,7 +43,7 @@ export default function MobileNav() {
                 animate={{ rotate: 0, opacity: 1 }}
                 exit={{ rotate: -90, opacity: 0 }}
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-5 w-5" aria-hidden="true" />
               </motion.span>
             )}
           </AnimatePresence>
