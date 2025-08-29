@@ -1,5 +1,6 @@
 // src/pages/Admin/offers/Edit.tsx
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -59,6 +60,9 @@ function csvToArray(csv?: string): string[] {
 }
 
 export default function AdminOfferEdit() {
+  const nav = useNavigate();
+  const { slug: routeSlug } = useParams<{ slug?: string }>();
+  const editing = !!routeSlug && routeSlug !== "new";
   const defaultValues: FormValues = useMemo(
     () => ({
       slug: "",
@@ -85,6 +89,38 @@ const {
   defaultValues,
   mode: "onBlur",
 });
+
+  // Load existing record when editing
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!editing || !routeSlug) return;
+        const s = decodeURIComponent(routeSlug);
+        const { data, error } = await (supabase as any)
+          .from("offers")
+          .select("*")
+          .eq("slug", s)
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) return;
+        const row = data as any;
+        reset({
+          slug: row.slug || "",
+          name: row.name || "",
+          license: row.license || "Other",
+          rating: Number(row.rating ?? 0),
+          payout: row.payout || "",
+          enabled: !!row.enabled,
+          payout_hours: row.payout_hours ?? null,
+          methods_csv: Array.isArray(row.methods) ? row.methods.join(", ") : "",
+          link: row.link ?? null,
+          position: row.position ?? null,
+        });
+      } catch (e: any) {
+        alert("Load error: " + (e?.message ?? e));
+      }
+    })();
+  }, [editing, routeSlug, reset]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     const methods = csvToArray(values.methods_csv);
@@ -132,6 +168,28 @@ const {
               <p className="mt-1 text-sm text-red-500">{errors.slug.message}</p>
             )}
           </div>
+          {editing && (
+            <div className="pt-2">
+              <Button
+                type="button"
+                variant="soft"
+                onClick={async () => {
+                  if (!routeSlug) return;
+                  if (!confirm("Delete this offer?")) return;
+                  const s = decodeURIComponent(routeSlug);
+                  const { error } = await (supabase as any)
+                    .from("offers")
+                    .delete()
+                    .eq("slug", s);
+                  if (error) { alert("Delete error: " + error.message); return; }
+                  alert("Deleted");
+                  nav("/admin/offers");
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          )}
 
           {/* name */}
           <div>

@@ -10,24 +10,20 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-     "esModuleInterop": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-     "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": true,
-    "noUncheckedIndexedAccess": false, // можешь включить true, если хочешь больше строгости
-    "exactOptionalPropertyTypes": false ,// оставь false, иначе придется много править типы
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/components/*": ["src/components/*"],
-      "@/ui/*": ["src/ui/*"],
-      "@/data/*": ["src/data/*"]
+      "@/*": ["src/*"]
     },
-
     "types": ["vite/client", "node", "@netlify/functions"]
   },
-  "include": ["src", "netlify/**/*.ts"],
-    "exclude": [
+  "include": ["src", "netlify/**/*.ts", "vite.config.ts"],
+  "exclude": [
     "node_modules",
     "dist",
     "build",
@@ -36,4 +32,3 @@
     "_archive"
   ]
 }
-

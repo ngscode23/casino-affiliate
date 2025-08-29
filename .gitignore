@@ -85,3 +85,11 @@ build
 .next
 coverage
 _archive
+
+.netlify/
+playwright-report/
+coverage/
+# env
+.env
+.env.local
+.env.production

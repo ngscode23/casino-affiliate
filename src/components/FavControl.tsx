@@ -1,5 +1,7 @@
+// src/components/FavControl.tsx
 import React from "react";
 import { useFavorites } from "@/lib/useFavorites";
+import { track } from "@/lib/analytics";
 
 export type FavControlProps = {
   id: string;
@@ -9,24 +11,30 @@ export type FavControlProps = {
   titleOff?: string;
 };
 
-function normalizeKey(slug: any): string {
-  try { return String(slug ?? "").trim(); } catch { return ""; }
-}
+export function FavControl({
+  id,
+  className,
+  onToggle,
+  titleOn = "Убрать из избранного",
+  titleOff = "В избранное",
+}: FavControlProps) {
+  const { items = [], toggle } = useFavorites();
 
-export function FavControl({ id, className, onToggle, titleOn = "Убрать из избранного", titleOff = "В избранное" }: FavControlProps) {
-  const { items, toggle } = useFavorites();
   const key = String(id ?? "").trim();
   const active = items.includes(key);
 
-
   const handleClick = (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.stopPropagation();
-    const next = toggle(key);
-    onToggle?.(next);
+    const toggled = toggle(key); // может вернуть boolean, а может ничего
+    const nextActive = typeof toggled === "boolean" ? toggled : !active;
+
+    onToggle?.(nextActive);
+    // Без try/catch: наш track внутри сам безопасен
+    track("favorite_toggle", { offer_slug: key, active: nextActive });
   };
 
   const base = className ?? "inline-flex h-10 w-10 items-center justify-center rounded";
-  const colorClass = active ? "text-amber-400" : "text-white/70 hover:text-white";
+  const colorClass = active ? "text-amber-400 fav-pop" : "text-white/70 hover:text-white";
 
   return (
     <button
@@ -35,7 +43,7 @@ export function FavControl({ id, className, onToggle, titleOn = "Убрать и
       title={active ? titleOn : titleOff}
       onClick={handleClick}
       className={`${base} ${colorClass}`}
-      data-testid={`fav-btn:${key}`}     
+      data-testid={`fav-btn:${key}`}
       aria-label={active ? "Remove from favorites" : "Add to favorites"}
       style={{ WebkitTapHighlightColor: "transparent" }}
     >
@@ -45,11 +53,3 @@ export function FavControl({ id, className, onToggle, titleOn = "Убрать и
     </button>
   );
 }
-
-
-
-
-
-
-
-

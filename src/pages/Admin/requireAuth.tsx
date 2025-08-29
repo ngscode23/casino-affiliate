@@ -9,12 +9,12 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   const loc = useLocation();
 
   useEffect(() => {
-    const unsub = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const unsub = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
       setOk(!!session);
       setLoading(false);
     });
-    // первичная проверка:
-    supabase.auth.getSession().then(({ data }) => {
+    // initial check:
+    supabase.auth.getSession().then(({ data }: { data: { session: any } }) => {
       setOk(!!data.session);
       setLoading(false);
     });
@@ -24,7 +24,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <Section className="p-6">
-        <div>Checking auth…</div>
+        <div>Checking auth.</div>
       </Section>
     );
   }
@@ -33,5 +33,4 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   }
   return <>{children}</>;
 }
-
 

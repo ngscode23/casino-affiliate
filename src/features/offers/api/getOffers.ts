@@ -1,7 +1,7 @@
 // src/features/offers/api/getOffers.ts
 import { supabase } from "@/lib/supabase";
 import { offersNormalized } from "@/lib/offers"; // только данные, не типы!
-import { HAS_SUPABASE } from "@/config/config";
+import { HAS_SUPABASE } from "@/config";
 
 // каноничные типы берем отсюда
 import type { NormalizedOffer } from "@/lib/offers";

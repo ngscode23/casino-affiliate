@@ -5,7 +5,7 @@ import Chip from "@/components/common/chip";
 
 export default function HomeHero() {
   return (
-    <section className="neon-hero">
+    <section className="neon-hero relative">
       <Section>
         <div className="chip-row mb-4 flex flex-wrap gap-2">
           <Chip>500+ Offers</Chip>

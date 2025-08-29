@@ -3,7 +3,7 @@ import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Button from "@/components/common/button";
 import { supabase } from "@/lib/supabase";
-import { AUTH_CALLBACK_URL, HAS_SUPABASE } from "@/config/config";
+import { AUTH_CALLBACK_URL, HAS_SUPABASE } from "@/config";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");

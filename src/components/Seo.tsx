@@ -1,5 +1,5 @@
-// src/components/Seo.tsx
 import { useEffect, useMemo } from "react";
+import { SITE_URL, SITE_NAME } from "@/config";
 
 type JsonLd = Record<string, unknown>;
 
@@ -16,21 +16,23 @@ type Props = {
 
 function upsertMeta(attr: "name" | "property", key: string, content?: string | null) {
   if (typeof document === "undefined") return;
-  const sel = `meta[${attr}="${key}"]`;
   const head = document.head;
+  const sel = `meta[${attr}="${key}"]`;
   const prev = head.querySelector<HTMLMetaElement>(sel);
+
   if (!content) {
     if (prev) head.removeChild(prev);
     return;
   }
   const el =
     prev ??
-    ((): HTMLMetaElement => {
+    (() => {
       const m = document.createElement("meta");
       m.setAttribute(attr, key);
       head.appendChild(m);
       return m;
     })();
+
   el.setAttribute("content", content);
 }
 
@@ -38,6 +40,7 @@ function upsertCanonical(href?: string | null) {
   if (typeof document === "undefined") return;
   const head = document.head;
   let link = head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+
   if (!href) {
     if (link) head.removeChild(link);
     return;
@@ -62,14 +65,13 @@ export default function Seo(props: Props) {
     noindex,
   } = props;
 
-  const robots = (noIndex || noindex) ? "noindex,nofollow" : "index,follow";
+  const robots = noIndex || noindex ? "noindex,nofollow" : "index,follow";
 
   const jsonArray = useMemo<JsonLd[] | null>(() => {
     if (!jsonLd) return null;
     return Array.isArray(jsonLd) ? jsonLd : [jsonLd];
   }, [jsonLd]);
 
-  // Title / meta / OG / Twitter / canonical
   useEffect(() => {
     if (typeof document === "undefined") return;
 
@@ -78,32 +80,40 @@ export default function Seo(props: Props) {
     upsertMeta("name", "description", description ?? null);
     upsertMeta("name", "robots", robots);
 
-    const origin = typeof location !== "undefined" ? location.origin : "";
+    const origin = (SITE_URL || "").replace(/\/$/, "");
+    const pathname = typeof location !== "undefined" ? location.pathname : "";
+    const search = typeof location !== "undefined" ? location.search : "";
+    const canonicalHref = canonical ?? (origin && pathname ? `${origin}${pathname}` : undefined);
     const fallbackOg = ogImage ?? (origin ? `${origin}/og.png` : undefined);
-    const urlForOg = ogUrl ?? (typeof location !== "undefined" ? location.href : undefined);
+    const urlForOg = ogUrl ?? (canonicalHref ?? (origin && pathname ? `${origin}${pathname}${search}` : undefined));
 
+    // Open Graph
+    upsertMeta("property", "og:site_name", SITE_NAME || null);
+    upsertMeta("property", "og:type", "website");
     upsertMeta("property", "og:title", title ?? null);
     upsertMeta("property", "og:description", description ?? null);
     upsertMeta("property", "og:url", urlForOg ?? null);
     upsertMeta("property", "og:image", fallbackOg ?? null);
 
+    // Twitter
     upsertMeta("name", "twitter:card", "summary_large_image");
     upsertMeta("name", "twitter:title", title ?? null);
     upsertMeta("name", "twitter:description", description ?? null);
     upsertMeta("name", "twitter:image", fallbackOg ?? null);
 
-    upsertCanonical(canonical ?? null);
+    // Canonical
+    upsertCanonical(canonicalHref ?? null);
   }, [title, description, robots, ogImage, ogUrl, canonical]);
 
-  // JSON-LD (чистим старые и вставляем новые)
+  // JSON-LD
   useEffect(() => {
     if (typeof document === "undefined") return;
 
-    // remove previous jsonld tags from this component
     const prev = document.querySelectorAll('script[data-seo-jsonld="true"]');
     prev.forEach((n) => n.parentElement?.removeChild(n));
 
     if (!jsonArray) return;
+
     jsonArray.forEach((obj, idx) => {
       const el = document.createElement("script");
       el.type = "application/ld+json";
@@ -121,5 +131,3 @@ export default function Seo(props: Props) {
 
   return null;
 }
-
-

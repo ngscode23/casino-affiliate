@@ -127,7 +127,7 @@ index e1a1bcd..b0d2c9a 100644
 @@ -1,7 +1,12 @@
  import React from "react";
 +import ErrorBoundary from "@/components/common/ErrorBoundary";
- // … остальные твои импорты
+
  
  export default function App() {
 -  return (

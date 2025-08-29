@@ -44,5 +44,3 @@ export function deleteCookie(name: string, path: string = '/', domain?: string):
   document.cookie = cookie;
 }
 
-
-
