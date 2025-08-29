@@ -29,6 +29,10 @@ import HomePage from "@/pages/Home";
 import ComparePage from "@/pages/Compare";
 
 import Health from "./pages/Health";
+import PageTransition from "@/components/ui/PageTransition";
+
+// ...
+
 
 // import posthog from 'posthog-js';
 // src/App.tsx
@@ -54,6 +58,7 @@ const CookieBar           = lazy(() => import("@/components/layout/CookieBar"));
 const OffersIndex         = lazy(() => import("@/pages/Offers"));
 const OfferPage           = lazy(() => import("@/pages/Offer"));
 const FavoritesPage       = lazy(() => import("@/pages/Favorites"));
+const AffiliateHome       = lazy(() => import("@/pages/AffiliateHome").then(m => ({ default: m.AffiliateHome })));
 
 const ContactPage         = lazy(() => import("@/pages/Contact"));
 const PrivacyPage         = lazy(() => import("@/pages/Legal/Privacy"));
@@ -127,10 +132,12 @@ setTimeout(() => { import("@/pages/Offer"); }, 3000);
               
             <main id="main" className="min-h-[60vh]">
               <Suspense fallback={<PageFallback />}>
-             <Routes>
+              <PageTransition>
+                <Routes>
                   {/* Публичные */}
                   <Route path="/" element={<HomePage />} />
                   <Route path="/compare" element={<ComparePage />} />
+                  <Route path="/affiliate" element={<AffiliateHome />} />
                   <Route path="/offers" element={<OffersIndex />} />
                   <Route path="/offers/:slug" element={<OfferPage />} />
                   <Route path="/favorites" element={<FavoritesPage />} />
@@ -159,6 +166,8 @@ setTimeout(() => { import("@/pages/Offer"); }, 3000);
                   {/* 404 в самом конце */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+              </PageTransition>
+            
               </Suspense>
             </main>
 

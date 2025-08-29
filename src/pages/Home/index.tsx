@@ -1,54 +1,10 @@
 // src/pages/Home/index.tsx
-import { useState, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import posthog from "posthog-js";
-
-import Section from "@/components/common/section";
+import { useMemo } from "react";
 import Seo from "@/components/Seo";
 import { SITE_URL, BRAND_NAME, BRAND_LOGO } from "@/lib/config";
-
-// Кнопка для проверки Sentry (если нужно тестить ошибки)
-function ErrorButton() {
-  return (
-    <button
-      onClick={() => {
-        throw new Error("This is your first error!");
-      }}
-      className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
-    >
-      Break the world
-    </button>
-  );
-}
-
-// Кнопка для проверки PostHog
-function TestButton() {
-  return (
-    <button
-      className="neon-btn mt-3"
-      onClick={() => posthog.capture("debug_click", { page: "home" })}
-    >
-      Send PostHog event
-    </button>
-  );
-}
-
-// ...
-
+import { AffiliateHome } from "@/pages/AffiliateHome";
 
 export default function Home() {
-  const navigate = useNavigate();
-  const [q, setQ] = useState("");
-
-  const onSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const term = q.trim();
-      navigate(`/compare${term ? `?q=${encodeURIComponent(term)}` : ""}`);
-    },
-    [q, navigate]
-  );
-
   // JSON-LD: Organization
   const orgLd = useMemo(
     () => ({
@@ -78,7 +34,6 @@ export default function Home() {
   }, []);
 
   return (
-    
     <>
       <Seo
         title={`${BRAND_NAME ?? "CasinoHub"} — сравнение казино, выплаты и рейтинги`}
@@ -86,64 +41,8 @@ export default function Home() {
         jsonLd={[orgLd, siteLd]}
         canonical={SITE_URL}
       />
-
-      <section className="neon-hero">
-        <Section>
-          {/* бейджи */}
-          <div className="mb-4 flex items-center gap-2">
-            <span className="neon-chip" data-glow>5000+ Offers</span>
-            <span className="neon-chip" data-glow>Real reviews</span>
-            <span className="neon-chip" data-glow>Fast payouts</span>
-          </div>
-
-          <h1 className="font-extrabold" style={{ fontSize: "clamp(22px, 6vw, 46px)" }}>
-            The Leading Casino Affiliate Platform
-          </h1>
-          <p className="neon-subline">
-            Compare top casinos, find exclusive bonuses, and withdraw faster.
-          </p>
-
-          <form
-            className="neon-search mt-4"
-            onSubmit={onSubmit}
-            role="search"
-            aria-label="Site search"
-          >
-            <input
-              type="search"
-              className="neon-input"
-              placeholder="Search casinos, bonuses, licenses…"
-              value={q}
-              onChange={(e) => setQ(e.currentTarget.value)}
-              autoComplete="off"
-              aria-label="Search"
-            />
-            <button className="neon-btn" type="submit">Compare now</button>
-          </form>
-{/* <button className="neon-btn mt-3" onClick={() => posthog.capture("debug_click", { page: "home" })}>
-  Send PostHog event
-</button> */}
-          {/* Кнопки для отладки показываем только в dev */}
-          {import.meta.env.DEV && (
-            <>
-              <TestButton />
-              <ErrorButton />
-            </>
-          )}
-        </Section>
-      </section>
-
-      <section className="neon-container mt-6">
-        <div className="neon-card p-4 flex items-center gap-3">
-          <img src="/logo192.png" alt="Brand" className="w-10 h-10 rounded" />
-          <div>
-            <div className="font-semibold">Проверенная витрина казино</div>
-            <div className="text-sm text-[var(--text-dim)]">
-              Обновления офферов, прозрачные рейтинги, быстрые выплаты.
-            </div>
-          </div>
-        </div>
-      </section>
+      <AffiliateHome />
     </>
   );
 }
+

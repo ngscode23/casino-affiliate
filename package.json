@@ -19,10 +19,7 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "sitemap": "tsx scripts/gen-sitemap.ts"
-      
   },
-
-  
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.6",
     "@hookform/resolvers": "^5.2.1",

@@ -1,6 +1,6 @@
 // src/components/CasinoCard.tsx
 import type { Offer } from "../data/casinos";
-import AffiliateLink from "@/components/AffiliateLink";
+import AffiliateLink from "@/components/misc/AffiliateLink";
 
 export function CasinoCard({ offer }: { offer: Offer }) {
   const { name, license, payout, methods = [], link, rating } = offer;

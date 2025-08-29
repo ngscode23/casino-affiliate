@@ -1,6 +1,6 @@
 // src/components/offers/OfferCard.tsx
 import type { NormalizedOffer } from "@/lib/offers";
-import AffiliateLink from "@/components/AffiliateLink";
+import AffiliateLink from "@/components/misc/AffiliateLink";
 import { t } from "@/lib/t";
 
 type Props = {

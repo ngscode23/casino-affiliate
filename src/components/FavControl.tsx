@@ -34,7 +34,7 @@ export function FavControl({
   };
 
   const base = className ?? "inline-flex h-10 w-10 items-center justify-center rounded";
-  const colorClass = active ? "text-amber-400" : "text-white/70 hover:text-white";
+  const colorClass = active ? "text-amber-400 fav-pop" : "text-white/70 hover:text-white";
 
   return (
     <button

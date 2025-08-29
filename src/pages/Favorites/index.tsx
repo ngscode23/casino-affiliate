@@ -87,7 +87,7 @@ export default function FavoritesPage() {
     <>
       <Seo title="Избранное — ваши сохранённые казино" description="Быстрый доступ к сохранённым офферам." />
 
-      <section className="neon-hero">
+      <section className="neon-hero relative">
         <Section>
           <h1
             style={{

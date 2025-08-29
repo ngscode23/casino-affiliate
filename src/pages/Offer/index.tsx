@@ -6,7 +6,7 @@ import Section from "@/components/common/section";
 import Card from "@/components/common/card";
 import Rating from "@/components/common/rating";
 import Seo from "@/components/Seo";
-import AffiliateLink from "@/components/AffiliateLink";
+import AffiliateLink from "@/components/misc/AffiliateLink";
 import { FavControl } from "@/components/FavControl";
 
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
@@ -124,7 +124,7 @@ export default function OfferPage() {
         jsonLd={jsonLd}
       />
 
-      <section className="neon-hero">
+      <section className="neon-hero relative">
         <Section>
           <h1
             style={{

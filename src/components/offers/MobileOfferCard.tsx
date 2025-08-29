@@ -6,7 +6,7 @@ import { ExternalLink } from "lucide-react";
 import Rating from "@/components/common/rating";
 import CompareInline from "@/components/compare/CompareInline";
 import { FavControl }   from "@/components/FavControl";
-import AffiliateLink from "@/components/AffiliateLink";
+import AffiliateLink from "@/components//misc/AffiliateLink";
 import { t } from "@/lib/t";
 
 import {
@@ -26,6 +26,7 @@ type Props = {
   className?: string;
   /** позиция карточки (0-based) для аналитики; необязательно */
   index?: number;
+  
 };
 
 export default function MobileOfferCard({ offer, className = "", index }: Props) {

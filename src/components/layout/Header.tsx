@@ -23,7 +23,12 @@ const nav: NavItem[] = [
 export default function Header() {
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--bg-0)]/80 backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-0)]/60">
+      {/* <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--bg-0)]/80 backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-0)]/60"> */}
+      <header className="
+  sticky top-0 z-50 border-b border-white/10
+  bg-[rgb(var(--bg-0)/.72)] backdrop-blur supports-[backdrop-filter]:bg-[rgb(var(--bg-0)/.55)]
+  shadow-[0_8px_30px_rgba(0,0,0,.35)]
+">
         <Section className="flex h-14 md:h-16 items-center gap-3">
           {/* Logo */}
           <div className="min-w-0">
@@ -60,9 +65,11 @@ export default function Header() {
             {/* CTA */}
             <Link
               to="/compare"
-              className="ml-2 inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-600"
-            >
+          className="group inline-flex items-center justify-center h-10 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold
+             shadow-[0_10px_24px_rgba(139,92,246,.28)] transition"
+>
               Start Compare
+                <span className="ml-1 opacity-0 group-hover:opacity-100 transition">→</span>
             </Link>
 
             {/* User badge (desktop) */}
