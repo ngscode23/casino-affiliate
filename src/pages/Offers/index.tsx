@@ -19,12 +19,11 @@ export default function OffersIndex() {
   const { offers, isLoading, error } = useOffers();
   const [params, setParams] = useSearchParams();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialFilters = useMemo<OffersFilterState>(() => {
     const lic = (params.get("license") as OffersFilterState["license"]) || "all";
     const q = params.get("q") || "";
     return { license: lic, q };
-  }, []);
+  }, [params]);
 
   const [filters, setFilters] = useState<OffersFilterState>(initialFilters);
 
