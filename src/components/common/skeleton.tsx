@@ -1,7 +1,4 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
-
-type Props = React.HTMLAttributes<HTMLDivElement>;
 export default function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div

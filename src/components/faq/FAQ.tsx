@@ -17,8 +17,6 @@ export default function Faq({ items, className, title = "FAQ", jsonLd = false }:
     [items]
   );
 
-  if (!list.length) return null;
-
   // Optional JSON-LD injection
   useEffect(() => {
     if (!jsonLd || !list.length || typeof document === "undefined") return;
@@ -41,6 +39,8 @@ export default function Faq({ items, className, title = "FAQ", jsonLd = false }:
       prev.forEach((n) => n.parentElement?.removeChild(n));
     };
   }, [jsonLd, list, baseId]);
+
+  if (!list.length) return null;
 
   return (
     <section className={className ?? "neon-card p-4"}>

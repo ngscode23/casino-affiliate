@@ -18,6 +18,7 @@ import './index.css';
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
 // можешь задать в .env: VITE_SENTRY_RELEASE=0.0.1  (или оставь undefined)
 const SENTRY_RELEASE = import.meta.env.VITE_SENTRY_RELEASE as string | undefined;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const options = {
   api_host: import.meta.env.VITE_POSTHOG_HOST, // не PUBLIC, можно без PUBLIC
 };
@@ -65,7 +66,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <App />
         
       </Sentry.ErrorBoundary>
-   =
     </BrowserRouter>
   </React.StrictMode>
 );

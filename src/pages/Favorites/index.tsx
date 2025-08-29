@@ -7,7 +7,6 @@ import MobileOfferCard from "@/components/offers/MobileOfferCard";
 import CompareTable, { type SortKey } from "@/components/compare/CompareTable";
 import { offersNormalized, type NormalizedOffer } from "@/lib/offers";
 import { useFavorites } from "@/lib/useFavorites";
-import { toast } from "@/components/common/toast";
 import { useSearchParams } from "react-router-dom";
 import { SITE_URL } from "@/config";
 
